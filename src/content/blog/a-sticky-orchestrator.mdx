@@ -71,6 +71,24 @@ transition rather than by accident over four.
 The system now carries somewhere around a thousand conversations an hour. The routing model is not
 meaningfully smarter than the one we started with. It just gets asked once.
 
+## What happened when I tried to prove it
+
+Shipping something that works is not the same as knowing why, so later I spent about sixty hours and something on the
+order of 230,000 model calls trying to falsify this design properly — ten pre-registered experiments, decision rules
+fixed and tagged in git before each run.
+
+Seven came back negative. The first kill criterion I wrote down was that if a fully-informed global router matched the
+local gate at conversational boundaries, the architecture argument was dead. It matched. Across eight deployments on
+two vendors, the gate never paid for itself once.
+
+What survived was a result about the benchmarks rather than the router. You can only measure state-conditioned routing
+on a corpus whose state is not recoverable from its own transcript — and the obvious public corpora fail that. In ABCD,
+not one of the 1,004 test dialogues runs more than one workflow, so the question "which workflow owns this turn" never
+comes up and a policy that never switches scores perfectly.
+
+Which leaves the production result standing on the only evidence it ever had: it stopped losing conversations. I would
+rather say that plainly than dress it up as validation.
+
 ## The general shape
 
 I have come to distrust any agent design where an LLM re-decides something it already decided. Every
