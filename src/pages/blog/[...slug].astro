@@ -43,7 +43,26 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long'
   }
   .prose :global(ul) { list-style: none; margin: 0 0 1.4em; padding: 0; display: grid; gap: .7em; }
   .prose :global(li) { padding-left: 22px; position: relative; }
-  .prose :global(li)::before { content: ""; position: absolute; left: 0; top: .68em; width: 10px; height: 1px; background: var(--fail); }
+  .prose :global(li)::before { content: ""; position: absolute; left: 0; top: .68em; width: 10px; height: 1px; background: var(--fail-ink); }
+  /* A numbered list is a sequence, and the number is the information. */
+  .prose :global(ol) { list-style: none; margin: 0 0 1.4em; padding: 0; display: grid; gap: .7em; counter-reset: step; }
+  .prose :global(ol > li) { padding-left: 30px; counter-increment: step; }
+  .prose :global(ol > li)::before {
+    content: counter(step); width: auto; height: auto; background: none; top: 0;
+    font-family: var(--mono); font-size: .72rem; color: var(--fail-ink); font-variant-numeric: tabular-nums;
+  }
+  .prose :global(blockquote) {
+    margin: 1.9em 0; padding: 4px 0 4px 24px; border-left: 2px solid var(--ink);
+    font-size: 1.2rem; line-height: 1.5;
+  }
+  .prose :global(blockquote p) { margin: 0; }
+  .prose :global(blockquote p + p) { margin-top: .6em; }
+  .prose :global(hr) { border: 0; border-top: 1px solid var(--rule); margin: 2.6em 0; }
+  .prose :global(h3) {
+    font-family: var(--display); font-weight: 700; font-stretch: 112%; text-transform: uppercase;
+    font-size: 1.02rem; letter-spacing: -.005em; margin: 2em 0 .7em; line-height: 1.15;
+  }
+  .prose :global(img) { margin: 1.9em 0; border: 1px solid var(--rule); }
   .prose :global(strong) { font-weight: 600; }
   .prose :global(code) { font-family: var(--mono); font-size: .82em; background: var(--paper-2); padding: 2px 5px; }
   .prose :global(pre) {
