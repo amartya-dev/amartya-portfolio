@@ -1,0 +1,80 @@
+---
+title: "Proving a challenge discriminates before anyone takes it"
+description: "Every hunr challenge ships with two solutions — one an expert would write, one a plausible engineer would. If the hidden tests can't tell them apart, it never goes live."
+date: 2026-07-04
+tags: ["hiring", "evals", "hunr"]
+---
+
+Generating a coding challenge is a solved problem. Any model will write you one in a few seconds,
+with a brief, starter files, and a test suite that goes green. That is exactly the problem. A
+challenge that passes its own tests tells you nothing about whether it can separate a strong
+candidate from a weak one, and most of them cannot.
+
+The failure mode is specific. A generated challenge tends to test the part the model found easy to
+articulate — the happy path, the obvious edge case, the thing the brief already named. It does not
+test the part where engineering judgment actually shows up. So a candidate who understands the
+problem and a candidate who pattern-matched their way to something plausible both come out green,
+and the screen has burned an hour of everyone's time to produce noise.
+
+## Two solutions, not one
+
+The fix we settled on is to make every challenge carry its own proof. Each one ships with two
+implementations:
+
+- a **reference solution** — what someone who understands the problem would actually write;
+- a **naive solution** — deliberately plausible and deliberately wrong, the shape a competent
+  engineer produces when they have not thought about the hard part.
+
+Both get replayed in the grading sandbox against the hidden suite. The predicate is blunt:
+
+```
+publishes = reference passes every hidden test
+         AND naive fails at least one
+```
+
+Fail either half and the challenge does not reach a candidate. If the reference fails, the tests are
+wrong. If the naive one passes, the tests are asleep.
+
+## Why the naive half is the interesting half
+
+The reference half is hygiene. Everybody who ships assessments already runs their own answer through
+their own tests, or at least means to.
+
+The naive half is where the signal lives, because writing a *good* naive solution is a design
+exercise. You are being asked to name the specific misunderstanding you expect, then encode it. Take
+a rate limiter for a tool-call loop. The naive solution is not a broken one — it is a fixed-window
+counter. It handles the burst, it rejects the eleventh call, it rolls the window, it keys per API
+key. Four of the eight tests go green.
+
+Then it fails the ones that matter: two concurrent callers each get their own read-modify-write, so
+the bucket over-admits. A clock that steps backwards hands out free calls. Idle keys accumulate
+forever because nothing ever evicts them.
+
+Writing that naive solution forces the author to state, in code, what the challenge is really about.
+And once it exists, it becomes a permanent regression test on the assessment itself. Add a test
+later, weaken a fixture, relax a timeout — the gate reruns and tells you if you just made the
+challenge stop discriminating.
+
+## This is mutation testing, pointed sideways
+
+The idea is not new. Mutation testing has been around for decades: perturb the code, and if the test
+suite still passes, the suite is weaker than you thought. The mutation score tells you how much your
+green build is worth.
+
+What is new is the target. We are not mutating the candidate's code, we are mutating the *expected
+answer* and measuring whether the assessment notices. A challenge whose naive solution passes has a
+mutation score of zero. It is a test suite that cannot fail, which is another way of saying it is not
+a test suite at all.
+
+## What it costs
+
+It roughly doubles authoring effort, which is the honest objection. Writing a convincing wrong answer
+takes about as long as writing the right one, and it is less fun.
+
+We pay it for two reasons. First, authoring happens once and the challenge runs against hundreds of
+candidates, so the amortised cost is close to nothing. Second — and this matters more — the
+alternative cost is invisible. A challenge that does not discriminate does not announce itself. It
+produces scores, and rankings, and a shortlist, all of which look exactly like signal. You find out
+eighteen months later, in a performance review, if you find out at all.
+
+Given the choice between an expensive check and an invisible failure, take the expensive check.

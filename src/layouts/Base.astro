@@ -1,0 +1,70 @@
+---
+import '../styles/global.css';
+const {
+  title = 'Amartya Gaur — founder of hunr.ai',
+  description = 'Amartya Gaur builds hunr.ai: technical screening that lets candidates use AI, then proves they understand what shipped. Agent orchestration, evals, and the infrastructure underneath.',
+  theme = 'chamber'
+} = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonical} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="color-scheme" content="dark light" />
+<link rel="alternate" type="application/rss+xml" title="Amartya Gaur" href="/rss.xml" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2308080A'/%3E%3Crect x='6' y='6' width='8' height='8' fill='%2335E08A'/%3E%3Crect x='18' y='6' width='8' height='8' fill='%2335E08A'/%3E%3Crect x='6' y='18' width='8' height='8' fill='%2335E08A'/%3E%3Crect x='18' y='18' width='8' height='8' fill='%23FF6244'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&display=swap" rel="stylesheet" />
+</head>
+<body class={theme === 'light' ? 'light' : ''}>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap top-in mono">
+    <a href="/">Amartya Gaur</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="/#hunr">hunr</a>
+      <a class="hide-sm" href="/#gate">The gate</a>
+      <a class="hide-sm" href="/#record">Record</a>
+      <a href="/blog">Writing</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main"><slot /></main>
+
+<footer class="foot chamber">
+  <div class="wrap foot-in mono">
+    <span>Amartya Gaur — Bengaluru, UTC+5:30</span>
+    <span><a href="https://hunr.ai" rel="noopener">hunr.ai</a> · <a href="https://github.com/amartya-dev" rel="me noopener">github</a> · <a href="https://linkedin.com/in/amartya-gaur" rel="me noopener">linkedin</a> · <a href="/rss.xml">rss</a></span>
+  </div>
+</footer>
+
+<script>
+  document.documentElement.classList.add('js');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+  document.querySelectorAll('.rv').forEach((el, i) => {
+    el.style.transitionDelay = (Math.min(i % 4, 3) * 70) + 'ms';
+    io.observe(el);
+  });
+</script>
+</body>
+</html>

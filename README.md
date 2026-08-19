@@ -1,63 +1,63 @@
 # amartya-portfolio
 
-Personal site for Amartya Gaur — AI systems engineer, founder of hunr.ai.
-Static HTML, CSS, and one script. No build step, no dependencies.
-
-## Run it
+Personal site for Amartya Gaur — founder of [hunr.ai](https://hunr.ai), AI systems engineer.
+Astro, three static pages plus a blog, two WebGL scenes, no CMS.
 
 ```bash
-python3 -m http.server 4321
+npm install
+npm run dev      # http://localhost:4321
+npm run build    # static output in dist/
 ```
 
-Then open http://localhost:4321.
+## The idea
 
-## Files
+A résumé is a claim. A proof is a different thing, and proving things is what hunr does — so the
+page alternates between the two.
 
-```
-index.html         all content, hand-edited
-assets/styles.css  design tokens at the top, then sections in source order
-assets/main.js     cold-start overlay, orchestrator canvas, scroll reveals, trace rows
-```
+- **Light sections carry the claims** — who, what, the record. Paper ground, Archivo set extra-wide,
+  Newsreader for prose.
+- **Black chambers carry the proof** — the hero eval swarm, the gate you can run yourself, the
+  orchestrator in 3D.
 
-## The design
+The only two accents in the whole system are the two verdicts a test can return: `--pass` and
+`--fail`. Nothing else gets a colour.
 
-The page is built as an orchestration console, because that is the work.
+## What's in it
 
-- **Hero** — a canvas rendering of an agent orchestration graph: requests enter, get classified,
-  route through a workflow registry or a tool call, hit a verification step with a repair loop, and
-  resolve. Pulses travel real routes; nodes light up as they are hit; the cursor warms nearby nodes.
-- **Trace** — the career as a span waterfall on a real time axis, so overlapping roles read as
-  overlapping spans. Solid bars are full-time, hollow bars ran alongside one.
-- **Cold start** — a short boot sequence on first visit each session, skipped on repeat visits and
-  whenever the visitor prefers reduced motion.
+| Piece | File | What it does |
+|---|---|---|
+| Eval swarm | `src/scripts/swarm.js` | 739 instanced cubes — the real size of the regression suite. A sweep resolves them; ~4% fail, get repaired, and pass. The readout counts along. |
+| The gate | `src/components/Gate.astro` | The hunr mechanic, playable. Runs a reference and a naive solution against a hidden suite and reports whether the challenge publishes. Tick *weaken the suite* to watch it get blocked. |
+| Orchestrator | `src/scripts/graph3d.js` | The state machine in space. Drag to look around; the bright travellers are conversations. |
+| Blog | `src/content/blog/*.md` | Content collection, RSS at `/rss.xml`, sitemap on build. |
 
-## Editing content
+Both WebGL scenes probe their own frame rate for the first 1.4 seconds and drop bloom plus pixel
+ratio if they can't hold 26fps. Both stop rendering when off-screen or when the tab is hidden, and
+both render a single static frame under `prefers-reduced-motion`.
 
-Everything lives in `index.html`.
+## Editing
 
-**Trace spans** carry their position on the time axis in two custom properties:
+**Posts** — drop a Markdown file in `src/content/blog/` with `title`, `description`, `date`, `tags`.
+It appears on `/blog`, on the home page (newest three), and in the feed.
+
+**Trace spans** — `src/pages/index.astro`. Each span carries its place on the axis:
 
 ```html
 <li class="span" style="--s:.1667;--e:.6667">
 ```
 
-`--s` and `--e` are fractions of the axis, which runs from January 2021 (`0`) to January 2027 (`1`) —
-six years, so one year is `.1667`. To change the range, edit the `<span>` labels inside `.axis` and
-recompute the fractions. Add `span-live` for something ongoing, `span-side` for anything that ran
-alongside a full-time role (renders as a hollow bar).
+`--s` and `--e` are fractions of an axis running January 2021 (`0`) to January 2027 (`1`), so one
+year is `.1667`. Add `live` for ongoing, `side` for anything part-time (hollow bar).
 
-**Metrics** count up from zero when scrolled into view. The target is an attribute, not the text:
+**Gate tests** — the `TESTS` array at the top of `src/components/Gate.astro`. `ref` and `naive` are
+what each solution scores; `weak` marks the cases that survive when the suite is weakened.
 
-```html
-<span class="display fig" data-count="1000" data-format="comma">0</span>
-```
-
-**Graph nodes** are the `NODES` array in `assets/main.js`. Each has an `x`/`y` for wide screens and an
-`sx`/`sy` for narrow ones. `EDGES` connects them by id, and `ROUTES` lists the paths pulses travel.
+**Graph** — `NODES`, `EDGES`, and `ROUTES` at the top of `src/scripts/graph3d.js`.
 
 ## Deploying
 
-Any static host works, since there is nothing to build.
+Static output, so anything works. Set `site` in `astro.config.mjs` to the real domain first — the
+canonical tags, sitemap, and RSS links all derive from it.
 
-- **GitHub Pages** — push, then Settings → Pages → deploy from `main`, root.
-- **Vercel / Netlify / Cloudflare Pages** — import the repo, no build command, output directory `.`.
+- **Vercel / Netlify / Cloudflare Pages** — import the repo. Build `npm run build`, output `dist`.
+- **GitHub Pages** — build and publish `dist/`.

@@ -1,0 +1,245 @@
+---
+const TESTS = [
+  { name: 'accepts a burst under the limit',            ref: 1, naive: 1, weak: true },
+  { name: 'rejects the eleventh call in a window',      ref: 1, naive: 1, weak: true },
+  { name: 'releases capacity when the window rolls',    ref: 1, naive: 1, weak: true },
+  { name: 'keeps buckets isolated per API key',         ref: 1, naive: 1, weak: true },
+  { name: 'two concurrent callers share one bucket',    ref: 1, naive: 0, weak: false },
+  { name: 'a backwards clock grants no free calls',     ref: 1, naive: 0, weak: false },
+  { name: 'in-flight retries cancel on shutdown',       ref: 1, naive: 1, weak: false },
+  { name: 'idle keys do not leak memory',               ref: 1, naive: 0, weak: false }
+];
+---
+<section id="gate" class="chamber sec gate">
+  <div class="wrap">
+    <p class="mono eyebrow rv">02 — the mechanic</p>
+    <h2 class="d d-2 rv">The gate</h2>
+    <p class="lede rv">Anyone can generate a coding challenge now. Almost nobody proves theirs discriminates.
+      Every hunr challenge ships with two solutions — one an expert would write, one a plausible engineer would —
+      and it only goes live if the hidden tests can tell them apart.</p>
+
+    <div class="rig rv">
+      <header class="rig-bar mono">
+        <span class="rig-dot" aria-hidden="true"></span>
+        <span>challenge · rate-limit the tool-call loop</span>
+        <span class="rig-meta">python · 90 min · hidden suite</span>
+      </header>
+
+      <div class="rig-body">
+        <div class="sols">
+          <article class="sol" data-sol="ref">
+            <p class="mono sol-h"><b>reference.py</b> what an expert ships</p>
+            <pre class="code"><code>class Limiter:
+    def __init__(self, rate, per):
+        self._buckets = TTLCache(ttl=per * 2)
+        self._lock = asyncio.Lock()
+
+    async def take(self, key):
+        async with self._lock:
+            b = self._buckets.get(key) or Bucket(rate, per)
+            return b.consume(monotonic())</code></pre>
+          </article>
+
+          <article class="sol" data-sol="naive">
+            <p class="mono sol-h"><b>naive.py</b> plausible, and wrong</p>
+            <pre class="code"><code>counts = {}
+
+def take(key):
+    now = time.time()
+    window = int(now // 60)
+    hits = counts.get((key, window), 0)
+    if hits >= 10:
+        return False
+    counts[(key, window)] = hits + 1
+    return True</code></pre>
+          </article>
+        </div>
+
+        <div class="suite">
+          <p class="mono suite-h"><span>hidden test suite</span><span data-suite-count>8 cases</span></p>
+          <p class="test head mono" aria-hidden="true">
+            <span></span><span>case</span><span class="tres"><b>ref</b><b>naive</b></span>
+          </p>
+          <ol class="tests">
+            {TESTS.map((t) => (
+              <li class="test" data-weak={t.weak ? 'y' : 'n'} data-ref={t.ref} data-naive={t.naive}>
+                <span class="pip"></span>
+                <span class="tname">{t.name}</span>
+                <span class="mono tres"><b class="r-ref">·</b><b class="r-naive">·</b></span>
+              </li>
+            ))}
+          </ol>
+          <div class="verdict" data-verdict hidden>
+            <p class="d verdict-word" data-word>Publishes</p>
+            <p class="mono verdict-why" data-why></p>
+          </div>
+        </div>
+      </div>
+
+      <footer class="rig-foot">
+        <button class="run" type="button" data-run>
+          <span class="run-label">Run the gate</span>
+          <span class="run-bar" aria-hidden="true"></span>
+        </button>
+        <label class="weaken mono">
+          <input type="checkbox" data-weaken />
+          <span>Weaken the suite — keep only the obvious cases</span>
+        </label>
+      </footer>
+    </div>
+
+    <p class="gate-note mono rv">Fail either half and the challenge never reaches a candidate. It is mutation testing,
+      pointed at the assessment instead of the code.</p>
+  </div>
+</section>
+
+<script>
+  const rig = document.querySelector('.rig');
+  if (rig) {
+    const rows = [...rig.querySelectorAll('.tests .test')];
+    const verdict = rig.querySelector('[data-verdict]');
+    const word = rig.querySelector('[data-word]');
+    const why = rig.querySelector('[data-why]');
+    const runBtn = rig.querySelector('[data-run]');
+    const weakenBox = rig.querySelector('[data-weaken]');
+    const suiteCount = rig.querySelector('[data-suite-count]');
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let running = false;
+
+    const active = () => rows.filter((r) => !weakenBox.checked || r.dataset.weak === 'y');
+
+    function reset() {
+      rows.forEach((r) => {
+        r.hidden = weakenBox.checked && r.dataset.weak !== 'y';
+        r.classList.remove('ran');
+        r.querySelector('.pip').className = 'pip';
+        r.querySelector('.r-ref').textContent = '·';
+        r.querySelector('.r-naive').textContent = '·';
+        r.querySelector('.r-ref').className = 'r-ref';
+        r.querySelector('.r-naive').className = 'r-naive';
+      });
+      suiteCount.textContent = active().length + ' cases';
+      verdict.hidden = true;
+      rig.classList.remove('done');
+    }
+
+    const wait = (ms) => new Promise((r) => setTimeout(r, reduced ? 0 : ms));
+
+    async function run() {
+      if (running) return;
+      running = true;
+      rig.classList.add('running');
+      reset();
+      const tests = active();
+
+      for (const row of tests) {
+        await wait(130 + Math.random() * 120);
+        const ref = row.dataset.ref === '1';
+        const naive = row.dataset.naive === '1';
+        const r1 = row.querySelector('.r-ref');
+        const r2 = row.querySelector('.r-naive');
+        r1.textContent = ref ? 'pass' : 'fail';
+        r1.className = 'r-ref ' + (ref ? 'ok' : 'no');
+        r2.textContent = naive ? 'pass' : 'fail';
+        r2.className = 'r-naive ' + (naive ? 'ok' : 'no');
+        row.querySelector('.pip').className = 'pip ' + (ref && !naive ? 'sep' : 'same');
+        row.classList.add('ran');
+      }
+
+      const refPass = tests.filter((r) => r.dataset.ref === '1').length;
+      const naiveFail = tests.filter((r) => r.dataset.naive !== '1').length;
+      const publishes = refPass === tests.length && naiveFail > 0;
+
+      await wait(340);
+      word.textContent = publishes ? 'Publishes' : 'Blocked';
+      why.textContent = publishes
+        ? `reference ${refPass}/${tests.length} · naive fails ${naiveFail} · the suite separates them`
+        : `reference ${refPass}/${tests.length} · naive fails ${naiveFail} · nothing here tells the two apart`;
+      verdict.dataset.state = publishes ? 'pass' : 'fail';
+      verdict.hidden = false;
+      rig.classList.remove('running');
+      rig.classList.add('done');
+      running = false;
+    }
+
+    reset();
+    runBtn.addEventListener('click', run);
+    weakenBox.addEventListener('change', reset);
+  }
+</script>
+
+<style>
+  .gate .lede { margin-top: 20px; max-width: 46ch; }
+  .rig {
+    margin-top: clamp(38px, 5vw, 64px);
+    border: 1px solid var(--rule-dark);
+    background: var(--void-2);
+  }
+  .rig-bar {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 13px 18px; border-bottom: 1px solid var(--rule-dark); color: var(--bone-dim);
+  }
+  .rig-dot { width: 7px; height: 7px; background: var(--bone-dim); flex: none; }
+  .rig.running .rig-dot { background: var(--pass-lit); }
+  .rig-meta { margin-left: auto; }
+
+  .rig-body { display: grid; }
+  @media (min-width: 940px) { .rig-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); } }
+
+  .sols { border-right: 1px solid var(--rule-dark); }
+  .sol { padding: 20px 18px; }
+  .sol + .sol { border-top: 1px solid var(--rule-dark); }
+  .sol-h { color: var(--bone-dim); display: flex; gap: 10px; margin-bottom: 12px; }
+  .sol-h b { color: var(--bone); font-weight: 500; }
+  .code {
+    margin: 0; font-family: var(--mono); font-size: .74rem; line-height: 1.75;
+    color: #9aa4b0; white-space: pre; overflow-x: auto;
+  }
+
+  .suite { padding: 20px 18px; }
+  .suite-h { display: flex; justify-content: space-between; color: var(--bone-dim); margin-bottom: 14px; }
+  .tests { display: grid; }
+  .test {
+    display: grid; grid-template-columns: 10px 1fr auto; gap: 12px; align-items: center;
+    padding: 9px 0; border-bottom: 1px solid var(--rule-dark);
+    opacity: .34; transition: opacity .25s ease;
+  }
+  .test.ran { opacity: 1; }
+  .test.head { opacity: 1; color: var(--bone-dim); padding-bottom: 7px; }
+  .test.head .tres b { color: var(--bone-dim); }
+  .pip { width: 7px; height: 7px; background: #2a2a33; }
+  .pip.sep { background: var(--pass-lit); }
+  .pip.same, .pip.both { background: #3a3a45; }
+  .tname { font-size: .92rem; color: #c3c3cb; }
+  .tres { display: flex; gap: 12px; font-size: .68rem; }
+  .tres b { font-weight: 500; letter-spacing: .06em; color: #55555f; min-width: 32px; text-align: right; }
+  .tres .ok { color: var(--pass-lit); }
+  .tres .no { color: var(--fail-lit); }
+  .test[hidden] { display: none; }
+
+  .verdict { margin-top: 22px; border-top: 1px solid var(--rule-dark); padding-top: 20px; }
+  .verdict-word { font-size: clamp(2rem, 5vw, 3.2rem); color: var(--pass-lit); }
+  .verdict[data-state='fail'] .verdict-word { color: var(--fail-lit); }
+  .verdict-why { color: var(--bone-dim); margin-top: 10px; text-transform: none; letter-spacing: .03em; }
+
+  .rig-foot {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 16px 26px;
+    padding: 16px 18px; border-top: 1px solid var(--rule-dark);
+  }
+  .run {
+    position: relative; overflow: hidden; cursor: pointer;
+    font-family: var(--mono); font-size: .74rem; letter-spacing: .12em; text-transform: uppercase;
+    background: var(--bone); color: var(--void); border: 0; padding: 13px 26px;
+  }
+  .run:hover { background: var(--pass-lit); }
+  .run-bar { position: absolute; left: 0; bottom: 0; height: 2px; width: 0; background: var(--void); }
+  .rig.running .run-bar { width: 100%; transition: width 1.6s linear; }
+  .rig.running .run { pointer-events: none; opacity: .7; }
+
+  .weaken { display: flex; align-items: center; gap: 10px; color: var(--bone-dim); cursor: pointer; text-transform: none; letter-spacing: .03em; }
+  .weaken input { accent-color: var(--fail-lit); width: 15px; height: 15px; }
+
+  .gate-note { margin-top: 22px; color: var(--bone-dim); text-transform: none; letter-spacing: .03em; max-width: 58ch; line-height: 1.7; }
+
+  @media (max-width: 939px) { .sols { border-right: 0; border-bottom: 1px solid var(--rule-dark); } }
+</style>

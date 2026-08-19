@@ -1,0 +1,28 @@
+<section id="orchestrator" class="chamber sec orch">
+  <canvas id="graph3d" aria-hidden="true"></canvas>
+  <div class="wrap orch-in">
+    <p class="mono eyebrow rv">04 — the layer underneath</p>
+    <h2 class="d d-2 rv">A thousand<br />conversations<br />an hour</h2>
+    <p class="lede rv">A state-machine sticky orchestrator with a workflow registry, carrying the production support
+      agents for Network Solutions and BigRock. Requests get classified, routed to a workflow or a tool call, verified,
+      repaired when verification fails, and resolved — and every hop is a span you can read afterwards.</p>
+    <p class="mono orch-hint rv">Drag to look around</p>
+  </div>
+</section>
+
+<script>
+  import { mountGraph } from '../scripts/graph3d.js';
+  const el = document.getElementById('graph3d');
+  if (el) mountGraph(el);
+</script>
+
+<style>
+  .orch { position: relative; overflow: hidden; min-height: 92svh; display: flex; align-items: center; }
+  #graph3d { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; }
+  #graph3d:active { cursor: grabbing; }
+  .orch-in { position: relative; pointer-events: none; }
+  .orch-in .lede { margin-top: 26px; max-width: 40ch; }
+  .orch-in :global(.d-2) { text-shadow: 0 0 60px rgba(8,8,10,.95), 0 0 22px rgba(8,8,10,.9); }
+  .orch-hint { margin-top: 30px; color: #4d4d57; }
+  @media (max-width: 860px) { .orch { min-height: 86svh; } .orch-hint { display: none; } }
+</style>

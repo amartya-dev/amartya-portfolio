@@ -1,0 +1,76 @@
+---
+title: "Why a sticky orchestrator beat a smarter router"
+description: "We kept trying to make the router smarter. What actually fixed support agents was refusing to re-route mid-conversation."
+date: 2026-05-18
+tags: ["agents", "orchestration", "production"]
+---
+
+For a long stretch, the production support agents I worked on lost conversations in a way that was
+maddening to debug. A customer would come in about a billing charge, get three turns into it, mention
+their domain in passing, and the next response would be a DNS troubleshooting walkthrough. Nothing
+had crashed. The traces were clean. The system had simply changed its mind.
+
+We treated it as a routing quality problem, because that is what it looks like. Better classifier
+prompt. More examples. A confidence threshold. Each change moved the number a little and none of them
+fixed it, because the problem was not that the router was wrong. The problem was that we asked it
+again.
+
+## Routing every turn is the bug
+
+A per-turn router re-decides the conversation's workflow on every message. That is fine when the
+first turn is unambiguous and every later turn stays on topic. Real support conversations are neither.
+People mention adjacent things. They answer a question you asked two turns ago. They paste an error
+that names three products.
+
+Every one of those is a chance to re-route, and the router has no memory of the commitment it already
+made. Worse, its input keeps getting less representative: by turn five, the most recent message is
+usually a fragment — "the second one", "still failing" — which carries almost no routing signal but
+plenty of noise.
+
+Accuracy per decision was around 94%, which sounds fine until you compound it. Eight turns of
+independent 94% decisions is a 61% chance of staying on the intended workflow for the whole
+conversation. The number that matters is not per-turn accuracy. It is per-conversation.
+
+## Stickiness as a state machine
+
+What we shipped instead: routing happens once, and the result is a piece of state.
+
+A conversation is a state machine. The classifier picks a workflow off a registry at intake and the
+conversation is *pinned* to it. Later turns feed the active workflow, not the router. Leaving that
+workflow requires an explicit transition — an escalation, a resolution, or a hand-off the active
+workflow itself requests, with a reason attached.
+
+Concretely:
+
+- **A workflow registry** — each workflow declares the states it owns, the tools it can call, and the
+  transitions it will accept. Adding a product area is a registry entry, not a prompt edit.
+- **Sticky assignment** — the workflow is written to conversation state at intake and read back on
+  every turn. Re-classification is not part of the turn loop.
+- **Explicit hand-off** — a workflow that decides it is the wrong owner emits a hand-off with a
+  target and a reason. That is a state transition, it lands in the trace, and it is countable.
+
+That last one is what turned a mystery into a metric. Before, drift was invisible: nobody logs the
+route they did not take. After, every workflow change is an event with a cause, so "handoff quality"
+became a thing we could put in the eval suite and gate deploys on.
+
+## What it cost us
+
+Stickiness has a real failure mode: when intake gets it wrong, the conversation is now confidently
+wrong for longer. A per-turn router at least stumbles into the right workflow eventually.
+
+Two things made that acceptable. Intake is the turn with the *most* signal — the customer's opening
+message is usually their fullest statement of the problem — so it is the cheapest place to spend
+classification effort. And an explicit hand-off path means being wrong is recoverable in one
+transition rather than by accident over four.
+
+The system now carries somewhere around a thousand conversations an hour. The routing model is not
+meaningfully smarter than the one we started with. It just gets asked once.
+
+## The general shape
+
+I have come to distrust any agent design where an LLM re-decides something it already decided. Every
+re-decision is an independent chance to disagree with yourself, and those chances compound in the
+direction of chaos.
+
+If a decision should hold for the length of an interaction, make it once and write it down. State is
+cheaper than judgment, and far easier to debug.
