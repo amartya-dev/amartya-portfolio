@@ -1,6 +1,6 @@
 ---
 title: "Proving a challenge discriminates before anyone takes it"
-description: "Every hunr challenge ships with two solutions — one an expert would write, one a plausible engineer would. If the hidden tests can't tell them apart, it never goes live."
+description: "Every hunr challenge ships with two solutions: one an expert would write, one a plausible engineer would. If the hidden tests can't tell them apart, it never goes live."
 date: 2026-07-04
 tags: ["hiring", "evals", "hunr"]
 ---
@@ -12,7 +12,7 @@ challenge that passes its own tests tells you nothing about whether it can separ
 candidate from a weak one, and most of them cannot.
 
 The failure mode is specific. A generated challenge tends to test the part the model found easy to
-articulate — the happy path, the obvious edge case, the thing the brief already named. It does not
+articulate: the happy path, the obvious edge case, the thing the brief already named. It does not
 test the part where engineering judgment actually shows up. So a candidate who understands the
 problem and a candidate who pattern-matched their way to something plausible both come out green,
 and the screen has burned an hour of everyone's time to produce noise.
@@ -22,8 +22,8 @@ and the screen has burned an hour of everyone's time to produce noise.
 The fix we settled on is to make every challenge carry its own proof. Each one ships with two
 implementations:
 
-- a **reference solution** — what someone who understands the problem would actually write;
-- a **naive solution** — deliberately plausible and deliberately wrong, the shape a competent
+- a **reference solution**, what someone who understands the problem would actually write;
+- a **naive solution**, deliberately plausible and deliberately wrong, the shape a competent
   engineer produces when they have not thought about the hard part.
 
 Both get replayed in the grading sandbox against the hidden suite. The predicate is blunt:
@@ -47,7 +47,7 @@ their own tests, or at least means to.
 
 The naive half is where the signal lives, because writing a *good* naive solution is a design
 exercise. You are being asked to name the specific misunderstanding you expect, then encode it. Take
-a rate limiter for a tool-call loop. The naive solution is not a broken one — it is a fixed-window
+a rate limiter for a tool-call loop. The naive solution is not a broken one. It is a fixed-window
 counter. It handles the burst, it rejects the eleventh call, it rolls the window, it keys per API
 key. Four of the eight tests go green.
 
@@ -57,7 +57,7 @@ forever because nothing ever evicts them.
 
 Writing that naive solution forces the author to state, in code, what the challenge is really about.
 And once it exists, it becomes a permanent regression test on the assessment itself. Add a test
-later, weaken a fixture, relax a timeout — the gate reruns and tells you if you just made the
+later, weaken a fixture, relax a timeout, and the gate reruns and tells you if you just made the
 challenge stop discriminating.
 
 ## This is mutation testing, pointed sideways
@@ -77,7 +77,7 @@ It roughly doubles authoring effort, which is the honest objection. Writing a co
 takes about as long as writing the right one, and it is less fun.
 
 We pay it for two reasons. First, authoring happens once and the challenge runs against hundreds of
-candidates, so the amortised cost is close to nothing. Second — and this matters more — the
+candidates, so the amortised cost is close to nothing. Second, and this matters more, the
 alternative cost is invisible. A challenge that does not discriminate does not announce itself. It
 produces scores, and rankings, and a shortlist, all of which look exactly like signal. You find out
 eighteen months later, in a performance review, if you find out at all.

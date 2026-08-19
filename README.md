@@ -1,7 +1,7 @@
 # amartya-portfolio
 
-Personal site for Amartya Gaur — founder of [hunr.ai](https://hunr.ai), AI systems engineer.
-Astro, three static pages plus a blog, two WebGL scenes, no CMS.
+Personal site for Amartya Gaur, founder of [hunr.ai](https://hunr.ai) and an AI systems engineer.
+Astro, static output, four pages plus a blog, no CMS and no client framework.
 
 ```bash
 npm install
@@ -11,13 +11,13 @@ npm run build    # static output in dist/
 
 ## The idea
 
-A résumé is a claim. A proof is a different thing, and proving things is what hunr does — so the
+A résumé is a claim. A proof is a different thing, and proving things is what hunr does, so the
 page alternates between the two.
 
-- **Light sections carry the claims** — who, what, the record. Paper ground, Archivo set extra-wide,
+- **Light sections carry the claims.** Who, what, the record. Paper ground, Archivo set extra-wide,
   Newsreader for prose.
-- **Black chambers carry the proof** — the hero eval swarm, the gate you can run yourself, the
-  orchestrator in 3D.
+- **Black chambers carry the proof.** Three demos you can operate, each one embedded again inside
+  the post that argues for it.
 
 The only two accents in the whole system are the two verdicts a test can return: `--pass` and
 `--fail`. Nothing else gets a colour.
@@ -26,38 +26,50 @@ The only two accents in the whole system are the two verdicts a test can return:
 
 | Piece | File | What it does |
 |---|---|---|
-| Eval swarm | `src/scripts/swarm.js` | 739 instanced cubes — the real size of the regression suite. A sweep resolves them; ~4% fail, get repaired, and pass. The readout counts along. |
-| The gate | `src/components/Gate.astro` | The hunr mechanic, playable. Runs a reference and a naive solution against a hidden suite and reports whether the challenge publishes. Tick *weaken the suite* to watch it get blocked. |
-| Orchestrator | `src/scripts/graph3d.js` | The state machine in space. Drag to look around; the bright travellers are conversations. |
-| Blog | `src/content/blog/*.md` | Content collection, RSS at `/rss.xml`, sitemap on build. |
-
-Both WebGL scenes probe their own frame rate for the first 1.4 seconds and drop bloom plus pixel
-ratio if they can't hold 26fps. Both stop rendering when off-screen or when the tab is hidden, and
-both render a single static frame under `prefers-reduced-motion`.
+| Hero | `src/components/Hero.astro` | A static SVG of the 739-case regression suite, about 4% of it red. No canvas, no runtime cost. |
+| Sticky routing | `src/components/Router.astro` | Two support routers side by side. Type at them; the stateless one loses the thread on an ambiguous fragment and the sticky one does not. |
+| The gate | `src/components/Gate.astro` | The hunr mechanic. Runs a reference and a naive solution against a hidden suite and reports whether the challenge may publish. Tick *weaken the suite* to watch it get blocked. |
+| Refusal | `src/components/Refuse.astro` | An analytics agent that declines to sum incomparable units, and says why. |
+| Ask | `src/components/Ask.astro` | Answers questions about the site from an index built at compile time. See below. |
+| Film | `src/components/Film.astro` | A video plate with a poster and a real play control. Native controls appear only after the first click. |
+| Blog | `src/content/blog/*.md(x)` | Content collection, RSS at `/rss.xml`, sitemap on build. Posts may embed the demo components directly. |
 
 ## Editing
 
-**Posts** — drop a Markdown file in `src/content/blog/` with `title`, `description`, `date`, `tags`.
-It appears on `/blog`, on the home page (newest three), and in the feed.
+**Posts.** Drop a Markdown or MDX file in `src/content/blog/` with `title`, `description`, `date`
+and `tags`. It appears on `/blog`, on the home page (newest three) and in the feed. An `.mdx` file
+can `import` any component in `src/components/` and place it mid-argument.
 
-**Trace spans** — `src/pages/index.astro`. Each span carries its place on the axis:
+**Projects.** `src/data/projects.js`. One object per row:
 
-```html
-<li class="span" style="--s:.1667;--e:.6667">
+```js
+{ g: 'agents', s: 'Live', n: 'name', h: 'one line', w: 'where', y: 'when', href: '…', d: 'the detail' }
 ```
 
-`--s` and `--e` are fractions of an axis running January 2021 (`0`) to January 2027 (`1`), so one
-year is `.1667`. Add `live` for ongoing, `side` for anything part-time (hollow bar).
+`g` is the filter group (`agents`, `infra`, `merged`). `s` is the status chip, printed verbatim, and
+it is the honesty mechanism: `Prototype` and `Unpublished research` are load-bearing.
 
-**Gate tests** — the `TESTS` array at the top of `src/components/Gate.astro`. `ref` and `naive` are
+**Trace spans.** `src/pages/index.astro`. Each span carries its place on the axis:
+
+```html
+<li class="span" style="--s:.1786;--e:.947">
+```
+
+`--s` and `--e` are fractions of an axis running January 2020 (`0`) to January 2027 (`1`), so one
+year is `.1429`. Add `live` for ongoing, `side` for anything part-time (hollow bar).
+
+**Gate tests.** The `TESTS` array at the top of `src/components/Gate.astro`. `ref` and `naive` are
 what each solution scores; `weak` marks the cases that survive when the suite is weakened.
 
-**Graph** — `NODES`, `EDGES`, and `ROUTES` at the top of `src/scripts/graph3d.js`.
+**Personal media.** Drop files in `public/media/personal/` and they appear on `/about`. See the
+README in that folder. `public/media/` itself is work footage referenced explicitly by a post.
 
 ## Deploying
 
-Static output, so anything works. Set `site` in `astro.config.mjs` to the real domain first — the
-canonical tags, sitemap, and RSS links all derive from it.
+Static output, so anything works. Set `site` in `astro.config.mjs` to the real domain first: the
+canonical tags, sitemap and RSS links all derive from it.
 
-- **Vercel / Netlify / Cloudflare Pages** — import the repo. Build `npm run build`, output `dist`.
-- **GitHub Pages** — build and publish `dist/`.
+- **Cloudflare Pages.** Import the repo, build `npm run build`, output `dist`. This is the one the
+  ask endpoint expects, since it needs a Pages Function.
+- **Vercel / Netlify.** Same build and output. Port `functions/api/ask.js` to their function format.
+- **GitHub Pages.** Build and publish `dist/`. The ask box falls back to its local index.

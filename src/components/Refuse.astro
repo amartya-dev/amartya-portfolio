@@ -30,7 +30,7 @@ const maxReach = Math.max(...PLATFORMS.map((p) => p.reach));
       </div>
     </div>
 
-    <p class="src mono rv">Real counting rules, real drift dates, simulated numbers — the platforms don&rsquo;t hand out
+    <p class="src mono rv">Real counting rules, real drift dates, simulated numbers. The platforms don&rsquo;t hand out
       API access to people building demos. Built for a private assessment, so this is the idea rather than the code.</p>
   </div>
 </section>
@@ -70,7 +70,7 @@ const maxReach = Math.max(...PLATFORMS.map((p) => p.reach));
       total: async () => {
         await push('How many views did I get in total?', 'you', 120);
         await push(
-          `<b>No.</b> I can add them — it comes to ${money(total)} — and the number would be fiction. ` +
+          `<b>No.</b> I can add them, and it comes to ${money(total)}, and the number would be fiction. ` +
             'A TikTok view is the video starting. A YouTube view is about thirty seconds of it. ' +
             'Summing those averages a second into a minute and hands you a decision you can’t defend.',
           'bot refuse',
@@ -97,7 +97,7 @@ const maxReach = Math.max(...PLATFORMS.map((p) => p.reach));
       drift: async () => {
         await push('Is Instagram up since April?', 'you', 120);
         await push(
-          '<b>Up 34% — and I&rsquo;d hold that number lightly.</b> Instagram changed what counts as a view on ' +
+          '<b>Up 34%, and I&rsquo;d hold that number lightly.</b> Instagram changed what counts as a view on ' +
             '<b>21 April 2025</b>. The step in the data is the definition moving, not your audience.',
           'bot refuse',
           420

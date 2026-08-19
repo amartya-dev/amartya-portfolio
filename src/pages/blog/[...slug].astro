@@ -11,7 +11,7 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
-<Base title={`${post.data.title} — Amartya Gaur`} description={post.data.description} theme="light">
+<Base title={`${post.data.title} · Amartya Gaur`} description={post.data.description} theme="light">
   <article class="light sec post">
     <div class="wrap">
       <a class="mono back" href="/blog">← Writing</a>
@@ -20,7 +20,7 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long'
       <p class="stand">{post.data.description}</p>
       <div class="prose"><Content /></div>
       <footer class="end">
-        <p class="mono">Written by Amartya Gaur — building <a href="https://hunr.ai" rel="noopener">hunr.ai</a>.</p>
+        <p class="mono">Written by Amartya Gaur, building <a href="https://hunr.ai" rel="noopener">hunr.ai</a>.</p>
         <a class="mono back" href="/blog">← More writing</a>
       </footer>
     </div>

@@ -1,6 +1,6 @@
 ---
 title: "Taking the network away from a Cloud Run job"
-description: "Running untrusted code with no egress, on managed infrastructure, without a VM you have to operate. The trick is one prefix — and the reason it looks broken at first is that loopback starts down."
+description: "Running untrusted code with no egress, on managed infrastructure, without a VM you have to operate. The trick is one prefix, and the reason it looks broken at first is that loopback starts down."
 date: 2026-08-16
 tags: ["infrastructure", "sandboxing", "cloud-run"]
 ---
@@ -14,7 +14,7 @@ The usual answers are all heavy. Run your own Kubernetes with a deny-all Network
 operate a cluster. Use Firecracker directly and now you operate a fleet. Both are correct and both cost
 you an ops function you may not want.
 
-What I wanted was the managed thing — hand a container to a platform, get told when it exited — with
+What I wanted was the managed thing, where you hand a container to a platform and get told when it exited, with
 the network removed. Here is how that works on Cloud Run, and the two details that are not in the docs.
 
 ## The prefix
@@ -70,7 +70,7 @@ actually a capability boundary.
 
 ## The detail that will waste your afternoon
 
-Drop the network and every test that talks to a local server fails. Not the interesting ones — all of
+Drop the network and every test that talks to a local server fails. Not the interesting ones. All of
 them. A web framework's test client, a database on `127.0.0.1`, anything that binds a port and connects
 to itself.
 
@@ -97,7 +97,7 @@ os.execvp(sys.argv[1], sys.argv[1:])
 Ten lines, and it does not weaken anything. Loopback goes nowhere by definition; the namespace still has
 no route off the box. You get the isolation you asked for and tests that pass for the right reasons.
 
-The `execvp` at the end is deliberate — the shim replaces itself with the real command rather than
+The `execvp` at the end is deliberate: the shim replaces itself with the real command rather than
 supervising it, so there is no extra process in the tree, no signal forwarding to get wrong, and the
 exit code is the exit code.
 
@@ -119,7 +119,7 @@ If a run fails, it failed. Deciding what that means is your job, not the platfor
 ## What this does not give you
 
 A namespace is an isolation boundary, not a security guarantee against a determined attacker with a
-kernel exploit — and you are on a shared managed platform. Set your CPU and memory limits, set a
+kernel exploit, and you are on a shared managed platform. Set your CPU and memory limits, set a
 deadline, treat everything the run produces as hostile input, and do not confuse "cannot reach the
 network" with "cannot do anything".
 

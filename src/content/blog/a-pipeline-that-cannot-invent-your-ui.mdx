@@ -1,6 +1,6 @@
 ---
 title: "A pipeline that cannot invent your UI"
-description: "Generated product videos show software that does not exist. Fixing that is not a prompting problem — it means making every frame cite the line of code it came from, and refusing to finish when it cannot."
+description: "Generated product videos show software that does not exist. Fixing that is not a prompting problem. It means making every frame cite the line of code it came from, and refusing to finish when it cannot."
 date: 2026-08-19
 tags: ["agents", "pipelines", "provenance"]
 ---
@@ -37,9 +37,9 @@ produced it, all the way down:
 - a **replica asset** carries the source files it was built against;
 - the assets stage reviews per-scene stills **against those sources** before it passes.
 
-Not one of those is a model judgement. A scanner reads the repository deterministically — framework
+Not one of those is a model judgement. A scanner reads the repository deterministically: framework
 detection, token sources, CSS custom properties with file and line, an index of screens and components
-— and everything downstream is required to reference it.
+and everything downstream is required to reference it.
 
 The result is that "is this real?" becomes a query rather than an opinion. You can follow any colour in
 the final frame back to the line of CSS it came from, or discover that you cannot, which is the same
@@ -50,7 +50,7 @@ information.
 A chain of citations is only worth as much as its weakest link, and the weakest link in every agent
 pipeline is the stage that decides it is finished.
 
-Nine agents run this thing — an executive producer, then directors for repo analysis, proposal,
+Nine agents run this thing: an executive producer, then directors for repo analysis, proposal,
 script, scene, assets, edit, composition and publish. Each writes a checkpoint when it is done. The
 important part is what a checkpoint will not accept:
 
@@ -74,7 +74,7 @@ pipeline for web frontends. Refusing the job is a feature.
 The best bug in this was mine, and a reviewer found it.
 
 To extract Tailwind's theme, I had been `require()`-ing the analysed repository's `tailwind.config.js`.
-It is a config file. Except it is not — it is a JavaScript program, and I was executing it, from a
+It is a config file. Except it is not. It is a JavaScript program, and I was executing it, from a
 repository I did not write, inside my own process.
 
 The replacement parses the config statically as an object literal and never executes anything. It picked
@@ -92,7 +92,7 @@ It does not template. Composition defaults to a mode where each product's screen
 bespoke replicas, because a per-product replica genuinely is bespoke and pretending otherwise is how you
 get the video that looks like every other video.
 
-It picks its own runtime at proposal time — one path for React and Next repositories, where a replica is
+It picks its own runtime at proposal time: one path for React and Next repositories, where a replica is
 close to a direct port of the real component, another for Vue and Tailwind-heavy markup where it is not.
 Choosing per-repository rather than per-pipeline is the difference between a replica and an impression.
 

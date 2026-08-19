@@ -2,8 +2,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import Base from '../layouts/Base.astro';
+import Film from '../components/Film.astro';
 
-const dir = path.join(process.cwd(), 'public', 'media');
+// Only this folder. public/media itself holds work footage, which does not belong here.
+const dir = path.join(process.cwd(), 'public', 'media', 'personal');
 const files = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
 const label = (f) => f.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
 const videos = files.filter((f) => /\.(mp4|webm)$/i.test(f)).sort();
@@ -16,11 +18,11 @@ const photos = files
 const posterFor = (v) => {
   const stem = v.replace(/\.[^.]+$/, '');
   const hit = files.find((f) => f !== v && f.startsWith(stem + '.') && /\.(jpe?g|png|webp)$/i.test(f));
-  return hit ? `/media/${hit}` : undefined;
+  return hit ? `/media/personal/${hit}` : undefined;
 };
 const hasMedia = photos.length > 0 || videos.length > 0;
 ---
-<Base title="Off the clock — Amartya Gaur" description="The parts of Amartya Gaur that are not infrastructure: music, martial arts, and talking to rooms full of people about WordPress." theme="light">
+<Base title="Off the clock · Amartya Gaur" description="The parts of Amartya Gaur that are not infrastructure: music, martial arts, and talking to rooms full of people about WordPress." theme="light">
   <article class="light sec about">
     <div class="wrap">
       <p class="mono eyebrow">Off the clock</p>
@@ -35,14 +37,14 @@ const hasMedia = photos.length > 0 || videos.length > 0;
             I would put money on; the guitar is the one I actually pick up, which tells you something about how
             practice works.</p>
           <p>There is a straight line between this and the day job, and I only noticed it recently. Tabla is a
-            grammar — a fixed vocabulary of strokes, composed into cycles, where the interesting part is the return
+            grammar: a fixed vocabulary of strokes, composed into cycles, where the interesting part is the return
             to the first beat rather than anything clever in the middle. I have spent five years building systems
             that behave the same way and calling it architecture.</p>
         </section>
 
         <section>
           <h2 class="mono sub">Rooms full of people</h2>
-          <p>Four WordCamps — Mumbai, Ahmedabad, Delhi, Kolkata — mostly the same talk about building Gutenberg
+          <p>Four WordCamps, in Mumbai, Ahmedabad, Delhi and Kolkata, mostly the same talk about building Gutenberg
             blocks, given three times, improving slightly each time. Speaking is the fastest way I know to find out
             whether you actually understand something. An audience finds the hole in your explanation in about
             forty seconds.</p>
@@ -53,7 +55,7 @@ const hasMedia = photos.length > 0 || videos.length > 0;
           <p>I built the site for the Jeet Kune Do Federation of India for nothing, which is the sort of thing you
             do when the cause is close to you.</p>
           <p>I make AI video, which is how <a href="https://github.com/calesthio/OpenMontage/pull/372" rel="noopener">product-motion</a>
-            happened — I wanted a tool that could cut a product film from the product&rsquo;s own source code, without
+            happened. I wanted a tool that could cut a product film from the product&rsquo;s own source code, without
             inventing screens that do not exist, and it was easier to build it than to keep being disappointed.</p>
           <p>Bengaluru, mostly. An Arctic Code Vault contributor, which means only that I was committing to the
             right repositories in 2020.</p>
@@ -63,14 +65,13 @@ const hasMedia = photos.length > 0 || videos.length > 0;
       {hasMedia ? (
         <div class="gallery">
           {videos.map((f) => (
-            <figure class="shot wide">
-              <video src={`/media/${f}`} poster={posterFor(f)} controls preload="none" playsinline></video>
-              <figcaption class="mono">{label(f)}</figcaption>
-            </figure>
+            <div class="shot wide">
+              <Film src={`/media/personal/${f}`} poster={posterFor(f)} caption={label(f)} />
+            </div>
           ))}
           {photos.map((f) => (
             <figure class="shot">
-              <img src={`/media/${f}`} alt={label(f)} loading="lazy" decoding="async" />
+              <img src={`/media/personal/${f}`} alt={label(f)} loading="lazy" decoding="async" />
               <figcaption class="mono">{label(f)}</figcaption>
             </figure>
           ))}

@@ -4,7 +4,7 @@ import { getCollection } from 'astro:content';
 const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
-<Base title="Writing — Amartya Gaur" description="Notes on agent orchestration, evals, and technical hiring, by Amartya Gaur." theme="light">
+<Base title="Writing · Amartya Gaur" description="Notes on agent orchestration, evals, and technical hiring, by Amartya Gaur." theme="light">
   <section class="light sec index">
     <div class="wrap">
       <p class="mono eyebrow">Writing</p>

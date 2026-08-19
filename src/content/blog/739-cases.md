@@ -21,11 +21,11 @@ assertion, it is a vibe.
 
 So the suite is built out of things that are deterministic given a fixed model and seed:
 
-- **Routing** — did this conversation land in the workflow it should have? A label match, not a
+- **Routing.** Did this conversation land in the workflow it should have? A label match, not a
   judgment call.
-- **Tool-call correctness** — was the tool invoked, with arguments in the right shape, in the right
+- **Tool-call correctness.** Was the tool invoked, with arguments in the right shape, in the right
   order, and not invoked when it should not have been?
-- **Handoff quality** — when a workflow gave up, did it hand off with a reason, to a target that
+- **Handoff quality.** When a workflow gave up, did it hand off with a reason, to a target that
   exists?
 
 Roughly 250 scoring metrics across 739 regression cases and about 2,700 assertions. The ones that
@@ -39,7 +39,7 @@ regression suite is supposed to: something misbehaved in production, we reduced 
 conversation that reproduced it, and it became a case.
 
 That has a useful side effect. Because each case has an incident behind it, nobody argues about
-whether it should be there. The argument you do get — "this case is too specific" — usually means the
+whether it should be there. The argument you do get, "this case is too specific", usually means the
 fix was too specific, which is worth knowing.
 
 ## Wiring it into Jenkins

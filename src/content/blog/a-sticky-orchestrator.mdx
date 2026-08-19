@@ -25,14 +25,14 @@ that names three products.
 
 Every one of those is a chance to re-route, and the router has no memory of the commitment it already
 made. Worse, its input keeps getting less representative: by turn five, the most recent message is
-usually a fragment — "the second one", "still failing" — which carries almost no routing signal but
+usually a fragment ("the second one", "still failing") which carries almost no routing signal but
 plenty of noise.
 
 Accuracy per decision was around 94%, which sounds fine until you compound it. Eight turns of
 independent 94% decisions is a 61% chance of staying on the intended workflow for the whole
 conversation. The number that matters is not per-turn accuracy. It is per-conversation.
 
-Here are both, side by side. Type at them — the ambiguous fragments are where it shows.
+Here are both, side by side. Type at them. The ambiguous fragments are where it shows.
 
 <Router bare />
 
@@ -42,16 +42,16 @@ What we shipped instead: routing happens once, and the result is a piece of stat
 
 A conversation is a state machine. The classifier picks a workflow off a registry at intake and the
 conversation is *pinned* to it. Later turns feed the active workflow, not the router. Leaving that
-workflow requires an explicit transition — an escalation, a resolution, or a hand-off the active
+workflow requires an explicit transition: an escalation, a resolution, or a hand-off the active
 workflow itself requests, with a reason attached.
 
 Concretely:
 
-- **A workflow registry** — each workflow declares the states it owns, the tools it can call, and the
+- **A workflow registry.** Each workflow declares the states it owns, the tools it can call, and the
   transitions it will accept. Adding a product area is a registry entry, not a prompt edit.
-- **Sticky assignment** — the workflow is written to conversation state at intake and read back on
+- **Sticky assignment.** The workflow is written to conversation state at intake and read back on
   every turn. Re-classification is not part of the turn loop.
-- **Explicit hand-off** — a workflow that decides it is the wrong owner emits a hand-off with a
+- **Explicit hand-off.** A workflow that decides it is the wrong owner emits a hand-off with a
   target and a reason. That is a state transition, it lands in the trace, and it is countable.
 
 That last one is what turned a mystery into a metric. Before, drift was invisible: nobody logs the
@@ -63,8 +63,8 @@ became a thing we could put in the eval suite and gate deploys on.
 Stickiness has a real failure mode: when intake gets it wrong, the conversation is now confidently
 wrong for longer. A per-turn router at least stumbles into the right workflow eventually.
 
-Two things made that acceptable. Intake is the turn with the *most* signal — the customer's opening
-message is usually their fullest statement of the problem — so it is the cheapest place to spend
+Two things made that acceptable. Intake is the turn with the *most* signal, since the customer's opening
+message is usually their fullest statement of the problem, so it is the cheapest place to spend
 classification effort. And an explicit hand-off path means being wrong is recoverable in one
 transition rather than by accident over four.
 
@@ -74,7 +74,7 @@ meaningfully smarter than the one we started with. It just gets asked once.
 ## What happened when I tried to prove it
 
 Shipping something that works is not the same as knowing why, so later I spent about sixty hours and something on the
-order of 230,000 model calls trying to falsify this design properly — ten pre-registered experiments, decision rules
+order of 230,000 model calls trying to falsify this design properly: ten pre-registered experiments, decision rules
 fixed and tagged in git before each run.
 
 Seven came back negative. The first kill criterion I wrote down was that if a fully-informed global router matched the
@@ -82,7 +82,7 @@ local gate at conversational boundaries, the architecture argument was dead. It 
 two vendors, the gate never paid for itself once.
 
 What survived was a result about the benchmarks rather than the router. You can only measure state-conditioned routing
-on a corpus whose state is not recoverable from its own transcript — and the obvious public corpora fail that. In ABCD,
+on a corpus whose state is not recoverable from its own transcript, and the obvious public corpora fail that. In ABCD,
 not one of the 1,004 test dialogues runs more than one workflow, so the question "which workflow owns this turn" never
 comes up and a policy that never switches scores perfectly.
 

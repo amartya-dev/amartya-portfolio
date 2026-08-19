@@ -1,0 +1,372 @@
+---
+// Ask the page. A model with a typed tool surface and retrieved passages, and no
+// other way to reach the visitor: prose it cannot source is rejected before it is
+// shown, and chart numbers come from series computed here rather than from the
+// model. Same argument as the data layer further down the page, pointed at me.
+//
+// The endpoint is functions/api/ask.js. Without it the box still answers, from the
+// index alone, and says so.
+import { getCollection } from 'astro:content';
+import { buildIndex, buildPlots } from '../data/ask.js';
+
+const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const INDEX = buildIndex(posts);
+const PLOTS = buildPlots(posts);
+
+const CHIPS = [
+  'How long has he been doing this?',
+  'What has he actually shipped?',
+  'Anything with payments?',
+  'How does he test an agent?',
+  'What does he do outside work?',
+  'What salary does he want?'
+];
+---
+<section id="ask" class="chamber sec">
+  <div class="wrap">
+    <p class="mono eyebrow rv">Ask</p>
+    <h2 class="d d-2 rv">Ask it about me.<br />It has to cite</h2>
+    <p class="lede rv">A model that can reach you through four tools and no other way. It decides what
+      to say and what to draw. It does not get to decide the numbers.</p>
+
+    <div class="box rv" data-ask>
+      <form class="bar" data-form>
+        <label class="sr" for="ask-q">Ask a question about Amartya</label>
+        <input id="ask-q" type="text" autocomplete="off" maxlength="300"
+          placeholder="Has he built anything with payments?" data-q />
+        <button type="submit" class="mono" data-go>Ask</button>
+      </form>
+
+      <div class="chips mono">
+        {CHIPS.map((c) => <button type="button" class="chip">{c}</button>)}
+      </div>
+
+      <div class="out" data-out aria-live="polite">
+        <p class="idle mono">{INDEX.length} passages indexed from this site: {PLOTS.projects} projects,
+          five roles, {PLOTS.posts} posts, and a page about the guitar. Ask it something, or take one
+          of those. The last one is there because refusing is the interesting part.</p>
+      </div>
+    </div>
+
+    <div class="how rv">
+      <p><b>How it cannot lie to you.</b> Your question is scored against the index in the browser, and
+      the best half-dozen passages go to the model with the question. Prose comes back through a tool
+      that requires the ids of the passages it used, and an answer citing a passage it was not given is
+      rejected and asked again. Charts come back as the name of a series this page computes, or as
+      points that each name the passage their number appears in; the ones that cannot are dropped
+      before you see the chart. The interesting case is the last suggestion, where the honest move is
+      to decline, so declining is one of the four things it can do.</p>
+    </div>
+  </div>
+
+  <script type="application/json" data-index set:html={JSON.stringify(INDEX)}></script>
+  <script type="application/json" data-plots set:html={JSON.stringify(PLOTS)}></script>
+</section>
+
+<script>
+  const root = document.querySelector('[data-ask]');
+  if (root) {
+    const sec = root.closest('section');
+    const INDEX = JSON.parse(sec.querySelector('[data-index]').textContent);
+    const PLOTS = JSON.parse(sec.querySelector('[data-plots]').textContent);
+    const out = root.querySelector('[data-out]');
+    const input = root.querySelector('[data-q]');
+    const go = root.querySelector('[data-go]');
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    const STOP = new Set(('a an the and or of to in on at is are was were be been being do does did done he his him she her ' +
+      'they them their it its i you your my me we us what which who whom whose how why when where can could would should ' +
+      'will has have had with for from about any some all more most much many that this these those tell show give know ' +
+      'as by not no yes than then there here also into out up down over under if but so too very just really actually ' +
+      'ever anything something things thing stuff please thanks hi hello hey ok okay').split(' '));
+
+    // A dotted token is indexed whole and in parts, so "hunr" finds "hunr.ai".
+    const tok = (s) => {
+      const out = [];
+      const keep = (w) => {
+        if (w.length < 2 || STOP.has(w)) return;
+        out.push(w.length > 3 && w.endsWith('s') && !w.endsWith('ss') ? w.slice(0, -1) : w);
+      };
+      for (const raw of String(s).toLowerCase().match(/[a-z0-9+#][a-z0-9+#.]*/g) || []) {
+        const w = raw.replace(/\.+$/, '');
+        keep(w);
+        if (w.includes('.')) w.split('.').forEach(keep);
+      }
+      return out;
+    };
+
+    // BM25, title counted three times. Small enough that the whole thing runs in a frame.
+    const N = INDEX.length;
+    const df = Object.create(null);
+    let totalLen = 0;
+    INDEX.forEach((d) => {
+      d._t = tok([d.t, d.t, d.t, d.q || '', d.k || '', d.a].join(' '));
+      d._f = Object.create(null);
+      d._t.forEach((w) => (d._f[w] = (d._f[w] || 0) + 1));
+      totalLen += d._t.length;
+      Object.keys(d._f).forEach((w) => (df[w] = (df[w] || 0) + 1));
+    });
+    const avgLen = totalLen / N;
+
+    function search(q) {
+      const qt = [...new Set(tok(q))].filter((w) => df[w]);
+      if (!qt.length) return [];
+      const k1 = 1.4, b = 0.7;
+      return INDEX.map((d) => {
+        let s = 0;
+        for (const w of qt) {
+          const f = d._f[w] || 0;
+          if (!f) continue;
+          s += Math.log(1 + (N - df[w] + 0.5) / (df[w] + 0.5)) *
+            ((f * (k1 + 1)) / (f + k1 * (1 - b + (b * d._t.length) / avgLen)));
+        }
+        return { d, s };
+      }).filter((x) => x.s > 0).sort((a, c) => c.s - a.s).slice(0, 6);
+    }
+
+    /* ---------- rendering ---------- */
+
+    const sourceCard = (d) => {
+      const label = d.ext ? d.u.replace(/^https?:\/\//, '') : d.u;
+      return `<article class="card"><p class="mono ck">${esc(d.k || '')}</p>` +
+        `<h4 class="cn">${esc(d.t)}</h4><p class="cb">${esc(d.a)}</p>` +
+        `<a class="mono cc" href="${esc(d.u)}"${d.ext ? ' rel="noopener"' : ''}>${esc(label)}</a></article>`;
+    };
+
+    const valueBars = (rows, accent, unit) => {
+      const max = Math.max(...rows.map((r) => r.v)) || 1;
+      return '<div class="plot">' + rows.map((r) =>
+        `<div class="prow"><span class="pn mono">${esc(r.n)}</span>` +
+        `<span class="pt"><i style="--w:${(r.v / max) * 100}%;--c:${accent}"></i></span>` +
+        `<span class="pv mono">${esc(r.v.toLocaleString('en-US'))}${unit ? ' ' + esc(unit) : ''}</span></div>`
+      ).join('') + '</div>';
+    };
+
+    const timelineBars = (roles) => {
+      const A = 2020, B = 2027;
+      return '<div class="plot tl">' + roles.map((r) => {
+        const s = ((r.from - A) / (B - A)) * 100, e = ((r.to - A) / (B - A)) * 100;
+        return `<div class="prow"><span class="pn mono">${esc(r.n)}</span>` +
+          `<span class="pt"><i class="${r.side ? 'side' : ''}${r.now ? ' now' : ''}" style="--s:${s}%;--w:${e - s}%"></i></span>` +
+          `<span class="pv mono">${esc(r.r)}</span></div>`;
+      }).join('') + '<p class="pax mono"><span>2020</span><span>2027</span></p></div>';
+    };
+
+    function renderBlock(b) {
+      if (b.type === 'text') {
+        return `<div class="said"><p class="cb">${esc(b.text)}</p>` +
+          `<p class="mono cited">Cited ${b.sources.length} passage${b.sources.length === 1 ? '' : 's'}, below</p></div>`;
+      }
+      if (b.type === 'decline') {
+        return `<div class="said no"><p class="mono verdict no">It declined</p><p class="cb">${esc(b.reason)}</p>` +
+          `<a class="mono cc" href="mailto:amartya@hunr.ai">ask him instead</a></div>`;
+      }
+      if (b.type === 'chart') {
+        let body = '';
+        if (b.kind === 'roles_timeline') body = timelineBars(b.data);
+        else if (b.kind === 'composed') body = valueBars(b.data.map((p) => ({ n: p.n, v: p.v })), 'var(--pass-lit)', b.unit);
+        else body = valueBars(b.data, b.kind === 'projects_by_status' ? 'var(--pass-lit)' : 'var(--bone)', '');
+        const drop = b.dropped ? `<p class="mono dropped">${b.dropped} point${b.dropped === 1 ? '' : 's'} dropped for naming a passage it was not given</p>` : '';
+        return `<figure class="fig"><figcaption class="mono figc">${esc(b.title || '')}</figcaption>${body}${drop}</figure>`;
+      }
+      return '';
+    }
+
+    // Without the endpoint the box has no model to pick a chart, so it falls back to
+    // matching the three presets by phrasing. With the endpoint this is never used.
+    const LOCAL_PLOT = [
+      { re: /\b(timeline|career|history|chronolog|track record|how long|when did|what year|since when|overlap|experience|been doing)\b/i,
+        kind: 'roles_timeline', title: 'Five spans, four of them overlapping' },
+      { re: /\b(shipped|production|proven|unproven|research|prototype|proof|actually built|actually done|private)\b/i,
+        kind: 'projects_by_status', title: 'What the projects actually are' },
+      { re: /\b(breakdown|how many|how much|split|spread|distribut|what kind|what sort|areas|categor|overview|summar|balance|focus|everything)\b/i,
+        kind: 'projects_by_area', title: 'The projects by area' }
+    ];
+    const localPlot = (q) => {
+      const m = LOCAL_PLOT.find((p) => p.re.test(q));
+      if (!m) return null;
+      const key = { roles_timeline: 'roles', projects_by_area: 'group', projects_by_status: 'status' }[m.kind];
+      return { type: 'chart', kind: m.kind, title: m.title, data: PLOTS[key] };
+    };
+
+    /* ---------- the ask ---------- */
+
+    let endpoint = true;
+
+    async function ask(q) {
+      q = q.trim();
+      if (!q) return;
+      go.disabled = true;
+      out.innerHTML = '<p class="idle mono work">Scoring the index<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>';
+
+      const hits = search(q);
+      const sources = hits.map((h) => h.d);
+
+      let blocks = null;
+      if (endpoint) {
+        out.innerHTML = '<p class="idle mono work">' + (sources.length ? sources.length + ' passages retrieved. Asking the model' : 'Nothing retrieved. Asking anyway') +
+          '<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>';
+        try {
+          const res = await fetch('/api/ask', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              q,
+              passages: sources.map((d) => ({ id: d.id, t: d.t, a: d.a, u: d.u })),
+              plots: PLOTS
+            })
+          });
+          if (res.status === 501 || res.status === 404 || res.status === 405) endpoint = false;
+          else if (res.ok) {
+            const j = await res.json();
+            if (Array.isArray(j.blocks) && j.blocks.length) blocks = j.blocks;
+          }
+        } catch {
+          endpoint = false;
+        }
+      }
+
+      let html = '';
+
+      const fig = blocks ? null : localPlot(q);
+      // Without a model, a weak top score is not an answer. Refuse instead of shrugging.
+      if (!blocks && !fig && (!hits.length || hits[0].s < 3.4)) sources.length = 0;
+
+      if (blocks) {
+        html += blocks.map(renderBlock).join('');
+      } else if (fig) {
+        html += renderBlock(fig) +
+          '<p class="mono srcnote">Drawn from the series this page computes. The model that would have ' +
+          'chosen it is not configured on this deployment.</p>';
+      } else if (!sources.length) {
+        html += '<div class="said no"><p class="mono verdict no">Not in the index</p>' +
+          '<p class="cb">Everything this box can answer is on this page: ' + PLOTS.projects + ' projects, five roles, ' +
+          PLOTS.posts + ' posts, and a page about the guitar. Nothing in there matches that, and guessing would ' +
+          'undo the only thing that makes the rest of this worth reading.</p>' +
+          '<a class="mono cc" href="mailto:amartya@hunr.ai">ask him instead</a></div>';
+      } else {
+        html += '<div class="said"><p class="mono verdict">Answering from the index directly</p>' +
+          '<p class="cb">The model endpoint is not configured on this deployment, so this is the retrieval ' +
+          'on its own. These are the passages it would have been given.</p></div>';
+      }
+
+      if (sources.length) {
+        html += '<p class="mono srclabel">Retrieved passages</p>' + sources.slice(0, 3).map(sourceCard).join('');
+        if (sources.length > 3) {
+          html += '<details class="more"><summary class="mono">' + (sources.length - 3) + ' more considered</summary>' +
+            sources.slice(3).map(sourceCard).join('') + '</details>';
+        }
+      }
+
+      out.innerHTML = html;
+      go.disabled = false;
+    }
+
+    root.querySelector('[data-form]').addEventListener('submit', (e) => { e.preventDefault(); ask(input.value); });
+    root.querySelectorAll('.chip').forEach((c) =>
+      c.addEventListener('click', () => { input.value = c.textContent; ask(c.textContent); }));
+  }
+</script>
+
+<style>
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  .box { margin-top: clamp(34px, 4vw, 54px); border: 1px solid var(--rule-dark); background: var(--void-2); }
+  .bar { display: flex; border-bottom: 1px solid var(--rule-dark); }
+  .bar input {
+    flex: 1; min-width: 0; background: none; border: 0; color: var(--bone);
+    font: inherit; font-size: 1.05rem; padding: 20px 22px;
+  }
+  .bar input::placeholder { color: #7e7e8a; }
+  .bar input:focus { outline: none; background: rgba(53,224,138,.05); }
+  .bar button {
+    font: inherit; font-family: var(--mono); font-size: var(--t-label); letter-spacing: .09em; text-transform: uppercase;
+    background: var(--bone); color: var(--void); border: 0; padding: 0 30px; cursor: pointer; flex: none;
+    transition: background-color .18s ease;
+  }
+  .bar button:hover:not(:disabled) { background: var(--pass-lit); }
+  .bar button:disabled { opacity: .4; cursor: default; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 22px; border-bottom: 1px solid var(--rule-dark); }
+  .chip {
+    font: inherit; font-family: var(--mono); font-size: .68rem; letter-spacing: .04em; cursor: pointer;
+    background: none; border: 1px dashed #33333d; color: #a0a0aa; padding: 8px 13px; transition: all .18s ease;
+  }
+  .chip:hover { border-style: solid; border-color: var(--bone); color: var(--bone); }
+  .chip:last-child { border-color: #533029; color: #cf9a90; }
+  .chip:last-child:hover { border-color: var(--fail-lit); color: var(--fail-lit); }
+
+  .out { padding: 24px 22px 28px; min-height: 200px; display: grid; align-content: start; gap: 18px; }
+  .idle { color: #9a9aa4; text-transform: none; letter-spacing: .03em; line-height: 1.8; max-width: 70ch; font-size: .78rem; }
+  .out :global(.work) { color: var(--pass-lit); }
+  .out :global(.dots i) { animation: askblink 1.1s infinite; opacity: .25; font-style: normal; }
+  .out :global(.dots i:nth-child(2)) { animation-delay: .18s; }
+  .out :global(.dots i:nth-child(3)) { animation-delay: .36s; }
+  @keyframes askblink { 40% { opacity: 1; } }
+
+  .out :global(.said) { display: grid; gap: 9px; }
+  .out :global(.said.no) { border-left: 2px solid var(--fail-lit); padding-left: 16px; }
+  .out :global(.verdict) { color: var(--pass-lit); text-transform: none; letter-spacing: .05em; font-size: .72rem; }
+  .out :global(.verdict.no) { color: var(--fail-lit); }
+  .out :global(.cited), .out :global(.dropped) { color: #86868f; font-size: var(--t-micro); letter-spacing: .1em; }
+  .out :global(.dropped) { color: var(--fail-lit); margin-top: 10px; }
+  .out :global(.cb) { color: #ccccd4; font-size: 1.02rem; line-height: 1.62; max-width: 72ch; margin: 0; }
+
+  .out :global(.srcnote) { color: #86868f; font-size: var(--t-micro); letter-spacing: .1em; text-transform: none; line-height: 1.7; max-width: 70ch; }
+  .out :global(.srclabel) { color: #86868f; font-size: var(--t-micro); letter-spacing: .16em; margin-top: 6px; }
+  .out :global(.card) { border-top: 1px solid var(--rule-dark); padding-top: 15px; display: grid; gap: 7px; }
+  .out :global(.ck) { color: #86868f; font-size: var(--t-micro); letter-spacing: .13em; }
+  .out :global(.cn) {
+    font-family: var(--display); font-weight: 700; font-stretch: 110%; text-transform: uppercase;
+    font-size: 1.06rem; line-height: 1.08; letter-spacing: -.012em; color: var(--bone); margin: 0;
+  }
+  .out :global(.card .cb) { color: #a8a8b2; font-size: .92rem; line-height: 1.58; }
+  .out :global(.cc) {
+    font-family: var(--mono); font-size: var(--t-micro); letter-spacing: .1em; text-transform: uppercase;
+    color: var(--pass-lit); text-decoration: none; border-bottom: 1px solid currentColor;
+    justify-self: start; padding-bottom: 3px;
+  }
+  .out :global(.cc:hover) { color: var(--bone); }
+  .out :global(.more) { border-top: 1px solid var(--rule-dark); }
+  .out :global(.more summary) {
+    cursor: pointer; color: #86868f; font-size: var(--t-micro); letter-spacing: .13em;
+    padding: 13px 0; list-style: none;
+  }
+  .out :global(.more summary::-webkit-details-marker) { display: none; }
+  .out :global(.more summary::before) { content: '+ '; }
+  .out :global(.more[open] summary::before) { content: '\2212 '; }
+  .out :global(.more summary:hover) { color: var(--bone); }
+  .out :global(.more .card:last-child) { padding-bottom: 6px; }
+
+  .out :global(.fig) { margin: 0; display: grid; gap: 14px; border-left: 2px solid var(--pass-lit); padding-left: 16px; }
+  .out :global(.figc) { color: var(--bone); font-size: .72rem; letter-spacing: .05em; text-transform: none; }
+  .out :global(.plot) { display: grid; gap: 8px; }
+  .out :global(.prow) { display: grid; grid-template-columns: 152px 1fr 200px; gap: 16px; align-items: center; }
+  .out :global(.pn) { color: var(--bone); font-size: .68rem; letter-spacing: .05em; text-transform: none; }
+  .out :global(.pt) { height: 12px; background: #1c1c25; display: block; position: relative; }
+  .out :global(.pt i) { display: block; height: 100%; width: var(--w); background: var(--c, var(--bone)); animation: askgrow .6s cubic-bezier(.2,.8,.2,1); transform-origin: left; }
+  .out :global(.pv) { color: #9a9aa4; font-size: .64rem; letter-spacing: .05em; text-transform: none; }
+  .out :global(.tl .pt i) { position: absolute; left: var(--s); width: var(--w); min-width: 7px; background: var(--bone); animation: none; }
+  .out :global(.tl .pt i.side) { background: none; border: 1px solid #7e7e8a; }
+  .out :global(.tl .pt i.now) { background: var(--pass-lit); border: 0; }
+  .out :global(.pax) { display: flex; justify-content: space-between; color: #86868f; font-size: .6rem; letter-spacing: .1em; margin: 2px 0 0; padding: 0 200px 0 168px; }
+  @keyframes askgrow { from { transform: scaleX(0); } }
+
+  .how { margin-top: var(--s-3); border-top: 1px solid var(--rule-dark); padding-top: var(--s-3); }
+  .how p { color: #9a9aa4; font-size: var(--t-small); max-width: 76ch; line-height: 1.75; }
+  .how b { color: var(--bone); font-weight: 500; }
+
+  @media (max-width: 760px) {
+    .bar { flex-wrap: wrap; }
+    .bar input { flex-basis: 100%; padding: 17px 18px; font-size: 1rem; }
+    .bar button { flex: 1; padding: 15px 0; border-top: 1px solid var(--rule-dark); }
+    .out :global(.prow) { grid-template-columns: 104px 1fr 56px; gap: 10px; }
+    .out :global(.tl .prow) { grid-template-columns: 104px 1fr; }
+    .out :global(.tl .pv) { display: none; }
+    .out :global(.pax) { padding: 0 0 0 114px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .out :global(.pt i) { animation: none; }
+    .out :global(.dots i) { animation: none; opacity: .7; }
+  }
+</style>
