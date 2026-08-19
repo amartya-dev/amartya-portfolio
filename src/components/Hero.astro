@@ -22,13 +22,13 @@ const FACTS = [
       ))}
     </dl>
 
-    <ul class="quick mono rv">
-      <li><a href="https://github.com/amartya-dev" rel="me noopener">GitHub</a></li>
-      <li><a href="https://linkedin.com/in/amartya-gaur" rel="me noopener">LinkedIn</a></li>
-      <li><a href="https://hunr.ai" rel="noopener">hunr.ai</a></li>
-      <li><a href="/blog">Writing</a></li>
-      <li><a href="/about">About me</a></li>
-      <li><a href="mailto:amartya@hunr.ai">Email</a></li>
+    <ul class="quick rv">
+      <li><a href="https://github.com/amartya-dev" rel="me noopener" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.2 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.6-4.04-1.6-.55-1.4-1.34-1.77-1.34-1.77-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.34-5.47-5.96 0-1.32.47-2.39 1.24-3.23-.13-.3-.54-1.53.11-3.18 0 0 1.01-.32 3.3 1.23a11.4 11.4 0 0 1 6.01 0c2.29-1.55 3.3-1.23 3.3-1.23.65 1.65.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.23 0 4.63-2.8 5.65-5.48 5.95.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 22.29 24 17.79 24 12.5 24 5.87 18.63.5 12 .5z"/></svg></a></li>
+      <li><a href="https://linkedin.com/in/amartya-gaur" rel="me noopener" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zm1.78 13.02H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg></a></li>
+      <li><a href="https://hunr.ai" rel="noopener" aria-label="hunr.ai" title="hunr.ai"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><path d="M2.8 12h18.4M12 2.8c2.4 2.6 3.6 5.7 3.6 9.2s-1.2 6.6-3.6 9.2c-2.4-2.6-3.6-5.7-3.6-9.2S9.6 5.4 12 2.8z"/></svg></a></li>
+      <li><a href="/blog" aria-label="Writing" title="Writing"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16M5 15.5 15.6 4.9a2 2 0 0 1 2.8 0l.7.7a2 2 0 0 1 0 2.8L8.5 19H5v-3.5z"/></svg></a></li>
+      <li><a href="/about" aria-label="About me" title="About me"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.9"/><path d="M4.4 20.4a7.8 7.8 0 0 1 15.2 0"/></svg></a></li>
+      <li><a href="mailto:amartya@hunr.ai" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.6" y="4.8" width="18.8" height="14.4" rx="1.8"/><path d="m3.4 6.6 8.6 6 8.6-6"/></svg></a></li>
     </ul>
 
     <p class="try mono rv">
@@ -44,35 +44,33 @@ const FACTS = [
     border-bottom: 1px solid var(--rule-dark);
   }
   .hero-in { padding-block: 140px 80px; width: 100%; }
-  .eyebrow { color: var(--bone-dim); margin-bottom: clamp(28px, 4vw, 44px); }
+  .eyebrow { color: var(--bone-dim); margin-bottom: var(--s-4); }
 
   h1 {
     font-size: clamp(2.6rem, 7.6vw, 6.6rem);
-    margin-bottom: clamp(28px, 3.5vw, 44px);
+    margin-bottom: var(--s-4);
   }
   h1 em { font-style: normal; color: var(--pass-lit); }
 
-  .sub {
-    max-width: 40ch; font-size: clamp(1.1rem, 1.6vw, 1.42rem); line-height: 1.5;
-    color: #c4c4cc;
-  }
+  .sub { max-width: 38ch; font-size: var(--t-lede); line-height: 1.42; color: #c4c4cc; }
 
   .facts {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 20px 40px; margin-top: clamp(48px, 6vw, 82px);
-    border-top: 1px solid var(--rule-dark); padding-top: 24px;
+    gap: var(--s-3) 40px; margin-top: var(--s-5);
+    border-top: 1px solid var(--rule-dark); padding-top: var(--s-3);
   }
-  .facts dt { color: #55555f; text-transform: uppercase; letter-spacing: .14em; font-size: .6rem; margin-bottom: 8px; }
-  .facts dd { margin: 0; color: var(--bone); font-size: .82rem; letter-spacing: .02em; }
+  .facts dt { color: #55555f; text-transform: uppercase; letter-spacing: .14em; font-size: var(--t-micro); margin-bottom: var(--s-1); }
+  .facts dd { margin: 0; color: var(--bone); font-size: var(--t-body); font-family: var(--body); letter-spacing: 0; text-transform: none; }
 
-  .quick { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+  .quick { display: flex; flex-wrap: wrap; gap: var(--s-1); margin-top: var(--s-3); }
   .quick a {
-    display: block; color: var(--bone-dim); text-decoration: none;
-    border: 1px solid #2a2a34; padding: 8px 14px; transition: all .18s ease;
+    display: grid; place-items: center; width: 42px; height: 42px;
+    color: var(--bone-dim); border: 1px solid #2a2a34;
+    transition: color .18s ease, background-color .18s ease, border-color .18s ease;
   }
-  .quick a:hover { color: var(--void); background: var(--pass-lit); border-color: var(--pass-lit); }
+  .quick a:hover, .quick a:focus-visible { color: var(--void); background: var(--pass-lit); border-color: var(--pass-lit); }
 
-  .try { margin-top: clamp(26px, 3vw, 38px); display: flex; align-items: center; gap: 12px; color: var(--bone-dim); }
+  .try { margin-top: var(--s-3); display: flex; align-items: center; gap: 12px; color: var(--bone-dim); }
   .try a { color: inherit; text-decoration: none; border-bottom: 1px solid #33333d; padding-bottom: 4px; }
   .try a:hover { color: var(--bone); border-color: var(--bone); }
 

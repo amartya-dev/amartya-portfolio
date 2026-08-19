@@ -27,6 +27,21 @@
 
   --wrap: 1280px;
   --gut: clamp(20px, 5vw, 72px);
+
+  /* type */
+  --t-body: 1.0625rem;
+  --t-small: .95rem;
+  --t-lede: clamp(1.35rem, 1.9vw, 1.72rem);
+  --t-label: .7rem;
+  --t-micro: .62rem;
+
+  /* vertical rhythm */
+  --s-1: 8px;
+  --s-2: 14px;
+  --s-3: 24px;
+  --s-4: clamp(30px, 4vw, 44px);
+  --s-5: clamp(44px, 6vw, 72px);
+  --s-6: clamp(64px, 9vw, 112px);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -38,8 +53,8 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--body);
-  font-size: 19px;
-  line-height: 1.55;
+  font-size: var(--t-body);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
@@ -51,7 +66,7 @@ img { max-width: 100%; display: block; }
 .chamber :focus-visible { outline-color: var(--pass-lit); }
 
 .wrap { width: 100%; max-width: var(--wrap); margin-inline: auto; padding-inline: var(--gut); }
-.mono { font-family: var(--mono); font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; }
+.mono { font-family: var(--mono); font-size: var(--t-label); letter-spacing: .09em; text-transform: uppercase; }
 .serif-i { font-style: italic; }
 
 /* Archivo carries every heading. Expanded width is the signature. */
@@ -65,7 +80,7 @@ img { max-width: 100%; display: block; }
 }
 .d-1 { font-size: clamp(2.9rem, 9.5vw, 9rem); }
 .d-2 { font-size: clamp(2.1rem, 5.6vw, 4.6rem); }
-.d-3 { font-size: clamp(1.3rem, 2.4vw, 1.9rem); font-stretch: 108%; font-weight: 700; letter-spacing: -.01em; }
+.d-3 { font-size: clamp(1.24rem, 1.9vw, 1.5rem); font-stretch: 108%; font-weight: 700; letter-spacing: -.012em; line-height: 1.06; }
 
 a { color: inherit; }
 
@@ -78,12 +93,12 @@ a { color: inherit; }
 .light { background: var(--paper); color: var(--ink); }
 .light ::selection { background: var(--ink); color: var(--paper); }
 
-.sec { padding-block: clamp(72px, 11vw, 168px); }
-.eyebrow { color: var(--mid); margin-bottom: clamp(20px, 3vw, 32px); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.sec { padding-block: var(--s-6); }
+.eyebrow { color: var(--mid); margin-bottom: var(--s-3); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: var(--t-micro); }
 .eyebrow::before { content: ""; width: 28px; height: 1px; background: currentColor; flex: none; }
 .chamber .eyebrow { color: var(--bone-dim); }
 
-.lede { font-size: clamp(1.15rem, 1.8vw, 1.5rem); line-height: 1.5; max-width: 40ch; color: var(--ink-2); }
+.lede { font-size: var(--t-lede); line-height: 1.42; max-width: 38ch; color: var(--ink-2); }
 .chamber .lede { color: var(--bone-dim); }
 
 /* reveal ------------------------------------------------------------------ */
