@@ -82,7 +82,7 @@ a { color: inherit; }
 .eyebrow::before { content: ""; width: 28px; height: 1px; background: currentColor; flex: none; }
 .chamber .eyebrow { color: var(--bone-dim); }
 
-.lede { font-size: clamp(1.15rem, 1.8vw, 1.5rem); line-height: 1.5; max-width: 30ch; color: var(--ink-2); }
+.lede { font-size: clamp(1.15rem, 1.8vw, 1.5rem); line-height: 1.5; max-width: 40ch; color: var(--ink-2); }
 .chamber .lede { color: var(--bone-dim); }
 
 /* reveal ------------------------------------------------------------------ */

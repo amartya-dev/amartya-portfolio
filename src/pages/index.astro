@@ -9,36 +9,104 @@ const posts = (await getCollection('blog'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
 const fmt = (d) => d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+
+const PROJECTS = [
+  { g: 'product', name: 'hunr.ai', where: 'Founder', when: '2026 —', href: 'https://hunr.ai',
+    what: 'Technical screening that hands candidates a real repository and lets them use any agent, then verifies understanding with a hidden suite and an unaided defence. Built solo, end to end.',
+    tags: ['FastAPI', 'LangGraph', 'RabbitMQ', 'Redis Streams', 'Postgres', 'Pulumi', 'ArgoCD'] },
+  { g: 'product', name: 'Agent orchestration framework', where: 'Newfold Digital', when: '2024 – 2026',
+    what: 'A sticky state machine with a workflow registry, running the production support agents for Network Solutions and BigRock at roughly a thousand conversations an hour.',
+    tags: ['LangGraph', 'Semantic Kernel', 'State machines'] },
+  { g: 'product', name: 'Eval harness with a deploy gate', where: 'Newfold Digital', when: '2024 – 2026',
+    what: '739 regression cases, about 2,700 assertions and 250 scoring metrics across routing, tool-call correctness and handoff quality — wired into Jenkins as a blocking gate rather than a dashboard.',
+    tags: ['promptfoo', 'Jenkins', 'Evals'] },
+  { g: 'product', name: 'AI-native website builder', where: 'Newfold Digital', when: '2023 – 2025',
+    what: 'Prompt to live hosted site. A LangGraph generation harness, sandbox orchestration and atomic publishes across OCI and Cloudflare. Top contributor at 149 of 334 commits; time to first preview down 48%.',
+    tags: ['LangGraph', 'OCI', 'Cloudflare', 'WordPress'] },
+  { g: 'product', name: 'Public MCP server for deploys', where: 'Newfold Digital', when: '2026',
+    what: 'Ship to a managed VPS straight from Claude Code or Codex. I built the infrastructure, the DevOps around it, the tool interface, and Cloudflare Enterprise endpoint authorisation.',
+    tags: ['MCP', 'DevOps', 'Cloudflare'] },
+  { g: 'product', name: 'Microsoft 365 to NCE migration', where: 'Newfold Digital', when: '2021 – 2023',
+    what: 'Roughly 100,000 accounts moved to New Commerce Experience, and the async systems underneath rebuilt to fit low-memory hosting.',
+    tags: ['Python', 'Async', 'Microsoft 365'] },
+  { g: 'product', name: 'UPI credit lending backend', where: 'PayCrunch', when: '2022 – 2025',
+    what: 'The backend from zero for a Y Combinator-backed fintech: lending and payment rail integrations with underwriting logic on top, plus the Flutter client. Hired and led the first three engineers.',
+    tags: ['Python', 'UPI rails', 'Flutter'] },
+
+  { g: 'oss', name: 'OpenMontage', where: 'Merged upstream · 49k stars', when: '2026', href: 'https://github.com/calesthio/OpenMontage/pull/354',
+    what: 'Azure AI Speech added as an optional cloud provider twice over — speech-to-text and text-to-speech, about 900 lines each. A repo-grounded product-motion pipeline is open at 4,316 lines across 39 files.',
+    tags: ['Python', 'Azure Speech'] },
+  { g: 'oss', name: 'Textualize/rich', where: 'Merged upstream · 57k stars', when: '2020', href: 'https://github.com/Textualize/rich/pull/380',
+    what: 'A flag to render binary or decimal suffixes in DownloadColumn.',
+    tags: ['Python', 'CLI'] },
+  { g: 'oss', name: 'Creative Commons cccatalog', where: 'Merged upstream · now Openverse', when: '2020', href: 'https://github.com/cc-archive/cccatalog/pull/344',
+    what: 'Automated test-on-pull-request CI, and tag blacklisting in ImageStore.',
+    tags: ['Python', 'CI'] },
+  { g: 'oss', name: 'newfold-labs · bluehost', where: 'Roughly 60 merged PRs', when: '2022 – 2025', href: 'https://github.com/newfold-labs',
+    what: 'The WordPress AI module, the help centre&rsquo;s migration from Algolia to Typesense, and AI-assisted onboarding.',
+    tags: ['WordPress', 'Typesense', 'React'] },
+  { g: 'oss', name: 'djangify', where: 'Merged upstream', when: '2020', href: 'https://github.com/L4TTiCe/djangify',
+    what: 'Unit tests and a PyPI release workflow.',
+    tags: ['Python', 'Packaging'] },
+
+  { g: 'side', name: 'swarmhq', where: 'Side project', when: '2026', href: 'https://github.com/amartya-dev/swarmhq',
+    what: 'A business-operations agent built on Google&rsquo;s Agent Development Kit.',
+    tags: ['Google ADK', 'Agents'] },
+  { g: 'side', name: 'Typesense toolkit', where: 'Side project', when: '2025', href: 'https://github.com/amartya-dev?tab=repositories',
+    what: 'A dashboard, a Helm chart and a mirror for running Typesense yourself — the fallout of migrating a production search stack onto it.',
+    tags: ['Typesense', 'Helm', 'Kubernetes'] },
+  { g: 'side', name: 'wordcamp-arcade', where: 'WordCamp Delhi', when: '2024', href: 'https://github.com/amartya-dev/wordcamp-arcade',
+    what: 'An arcade built for the WordCamp Delhi booth.',
+    tags: ['JavaScript', 'WordPress'] },
+  { g: 'side', name: 'Gutenberg blocks & search indexer', where: 'Side projects', when: '2023',
+    what: 'A quiz block and a search-indexer plugin — the groundwork behind the Gutenberg talks.',
+    tags: ['WordPress', 'PHP', 'JavaScript'] },
+  { g: 'side', name: 'flutter-bloc', where: '61 stars', when: '2020', href: 'https://github.com/amartya-dev/flutter-bloc',
+    what: 'A reference implementation of login against a REST API with SQLite, using BLoCs. It became a Flutter Community article that still gets read.',
+    tags: ['Dart', 'Flutter'] }
+];
+
+const FILTERS = [
+  { k: 'all', label: 'Everything' },
+  { k: 'product', label: 'Products & platforms' },
+  { k: 'oss', label: 'Open source' },
+  { k: 'side', label: 'Side projects' }
+];
 ---
 <Base>
   <Hero />
 
-  <section id="hunr" class="light sec">
+  <section id="work" class="light sec">
     <div class="wrap">
-      <p class="mono eyebrow rv">01 — the company</p>
-      <h2 class="d d-2 rv">Résumés<br />don&rsquo;t ship</h2>
-      <p class="lede rv">The first screen in engineering hiring rewards the wrong things: keywords, take-homes that
-        measure free time, and puzzles nobody will write again. hunr replaces it with the work.</p>
+      <p class="mono eyebrow rv">01 — what I build</p>
+      <h2 class="d d-2 rv">The layer<br />underneath</h2>
+      <p class="lede rv">Agents are the easy part. What gives way is everything they stand on — routing that changes its
+        mind mid-conversation, evaluation nobody can act on, infrastructure that can&rsquo;t be rebuilt from scratch.
+        That is the part I work on, and I have been doing it in production for five years.</p>
 
-      <ol class="loop">
-        <li class="rv"><p class="mono step">01 — challenge</p><p>Built from a real codebase or job description: a real
-          repository, a hidden test suite, a weighted rubric.</p></li>
-        <li class="rv"><p class="mono step">02 — build, agents allowed</p><p>The candidate works in their own repo with
-          whatever agent they like. Every push runs against the hidden suite in an isolated sandbox, verdicts live.</p></li>
-        <li class="rv"><p class="mono step">03 — defend, unaided</p><p>A timed reasoning round, one question at a time.
-          An ownership multiplier decides how much the build actually counts for.</p></li>
-        <li class="rv"><p class="mono step">04 — score</p><p>A per-competency fit score with the code cited, reported in
-          bands — a 73 and a 71 are the same performance with noise on top.</p></li>
-      </ol>
-
-      <div class="hunr-foot rv">
-        <dl class="stats mono">
-          <div><dt>Applicants screened</dt><dd>175</dd></div>
-          <div><dt>Design partners</dt><dd>2</dd></div>
-          <div><dt>Built by</dt><dd>One engineer</dd></div>
-        </dl>
-        <a class="cta" href="https://hunr.ai" rel="noopener">See it at hunr.ai<span aria-hidden="true">→</span></a>
+      <div class="pillars">
+        <article class="rv">
+          <h3 class="mono p-h">Orchestration</h3>
+          <p>State machines, not cleverness. A conversation gets routed once and pinned, transitions are explicit, and
+            every hop is a span you can read afterwards. About a thousand support conversations an hour go through it.</p>
+        </article>
+        <article class="rv">
+          <h3 class="mono p-h">Evaluation</h3>
+          <p>739 regression cases sitting in the deploy pipeline as a blocking gate. Deterministic assertions can fail a
+            build; model-judged ones report and stay out of the way. An eval suite that can&rsquo;t say no is a dashboard.</p>
+        </article>
+        <article class="rv">
+          <h3 class="mono p-h">Infrastructure</h3>
+          <p>FastAPI and LangGraph over Postgres, RabbitMQ and Redis Streams; Pulumi on Azure, ArgoCD GitOps, self-hosted
+            observability across three data-residency regions. Built solo for hunr, so every layer is one I maintain.</p>
+        </article>
       </div>
+
+      <dl class="now mono rv">
+        <div><dt>Now</dt><dd>Founder and engineer at <a href="https://hunr.ai" rel="noopener">hunr.ai</a>, since August 2026</dd></div>
+        <div><dt>Before</dt><dd>Five years in Newfold Digital&rsquo;s AI Center of Excellence</dd></div>
+        <div><dt>Based</dt><dd>Bengaluru, India — remote since 2021</dd></div>
+      </dl>
     </div>
   </section>
 
@@ -46,7 +114,7 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { month: 'short', year: 'numeri
 
   <section id="record" class="light sec">
     <div class="wrap">
-      <p class="mono eyebrow rv">03 — the record</p>
+      <p class="mono eyebrow rv">03 — where I&rsquo;ve worked</p>
       <h2 class="d d-2 rv">Five years,<br />three spans</h2>
       <p class="lede rv">Two of them ran concurrently. Open one to see what was inside it.</p>
 
@@ -64,10 +132,10 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { month: 'short', year: 'numeri
             </button>
             <div class="detail" id="s1">
               <p>Remote, April 2021 to August 2026. I owned the agent orchestration framework behind the production
-                support agents for Network Solutions and BigRock, the promptfoo eval harness that gated their releases —
-                739 regression cases, about 2,700 assertions, wired in as a blocking Jenkins gate — and the generation
-                stack behind the AI-native website builder. Before the AI work: roughly 100,000 Microsoft 365 accounts
-                migrated to NCE, and async systems rebuilt to fit low-memory hosting.</p>
+                support agents for Network Solutions and BigRock, the promptfoo eval harness that gated their releases,
+                and the generation stack behind the AI-native website builder. Before the AI work: roughly 100,000
+                Microsoft 365 accounts migrated to NCE, and async systems rebuilt to fit low-memory hosting. Four
+                Rockstar of the Month awards across APAC.</p>
             </div>
           </li>
           <li class="span side" style="--s:.1667;--e:.6667">
@@ -89,84 +157,83 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { month: 'short', year: 'numeri
               <span class="mono dur">2026 —</span>
             </button>
             <div class="detail" id="s3" hidden>
-              <p>Built solo on FastAPI and LangGraph with RabbitMQ, Redis Streams SSE, Postgres, sandboxed code
-                execution, Pulumi on Azure, ArgoCD GitOps, and self-hosted observability across three data-residency
-                regions. Started on the side; full-time since August 2026.</p>
+              <p>Started on the side in early 2026, full-time since August. 175 applicants screened so far across two
+                design partners, on a stack I built and run alone.</p>
             </div>
           </li>
         </ol>
         <p class="legend mono">Solid bars are full-time. The hollow one ran alongside.</p>
       </div>
 
-      <ul class="works">
-        <li class="rv"><p class="mono w-org">Newfold Digital</p><h3 class="d d-3">Evals that fail a build</h3>
-          <p>739 regression cases, about 2,700 assertions, roughly 250 scoring metrics across routing, tool-call
-            correctness, and handoff quality — a blocking Jenkins gate, not a dashboard nobody reads.</p></li>
-        <li class="rv"><p class="mono w-org">Newfold Digital</p><h3 class="d d-3">AI-native website builder</h3>
-          <p>Prompt to live hosted site: a LangGraph generation harness, sandbox orchestration, atomic publishes across
-            OCI and Cloudflare. Top contributor, 149 of 334 commits. Time to preview down 48%, 11m54s to 6m12s.</p></li>
-        <li class="rv"><p class="mono w-org">Newfold Digital</p><h3 class="d d-3">Public MCP server for deploys</h3>
-          <p>Ships to managed VPS straight from Claude Code and Codex — the infrastructure, the DevOps, the tool
-            interface, and Cloudflare Enterprise endpoint authorisation.</p></li>
-        <li class="rv"><p class="mono w-org">PayCrunch</p><h3 class="d d-3">UPI credit lending backend</h3>
-          <p>Built from zero for a YC-backed fintech: lending and payment rail integrations with underwriting on top,
-            plus the Flutter client. Hired and led the first three engineers.</p></li>
-      </ul>
+      <p class="early rv">Before all that: software engineering internships at <b>American Express</b> — backend APIs and
+        an ML-based ETA prediction system, closed with a pre-placement offer — and at <b>Bruce Clay</b>, building
+        automation tools and workflow integrations. B.Tech in computer science from <b>VIT</b>, 2021, CGPA 8.99.</p>
     </div>
   </section>
 
   <Graph3D />
 
-  <section id="public" class="light sec">
+  <section id="projects" class="light sec">
     <div class="wrap">
-      <p class="mono eyebrow rv">05 — in public</p>
-      <h2 class="d d-2 rv">109 merged<br />pull requests</h2>
-      <p class="lede rv">Outside my own repositories. The four worth naming:</p>
+      <p class="mono eyebrow rv">05 — everything I&rsquo;ve built</p>
+      <h2 class="d d-2 rv">Seventeen<br />things</h2>
+      <p class="lede rv">Products I shipped, patches that landed in other people&rsquo;s repositories, and the side
+        projects that were mostly for me.</p>
 
-      <ul class="contribs">
-        <li class="rv">
-          <p class="mono repo"><a href="https://github.com/calesthio/OpenMontage" rel="noopener">calesthio/OpenMontage</a><span>49k stars</span></p>
-          <p>Azure AI Speech added as an optional cloud provider twice over —
-            <a href="https://github.com/calesthio/OpenMontage/pull/354" rel="noopener">speech-to-text</a> and
-            <a href="https://github.com/calesthio/OpenMontage/pull/371" rel="noopener">text-to-speech</a>, both merged,
-            about 900 lines each. A <a href="https://github.com/calesthio/OpenMontage/pull/372" rel="noopener">repo-grounded
-            product-motion pipeline</a> is open at 4,316 lines across 39 files.</p>
-        </li>
-        <li class="rv">
-          <p class="mono repo"><a href="https://github.com/Textualize/rich" rel="noopener">Textualize/rich</a><span>57k stars</span></p>
-          <p>A <a href="https://github.com/Textualize/rich/pull/380" rel="noopener">flag for binary or decimal suffixes</a>
-            in <code>DownloadColumn</code>. Merged in 2020.</p>
-        </li>
-        <li class="rv">
-          <p class="mono repo"><a href="https://github.com/newfold-labs" rel="noopener">newfold-labs</a> · <a href="https://github.com/bluehost" rel="noopener">bluehost</a><span>2022 – 2025</span></p>
-          <p>Roughly 60 merged pull requests across the WordPress AI module, the help centre&rsquo;s migration from
-            Algolia to Typesense, and AI-assisted onboarding.</p>
-        </li>
-        <li class="rv">
-          <p class="mono repo"><a href="https://github.com/cc-archive/cccatalog" rel="noopener">Creative Commons cccatalog</a><span>now Openverse</span></p>
-          <p>Automated <a href="https://github.com/cc-archive/cccatalog/pull/344" rel="noopener">test-on-pull-request CI</a>
-            and <a href="https://github.com/cc-archive/cccatalog/pull/380" rel="noopener">tag blacklisting in ImageStore</a>.
-            Merged in 2020.</p>
-        </li>
-      </ul>
+      <div class="filters mono rv" role="group" aria-label="Filter projects">
+        {FILTERS.map((f, i) => (
+          <button type="button" class="chip" data-filter={f.k} aria-pressed={i === 0 ? 'true' : 'false'}>{f.label}</button>
+        ))}
+      </div>
 
-      <div class="talks rv">
-        <h3 class="mono sub">Talks</h3>
-        <ul class="plain">
-          <li><b>Mastering Gutenberg blocks: from basics to building your own</b> — given three times: WordCamp
-            <a href="https://kolkata.wordcamp.org/2025/speaker/amartya-gaur/" rel="noopener">Kolkata 2025</a>,
-            <a href="https://delhi.wordcamp.org/2024/speaker/amartya-gaur/" rel="noopener">Delhi 2024</a>,
-            <a href="https://ahmedabad.wordcamp.org/2023/mastering-gutenberg-blocks-from-basics-to-building-your-own-by-amartya-gaur/" rel="noopener">Ahmedabad 2023</a>.</li>
-          <li><b>WordPress plugin development with the REST API and React</b> —
-            <a href="https://mumbai.wordcamp.org/2023/speaker/amartya-gaur/" rel="noopener">WordCamp Mumbai 2023</a>.</li>
-        </ul>
+      <ol class="projects" data-projects>
+        {PROJECTS.map((p) => (
+          <li class="proj" data-group={p.g}>
+            <div class="p-id">
+              {p.href
+                ? <a class="d d-3 p-name" href={p.href} rel="noopener">{p.name}<span class="ext" aria-hidden="true">↗</span></a>
+                : <span class="d d-3 p-name">{p.name}</span>}
+              <p class="mono p-meta">{p.where} · {p.when}</p>
+            </div>
+            <div class="p-body">
+              <p set:html={p.what} />
+              <p class="mono p-tags">{p.tags.map((t) => <span>{t}</span>)}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <p class="mono p-empty" data-empty hidden>Nothing in that category yet.</p>
+    </div>
+  </section>
+
+  <section id="public" class="chamber sec">
+    <div class="wrap">
+      <p class="mono eyebrow rv">06 — in public</p>
+      <h2 class="d d-2 rv">Talks, and<br />the rest of it</h2>
+
+      <div class="pub">
+        <div class="rv">
+          <h3 class="mono sub">Speaking</h3>
+          <ul class="plain">
+            <li><b>Mastering Gutenberg blocks: from basics to building your own</b> — given three times: <a href="https://kolkata.wordcamp.org/2025/speaker/amartya-gaur/" rel="noopener">WordCamp Kolkata 2025</a>, <a href="https://delhi.wordcamp.org/2024/speaker/amartya-gaur/" rel="noopener">WordCamp Delhi 2024</a>, <a href="https://ahmedabad.wordcamp.org/2023/mastering-gutenberg-blocks-from-basics-to-building-your-own-by-amartya-gaur/" rel="noopener">WordCamp Ahmedabad 2023</a>.</li>
+            <li><b>WordPress plugin development with the REST API and React</b> — <a href="https://mumbai.wordcamp.org/2023/speaker/amartya-gaur/" rel="noopener">WordCamp Mumbai 2023</a>.</li>
+          </ul>
+        </div>
+        <div class="rv">
+          <h3 class="mono sub">Elsewhere</h3>
+          <ul class="plain">
+            <li>Writing on <a href="https://medium.com/@amarkaushik1999" rel="noopener">Medium</a>, including pieces published by The Startup and Flutter Community.</li>
+            <li>An Arctic Code Vault contributor, which mostly means I was committing to the right repositories in 2020.</li>
+            <li>Away from the terminal I sing, and play harmonium and tabla.</li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
 
   <section id="writing" class="light sec writing">
     <div class="wrap">
-      <p class="mono eyebrow rv">06 — writing</p>
+      <p class="mono eyebrow rv">07 — writing</p>
       <h2 class="d d-2 rv">Notes from<br />the build</h2>
       <ul class="posts">
         {posts.map((p) => (
@@ -183,12 +250,12 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { month: 'short', year: 'numeri
     </div>
   </section>
 
-  <section id="contact" class="chamber sec contact">
+  <section id="contact" class="chamber sec section-end">
     <div class="wrap">
-      <p class="mono eyebrow rv">07 — contact</p>
+      <p class="mono eyebrow rv">08 — contact</p>
       <h2 class="d d-2 rv">Tell me<br />what&rsquo;s breaking</h2>
-      <p class="lede rv">If you&rsquo;re hiring engineers and the first screen isn&rsquo;t working, or you&rsquo;re building
-        agents and the platform underneath them keeps giving way — that&rsquo;s the conversation I want.</p>
+      <p class="lede rv">If you&rsquo;re building agents and the platform underneath them keeps giving way, or you&rsquo;re
+        hiring engineers and the first screen isn&rsquo;t working — that&rsquo;s the conversation I want.</p>
       <a class="d bigmail rv" href="mailto:amartya@hunr.ai">amartya@hunr.ai</a>
       <ul class="links mono rv">
         <li><a href="https://hunr.ai" rel="noopener">hunr.ai</a></li>
@@ -207,33 +274,41 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { month: 'short', year: 'numeri
         if (d) d.hidden = open;
       });
     });
+
+    const chips = [...document.querySelectorAll('.chip')];
+    const projects = [...document.querySelectorAll('.proj')];
+    const empty = document.querySelector('[data-empty]');
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const key = chip.dataset.filter;
+        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        let shown = 0;
+        projects.forEach((p) => {
+          const on = key === 'all' || p.dataset.group === key;
+          p.hidden = !on;
+          if (on) shown++;
+        });
+        if (empty) empty.hidden = shown > 0;
+      });
+    });
   </script>
 </Base>
 
 <style>
   .sec :global(.d-2) { margin-bottom: 26px; }
 
-  /* 01 — hunr */
-  .loop {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 1px; background: var(--rule); margin-top: clamp(44px, 6vw, 80px); border-block: 1px solid var(--rule);
+  /* 01 — what I build */
+  .pillars {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px; background: var(--rule); margin-top: clamp(46px, 6vw, 80px); border-block: 1px solid var(--rule);
   }
-  .loop li { background: var(--paper); padding: 28px 24px 34px 0; }
-  .loop li + li { padding-left: 24px; }
-  .step { color: var(--fail); margin-bottom: 14px; }
-  .loop p:last-child { font-size: .98rem; color: var(--ink-2); }
-
-  .hunr-foot { display: flex; flex-wrap: wrap; gap: 32px 60px; align-items: flex-end; justify-content: space-between; margin-top: 44px; }
-  .stats { display: flex; flex-wrap: wrap; gap: 26px 48px; }
-  .stats dt { color: var(--mid); margin-bottom: 6px; }
-  .stats dd { margin: 0; font-family: var(--display); font-weight: 800; font-stretch: 118%; font-size: 2.1rem; letter-spacing: -.02em; }
-  .cta {
-    font-family: var(--mono); font-size: .74rem; letter-spacing: .12em; text-transform: uppercase;
-    text-decoration: none; border-bottom: 2px solid currentColor; padding-bottom: 6px;
-    display: inline-flex; gap: 10px; align-items: center;
-  }
-  .cta span { transition: transform .25s ease; }
-  .cta:hover span { transform: translateX(5px); }
+  .pillars article { background: var(--paper); padding: 30px 26px 38px 0; }
+  .pillars article + article { padding-left: 26px; }
+  .p-h { color: var(--fail); margin-bottom: 16px; }
+  .pillars p { font-size: .98rem; color: var(--ink-2); }
+  .now { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px 44px; margin-top: 44px; }
+  .now dt { color: var(--mid); margin-bottom: 7px; }
+  .now dd { margin: 0; font-family: var(--body); font-size: 1.02rem; letter-spacing: 0; text-transform: none; }
 
   /* 03 — the record */
   .panel { margin-top: clamp(38px, 5vw, 60px); border: 1px solid var(--ink); }
@@ -257,39 +332,56 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { month: 'short', year: 'numeri
   .detail[hidden] { display: none; }
   .detail p { max-width: 74ch; color: var(--ink-2); font-size: .98rem; }
   .legend { border-top: 1px solid var(--rule); padding: 14px 20px; color: var(--mid); }
+  .early { margin-top: 36px; max-width: 78ch; color: var(--ink-2); font-size: .98rem; }
+  .early b { font-weight: 600; color: var(--ink); }
 
-  .works { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin-top: 40px; }
-  .works li { background: var(--paper); padding: 30px 26px; }
-  .w-org { color: var(--mid); margin-bottom: 14px; }
-  .works h3 { margin-bottom: 12px; }
-  .works p:last-child { font-size: .96rem; color: var(--ink-2); }
+  /* 05 — projects */
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: clamp(34px, 4vw, 50px); }
+  .chip {
+    font: inherit; cursor: pointer; background: none; color: var(--mid);
+    border: 1px solid var(--rule); padding: 9px 16px; transition: all .2s ease;
+  }
+  .chip:hover { border-color: var(--ink); color: var(--ink); }
+  .chip[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 
-  /* 05 — in public */
-  .contribs { margin-top: clamp(38px, 5vw, 56px); border-top: 1px solid var(--rule); }
-  .contribs li { display: grid; grid-template-columns: 280px 1fr; gap: 22px; padding: 24px 0; border-bottom: 1px solid var(--rule); }
-  .repo { display: flex; flex-direction: column; gap: 6px; }
-  .repo a { text-decoration: none; border-bottom: 1px solid var(--rule); align-self: flex-start; }
-  .repo a:hover { border-color: var(--ink); }
-  .repo span { color: var(--mid); font-size: .64rem; }
-  .contribs li > p + p { color: var(--ink-2); font-size: .98rem; }
-  .contribs code { font-family: var(--mono); font-size: .85em; }
-  .talks { margin-top: 46px; }
-  .sub { color: var(--fail); margin-bottom: 16px; }
-  .plain { display: grid; gap: 14px; max-width: 74ch; color: var(--ink-2); font-size: .98rem; }
-  .plain b { font-weight: 600; color: var(--ink); }
+  .projects { margin-top: 30px; border-top: 1px solid var(--rule); }
+  .proj { display: grid; grid-template-columns: 300px 1fr; gap: 26px; padding: 26px 0; border-bottom: 1px solid var(--rule); }
+  .proj[hidden] { display: none; }
+  .p-name { display: inline-flex; gap: .3em; align-items: baseline; text-decoration: none; }
+  a.p-name:hover { color: var(--fail); }
+  .ext { font-size: .5em; opacity: .55; }
+  .p-meta { color: var(--mid); margin-top: 9px; }
+  .p-body p { color: var(--ink-2); font-size: .98rem; max-width: 68ch; }
+  .p-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .p-tags span { border: 1px solid var(--rule); padding: 4px 10px; color: var(--mid); font-size: .62rem; }
+  .p-empty { margin-top: 24px; color: var(--mid); }
 
-  /* 06 — writing */
+  /* 06 — in public */
+  .pub { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(28px, 4vw, 64px); margin-top: clamp(34px, 4vw, 52px); }
+  .sub { color: var(--pass-lit); margin-bottom: 16px; }
+  .plain { display: grid; gap: 15px; color: #b9b9c2; font-size: .98rem; }
+  .plain b { font-weight: 600; color: var(--bone); }
+  .plain a { color: var(--pass-lit); }
+
+  /* 07 — writing */
   .posts { margin-top: clamp(34px, 4vw, 52px); border-top: 1px solid var(--rule); }
   .posts li { border-bottom: 1px solid var(--rule); }
-  .posts a { display: grid; grid-template-columns: 160px minmax(0, 1.1fr) minmax(0, 1fr); gap: 26px; align-items: baseline; padding: 26px 0; text-decoration: none; }
+  .posts a { display: grid; grid-template-columns: 150px minmax(0, 1.1fr) minmax(0, 1fr); gap: 26px; align-items: baseline; padding: 26px 0; text-decoration: none; }
   .posts a:hover .p-title { color: var(--fail); }
   .p-date { color: var(--mid); }
   .p-title { transition: color .2s ease; }
   .p-blurb { color: var(--ink-2); font-size: .96rem; }
-  .writing .cta { margin-top: 40px; }
+  .cta {
+    font-family: var(--mono); font-size: .74rem; letter-spacing: .12em; text-transform: uppercase;
+    text-decoration: none; border-bottom: 2px solid currentColor; padding-bottom: 6px;
+    display: inline-flex; gap: 10px; align-items: center; margin-top: 40px;
+  }
+  .cta span { transition: transform .25s ease; }
+  .cta:hover span { transform: translateX(5px); }
 
-  /* 07 — contact */
-  .contact .lede { max-width: 42ch; }
+  /* 08 — contact */
+  .section-end { padding-bottom: clamp(80px, 10vw, 140px); }
+  #contact .lede { max-width: 42ch; }
   .bigmail {
     display: inline-block; margin-top: clamp(34px, 4vw, 52px); font-size: clamp(1.5rem, 5.6vw, 4.4rem);
     text-decoration: none; color: var(--bone); word-break: break-word; border-bottom: 3px solid var(--rule-dark);
@@ -307,7 +399,7 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { month: 'short', year: 'numeri
     .dur { grid-row: 1; }
     .plot { grid-column: 1 / -1; }
     .detail { padding-left: 20px; }
-    .contribs li, .posts a { grid-template-columns: 1fr; gap: 10px; }
-    .loop li, .loop li + li { padding: 24px 0; }
+    .proj, .posts a { grid-template-columns: 1fr; gap: 12px; }
+    .pillars article, .pillars article + article { padding: 26px 0; }
   }
 </style>
