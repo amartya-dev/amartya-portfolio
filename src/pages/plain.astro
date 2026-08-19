@@ -1,0 +1,97 @@
+---
+import { P } from '../data/projects.js';
+import { getCollection } from 'astro:content';
+const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const groups = [
+  { k: 'agents', l: 'Agent systems' },
+  { k: 'infra', l: 'Infrastructure' },
+  { k: 'merged', l: 'Merged into other people’s repositories' }
+];
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Amartya Gaur — the plain version</title>
+<meta name="description" content="Everything on amartyagaur.com, as text. No canvas, no scripts, no scrolling animations." />
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    max-width: 68ch; margin: 0 auto; padding: 3rem 1.25rem 6rem;
+    font: 16px/1.6 ui-serif, Georgia, serif; color: #16161a; background: #fbfbf9;
+  }
+  @media (prefers-color-scheme: dark) { body { color: #e7e7e4; background: #101012; } }
+  h1 { font-size: 1.6rem; margin: 0 0 .2rem; }
+  h2 { font-size: 1rem; margin: 2.6rem 0 .8rem; text-transform: uppercase; letter-spacing: .08em; }
+  h3 { font-size: 1rem; margin: 1.4rem 0 .2rem; }
+  p, li { margin: .4rem 0; }
+  ul { padding-left: 1.1rem; }
+  .meta { font: .8rem/1.5 ui-monospace, monospace; opacity: .65; }
+  a { color: inherit; }
+  hr { border: 0; border-top: 1px solid currentColor; opacity: .15; margin: 2.4rem 0; }
+  .top { font: .8rem/1.5 ui-monospace, monospace; opacity: .7; margin-bottom: 2rem; }
+</style>
+</head>
+<body>
+  <p class="top"><a href="/">← the version with the moving parts</a></p>
+
+  <h1>Amartya Gaur</h1>
+  <p class="meta">AI systems engineer — agent orchestration, evals, infrastructure. Bengaluru, remote.</p>
+  <p>Founder and engineer at <a href="https://hunr.ai">hunr.ai</a> since August 2026. Before that, five years in
+    Newfold Digital&rsquo;s AI Center of Excellence.</p>
+  <p class="meta"><a href="mailto:amartya@hunr.ai">amartya@hunr.ai</a> ·
+    <a href="https://github.com/amartya-dev">github.com/amartya-dev</a> ·
+    <a href="https://linkedin.com/in/amartya-gaur">linkedin.com/in/amartya-gaur</a></p>
+
+  <hr />
+
+  <h2>Roles</h2>
+  <h3>Newfold Digital — Senior Software Developer, AI Center of Excellence</h3>
+  <p class="meta">April 2021 – August 2026 · remote</p>
+  <p>Owned the agent orchestration framework behind the production support agents for Network Solutions and BigRock,
+    the eval harness that gated their releases, and the generation stack behind the AI-native website builder. Earlier:
+    roughly 100,000 Microsoft 365 accounts migrated to NCE.</p>
+
+  <h3>hunr.ai (Kodaksh Private Limited) — Founder &amp; engineer</h3>
+  <p class="meta">2026 – present</p>
+  <p>Technical screening that lets candidates use AI and then verifies they understand what shipped.</p>
+
+  <h3>PayCrunch — Founding consultant &amp; technical architect</h3>
+  <p class="meta">2022 – 2025 · part-time</p>
+  <p>Backend from zero for a UPI credit lending product at a Y Combinator-backed fintech. Hired and led the first
+    three engineers.</p>
+
+  <hr />
+
+  {groups.map((g) => (
+    <>
+      <h2>{g.l}</h2>
+      <ul>
+        {P.filter((p) => p.g === g.k).map((p) => (
+          <li>
+            <strong>{p.href ? <a href={p.href}>{p.n}</a> : p.n}</strong>
+            <span class="meta"> — {p.w} · {p.y}</span>
+            <br />{p.d}
+          </li>
+        ))}
+      </ul>
+    </>
+  ))}
+
+  <hr />
+
+  <h2>Writing</h2>
+  <ul>
+    {posts.map((p) => (
+      <li><a href={`/blog/${p.id}/`}>{p.data.title}</a> <span class="meta">— {p.data.description}</span></li>
+    ))}
+  </ul>
+
+  <h2>Earlier</h2>
+  <p>Software engineering internships at American Express and Bruce Clay. B.Tech in computer science, Vellore Institute
+    of Technology, 2021. Four WordCamp talks.</p>
+
+  <p class="top" style="margin-top:3rem"><a href="/">← back to the moving parts</a></p>
+</body>
+</html>

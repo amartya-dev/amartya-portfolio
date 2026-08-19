@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Nothing here — Amartya Gaur" description="This page does not exist.">
+  <section class="chamber sec four">
+    <div class="wrap">
+      <p class="mono eyebrow">404</p>
+      <h1 class="d d-2">Reference<br />solution missing</h1>
+      <p class="lede">Every challenge I write ships with two answers, so the tests can prove they tell them apart.
+        This URL shipped with none, which is exactly the failure I built a gate to catch.</p>
+      <ul class="links mono">
+        <li><a href="/">Home</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/plain">The plain version</a></li>
+        <li><a href="mailto:amartya@hunr.ai">Tell me what you were looking for</a></li>
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .four { min-height: 78svh; display: flex; align-items: center; }
+  .four .lede { margin-top: 24px; max-width: 46ch; }
+  .links { display: flex; flex-wrap: wrap; gap: 12px 28px; margin-top: 40px; color: var(--bone-dim); }
+  .links a { text-decoration: none; border-bottom: 1px solid transparent; }
+  .links a:hover { color: var(--bone); border-color: currentColor; }
+</style>

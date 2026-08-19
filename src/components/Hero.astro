@@ -16,13 +16,46 @@
     <span class="no">failing <b data-fail>0</b></span>
     <span class="dimmed">739 cases</span>
   </div>
-  <a class="cue mono" href="#work">Scroll<span aria-hidden="true"></span></a>
+  <button type="button" class="view mono" data-view aria-pressed="false">
+    <span data-view-label>Order</span>
+  </button>
+  <a class="cue mono" href="#what">Scroll<span aria-hidden="true"></span></a>
 </section>
 
 <script>
   import { mountSwarm } from '../scripts/swarm.js';
   const canvas = document.getElementById('swarm');
-  if (canvas) mountSwarm(canvas, document.getElementById('readout'));
+  if (canvas) {
+    const swarm = mountSwarm(canvas, document.getElementById('readout'));
+    const btn = document.querySelector('[data-view]');
+    const label = document.querySelector('[data-view-label]');
+    const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let ordered = false, timer = null;
+
+    // Scramble the control, never the content — it is feedback that the state moved.
+    function morph(to) {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) { label.textContent = to; return; }
+      clearInterval(timer);
+      const from = label.textContent;
+      const len = Math.max(from.length, to.length);
+      let f = 0;
+      timer = setInterval(() => {
+        label.textContent = Array.from({ length: len }, (_, i) => {
+          if (i < f / 2.2) return to[i] || '';
+          return CHARS[(Math.random() * 26) | 0];
+        }).join('');
+        if (f++ > len * 2.2 + 2) { clearInterval(timer); label.textContent = to; }
+      }, 40);
+    }
+
+    btn.addEventListener('click', () => {
+      ordered = !ordered;
+      swarm.setOrder(ordered);
+      btn.setAttribute('aria-pressed', String(ordered));
+      btn.setAttribute('aria-label', ordered ? 'Show the suite as an object' : 'Show the suite as a matrix');
+      morph(ordered ? 'Flow' : 'Order');
+    });
+  }
 </script>
 
 <style>
@@ -55,6 +88,15 @@
   .readout .ok b { color: var(--pass-lit); }
   .readout .no b { color: var(--fail-lit); }
 
+  .view {
+    position: absolute; right: var(--gut); top: 96px; z-index: 3;
+    font: inherit; font-family: var(--mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
+    background: none; border: 1px solid #2b2b35; color: var(--bone-dim);
+    padding: 9px 16px; cursor: pointer; min-width: 92px; transition: border-color .2s ease, color .2s ease;
+  }
+  .view:hover { border-color: var(--bone-dim); color: var(--bone); }
+  .view[aria-pressed='true'] { border-color: var(--pass-lit); color: var(--pass-lit); }
+
   .cue {
     position: absolute; right: var(--gut); bottom: 30px; z-index: 2;
     color: var(--bone-dim); text-decoration: none; display: flex; align-items: center; gap: 10px;
@@ -66,5 +108,6 @@
     .hero-scrim { background: linear-gradient(180deg, rgba(8,8,10,.92) 0%, rgba(8,8,10,.62) 24%, rgba(8,8,10,.9) 52%, rgba(8,8,10,.97) 100%); }
     .hero-in { padding-block: 128px 92px; }
     .cue { display: none; }
+    .view { top: auto; bottom: 76px; right: var(--gut); }
   }
 </style>

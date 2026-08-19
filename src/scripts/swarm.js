@@ -41,11 +41,21 @@ export function mountSwarm(canvas, readout) {
     const shell = 23 + (i % 5) * 1.4;
     cells.push({
       pos: new THREE.Vector3(Math.cos(th) * r * shell, y * shell, Math.sin(th) * r * shell),
+      grid: new THREE.Vector3(),
+      at: new THREE.Vector3(),
       spin: new THREE.Euler(Math.random() * 6.28, Math.random() * 6.28, Math.random() * 6.28),
       order: 0, state: 0, t: 0, scale: 0.55, color: PENDING.clone(), repairAt: 0
     });
   }
   // Sweep order runs along x, so the resolve wave crosses the object.
+  // Order view: the same 739 cases as a flat matrix, which is what a test report
+  // actually looks like. Flow view: the same data as an object.
+  const COLS = 37, ROWS = Math.ceil(COUNT / 37);
+  cells.forEach((c, i) => {
+    const col = i % COLS, rw = Math.floor(i / COLS);
+    c.grid.set((col - (COLS - 1) / 2) * 1.55, -(rw - (ROWS - 1) / 2) * 1.55, 0);
+  });
+
   const xs = cells.map(c => c.pos.x);
   const minX = Math.min(...xs), maxX = Math.max(...xs);
   cells.forEach(c => { c.order = (c.pos.x - minX) / (maxX - minX); });
@@ -64,10 +74,11 @@ export function mountSwarm(canvas, readout) {
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
   const CYCLE = 8.6; // seconds for one sweep, wall-clock so a slow frame rate can't stall it
   let sweep = -0.05, cycle = 0, passing = 0, failing = 0, raf = null, live = true, phase0 = 0;
+  let order = 0, orderTarget = 0; // 0 = flow, 1 = order
 
   function resize() {
     const r = canvas.getBoundingClientRect();
-    const dpr = Math.min(devicePixelRatio || 1, quality === 2 ? 1.5 : 1);
+    const dpr = Math.min(devicePixelRatio || 1, r.width < 768 ? 1 : quality === 2 ? 1.5 : 1);
     renderer.setPixelRatio(dpr);
     renderer.setSize(r.width, r.height, false);
     composer.setPixelRatio(dpr);
@@ -86,6 +97,8 @@ export function mountSwarm(canvas, readout) {
     for (const c of cells) { c.state = 0; c.t = 0; c.scale = 0.55; c.color.copy(PENDING); c.repairAt = 0; }
   }
 
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
   let last = performance.now();
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000);
@@ -95,13 +108,18 @@ export function mountSwarm(canvas, readout) {
     sweep = ((now - phase0) / 1000 / CYCLE) * 1.6 - 0.05;
     if (sweep > 1.55) reset(now);
 
+    order += (orderTarget - order) * Math.min(1, dt * 3.4);
+    const flow = 1 - order;
+
     pointer.x += (pointer.tx - pointer.x) * 0.045;
     pointer.y += (pointer.ty - pointer.y) * 0.045;
-    group.rotation.y += dt * 0.075;
-    group.rotation.x = pointer.y * 0.22;
-    group.rotation.z = pointer.x * 0.06;
-    camera.position.x = pointer.x * 5;
-    camera.position.y = -pointer.y * 4;
+    group.rotation.y += dt * 0.075 * flow;
+    group.rotation.y *= order > 0.98 ? 0 : 1;
+    group.rotation.x = pointer.y * 0.22 * flow;
+    group.rotation.z = pointer.x * 0.06 * flow;
+    camera.position.x = pointer.x * 5 * flow;
+    camera.position.y = -pointer.y * 4 * flow;
+    group.position.x = order * (W > 900 ? 13 : 0);
     camera.lookAt(0, 0, 0);
 
     for (let i = 0; i < COUNT; i++) {
@@ -120,10 +138,14 @@ export function mountSwarm(canvas, readout) {
         c.scale += (1 - c.scale) * Math.min(1, dt * 9);
         if (c.state === 2 && c.t > c.repairAt) { c.state = 1; c.t = 0; failing--; passing++; }
       }
-      dummy.position.copy(c.pos);
-      dummy.rotation.copy(c.spin);
-      dummy.rotation.y += now * 0.00008 * (1 + (i % 3));
-      dummy.scale.setScalar(c.scale);
+      c.at.lerpVectors(c.pos, c.grid, ease(order));
+      dummy.position.copy(c.at);
+      dummy.rotation.set(
+        c.spin.x * flow,
+        c.spin.y * flow + now * 0.00008 * (1 + (i % 3)) * flow,
+        c.spin.z * flow
+      );
+      dummy.scale.setScalar(c.scale * (1 - order * 0.22));
       dummy.updateMatrix();
       mesh.setMatrixAt(i, dummy.matrix);
       mesh.setColorAt(i, c.color);
@@ -176,4 +198,6 @@ export function mountSwarm(canvas, readout) {
     document.addEventListener('visibilitychange', () => { live = !document.hidden; live ? play() : pause(); });
     play();
   }
+
+  return { setOrder: (v) => { orderTarget = v ? 1 : 0; if (!raf && live) play(); } };
 }
