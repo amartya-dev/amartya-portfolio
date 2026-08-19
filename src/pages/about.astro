@@ -6,8 +6,18 @@ import Base from '../layouts/Base.astro';
 const dir = path.join(process.cwd(), 'public', 'media');
 const files = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
 const label = (f) => f.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
-const photos = files.filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(f)).sort();
 const videos = files.filter((f) => /\.(mp4|webm)$/i.test(f)).sort();
+const stems = new Set(videos.map((f) => f.replace(/\.[^.]+$/, '')));
+// An image sharing a video's name is that video's poster, not a photograph.
+const photos = files
+  .filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(f))
+  .filter((f) => !stems.has(f.replace(/\.[^.]+$/, '')))
+  .sort();
+const posterFor = (v) => {
+  const stem = v.replace(/\.[^.]+$/, '');
+  const hit = files.find((f) => f !== v && f.startsWith(stem + '.') && /\.(jpe?g|png|webp)$/i.test(f));
+  return hit ? `/media/${hit}` : undefined;
+};
 const hasMedia = photos.length > 0 || videos.length > 0;
 ---
 <Base title="Off the clock — Amartya Gaur" description="The parts of Amartya Gaur that are not infrastructure: music, martial arts, and talking to rooms full of people about WordPress." theme="light">
@@ -54,7 +64,7 @@ const hasMedia = photos.length > 0 || videos.length > 0;
         <div class="gallery">
           {videos.map((f) => (
             <figure class="shot wide">
-              <video src={`/media/${f}`} controls preload="none" playsinline></video>
+              <video src={`/media/${f}`} poster={posterFor(f)} controls preload="none" playsinline></video>
               <figcaption class="mono">{label(f)}</figcaption>
             </figure>
           ))}
