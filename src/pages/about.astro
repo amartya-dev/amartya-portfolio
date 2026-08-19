@@ -42,6 +42,9 @@ const hasMedia = photos.length > 0 || videos.length > 0;
           <h2 class="mono sub">Elsewhere</h2>
           <p>I built the site for the Jeet Kune Do Federation of India for nothing, which is the sort of thing you
             do when the cause is close to you.</p>
+          <p>I make AI video, which is how <a href="https://github.com/calesthio/OpenMontage/pull/372" rel="noopener">product-motion</a>
+            happened — I wanted a tool that could cut a product film from the product&rsquo;s own source code, without
+            inventing screens that do not exist, and it was easier to build it than to keep being disappointed.</p>
           <p>Bengaluru, mostly. An Arctic Code Vault contributor, which means only that I was committing to the
             right repositories in 2020.</p>
         </section>
@@ -79,6 +82,7 @@ const hasMedia = photos.length > 0 || videos.length > 0;
   .sub { color: var(--fail); margin-bottom: 16px; }
   .cols p { color: var(--ink-2); font-size: .98rem; }
   .cols p + p { margin-top: 1em; }
+  .cols a { color: var(--fail); }
 
   .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; margin-top: clamp(44px, 5vw, 72px); }
   .shot { margin: 0; }
