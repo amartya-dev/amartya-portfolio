@@ -1,0 +1,95 @@
+<div class="units" data-units>
+  <div class="term">
+    <span class="spin" data-spin>⠋</span>
+    <span class="label">downloading</span>
+    <span class="track"><i data-fill></i></span>
+    <span class="read" data-read>0.0/5.0 MiB</span>
+  </div>
+  <div class="ctl mono">
+    <button type="button" class="tog" data-tog aria-pressed="true">
+      <code>DownloadColumn(binary_units=<b data-flag>True</b>)</code>
+    </button>
+    <span class="div" data-div>divisor 1024</span>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('[data-units]').forEach((el) => {
+    const BIN = ['bytes', 'KiB', 'MiB', 'GiB', 'TiB'];
+    const DEC = ['bytes', 'KB', 'MB', 'GB', 'TB'];
+    const TOTAL = 5 * 1024 * 1024;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let binary = true, done = 0, raf = null;
+
+    const read = el.querySelector('[data-read]');
+    const fill = el.querySelector('[data-fill]');
+    const flag = el.querySelector('[data-flag]');
+    const divEl = el.querySelector('[data-div]');
+    const spin = el.querySelector('[data-spin]');
+    const FRAMES = '⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏';
+
+    // rich/progress.py: pick a unit, then precision = 0 if unit == 1 else 1
+    function render(completed) {
+      const table = binary ? BIN : DEC;
+      const base = binary ? 1024 : 1000;
+      let unit = 1, i = 0;
+      while (i < table.length - 1 && TOTAL >= unit * base) { unit *= base; i++; }
+      const p = unit === 1 ? 0 : 1;
+      return `${(completed / unit).toFixed(p)}/${(TOTAL / unit).toFixed(p)} ${table[i]}`;
+    }
+
+    function paint() {
+      read.textContent = render(done);
+      fill.style.width = (done / TOTAL) * 100 + '%';
+      flag.textContent = binary ? 'True' : 'False';
+      divEl.textContent = 'divisor ' + (binary ? '1024' : '1000');
+    }
+
+    let t = 0;
+    function tick() {
+      t += 0.006;
+      done = Math.min(TOTAL, TOTAL * (t % 1.25));
+      spin.textContent = FRAMES[Math.floor(t * 40) % FRAMES.length];
+      paint();
+      raf = requestAnimationFrame(tick);
+    }
+
+    el.querySelector('[data-tog]').addEventListener('click', (e) => {
+      binary = !binary;
+      e.currentTarget.setAttribute('aria-pressed', String(binary));
+      el.classList.add('flash');
+      setTimeout(() => el.classList.remove('flash'), 320);
+      paint();
+    });
+
+    if (reduced) { done = TOTAL * 0.62; paint(); }
+    else {
+      new IntersectionObserver((es) => es.forEach((en) => {
+        if (en.isIntersecting) { if (!raf) raf = requestAnimationFrame(tick); }
+        else if (raf) { cancelAnimationFrame(raf); raf = null; }
+      }), { threshold: 0 }).observe(el);
+    }
+  });
+</script>
+
+<style>
+  .units { border: 1px solid var(--rule); background: var(--paper); }
+  .term {
+    display: flex; align-items: center; gap: 14px; padding: 18px 20px;
+    font-family: var(--mono); font-size: .82rem; color: var(--ink);
+  }
+  .spin { color: var(--pass); width: 1ch; }
+  .label { color: var(--mid); }
+  .track { flex: 1; min-width: 60px; height: 9px; background: var(--paper-2); display: block; }
+  .track i { display: block; height: 100%; background: var(--ink); width: 0; }
+  .read { font-variant-numeric: tabular-nums; min-width: 13ch; text-align: right; transition: color .2s ease; }
+  .flash .read { color: var(--fail); }
+
+  .ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 13px 20px; border-top: 1px solid var(--rule); background: var(--paper-2); }
+  .tog { font: inherit; cursor: pointer; background: var(--paper); border: 1px solid var(--rule); padding: 9px 14px; color: var(--ink-2); }
+  .tog:hover { border-color: var(--ink); }
+  .tog code { font-family: var(--mono); font-size: .72rem; }
+  .tog b { color: var(--pass); font-weight: 500; }
+  .tog[aria-pressed='false'] b { color: var(--fail); }
+  .div { color: var(--mid); text-transform: none; letter-spacing: .04em; }
+</style>

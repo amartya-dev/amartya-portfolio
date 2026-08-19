@@ -1,0 +1,216 @@
+---
+const SEEDS = [
+  'my dns records are not propagating',
+  'and the invoice for last month',
+  'the second one',
+  'still failing'
+];
+---
+<section id="router" class="chamber sec rig-sec">
+  <div class="wrap">
+    <p class="mono eyebrow rv">Orchestration</p>
+    <h2 class="d d-2 rv">Ask it twice,<br />get two answers</h2>
+    <p class="lede rv">A router that re-decides every turn will change its mind on you. Type at both of these and watch
+      which one keeps the plot.</p>
+
+    <div class="rig rv">
+      <div class="rig-in">
+        <label class="mono ask-l" for="ask">say something to support</label>
+        <div class="ask">
+          <input id="ask" type="text" autocomplete="off" spellcheck="false"
+                 placeholder="my dns records are not propagating" data-ask />
+          <button type="button" class="send mono" data-send>Send</button>
+        </div>
+        <div class="seeds mono">
+          <span>or borrow one:</span>
+          {SEEDS.map((s) => <button type="button" class="seed" data-seed={s}>{s}</button>)}
+          <button type="button" class="seed reset" data-reset>start over</button>
+        </div>
+      </div>
+
+      <div class="lanes">
+        <article class="lane" data-lane="naive">
+          <header class="mono">
+            <b>Router</b><span>re-decides every turn</span>
+            <em class="tally" data-flips>0 re-routes</em>
+          </header>
+          <ol class="turns" data-turns="naive"></ol>
+          <p class="empty mono" data-empty-naive>Nothing yet. Go on.</p>
+        </article>
+
+        <article class="lane" data-lane="sticky">
+          <header class="mono">
+            <b>Sticky orchestrator</b><span>decides once, holds</span>
+            <em class="tally ok" data-pinned>unpinned</em>
+          </header>
+          <ol class="turns" data-turns="sticky"></ol>
+          <p class="empty mono" data-empty-sticky>Same input. Calmer outcome.</p>
+        </article>
+      </div>
+    </div>
+
+    <p class="foot-note mono rv">Eight turns at 94% per-turn accuracy is a 61% chance of finishing where you started.
+      Deciding once is cheating, and I recommend it.</p>
+  </div>
+</section>
+
+<script>
+  const rig = document.querySelector('#router .rig');
+  if (rig) {
+    const WORKFLOWS = {
+      dns: ['dns', 'domain', 'nameserver', 'record', 'cname', 'propagat', 'a record', 'mx'],
+      billing: ['invoice', 'charge', 'refund', 'bill', 'payment', 'price', 'renew', 'subscription', 'card'],
+      email: ['email', 'mailbox', 'imap', 'smtp', 'inbox', 'spam', 'webmail'],
+      hosting: ['site', 'wordpress', 'php', 'server', 'ssl', 'down', '500', 'hosting', 'slow']
+    };
+    const KEYS = Object.keys(WORKFLOWS);
+
+    function classify(text) {
+      const t = text.toLowerCase();
+      let best = null, score = 0;
+      for (const k of KEYS) {
+        const hits = WORKFLOWS[k].filter((w) => t.includes(w)).length;
+        if (hits > score) { score = hits; best = k; }
+      }
+      return { workflow: best, confident: score > 0 };
+    }
+
+    const ask = rig.querySelector('[data-ask]');
+    const naiveList = rig.querySelector('[data-turns="naive"]');
+    const stickyList = rig.querySelector('[data-turns="sticky"]');
+    const flipsEl = rig.querySelector('[data-flips]');
+    const pinnedEl = rig.querySelector('[data-pinned]');
+    const emptyN = rig.querySelector('[data-empty-naive]');
+    const emptyS = rig.querySelector('[data-empty-sticky]');
+
+    let pinned = null, lastNaive = null, flips = 0, turn = 0;
+
+    function row(list, workflow, note, tone) {
+      const li = document.createElement('li');
+      li.className = 'turn' + (tone ? ' ' + tone : '');
+      li.innerHTML =
+        '<span class="mono wf">' + (workflow ? 'wf.' + workflow : 'wf.unknown') + '</span>' +
+        '<span class="mono note">' + note + '</span>';
+      list.appendChild(li);
+      requestAnimationFrame(() => li.classList.add('in'));
+    }
+
+    function send(text) {
+      const msg = text.trim();
+      if (!msg) return;
+      turn++;
+      emptyN.hidden = true;
+      emptyS.hidden = true;
+
+      const bubble = (list) => {
+        const li = document.createElement('li');
+        li.className = 'said';
+        li.textContent = msg;
+        list.appendChild(li);
+        requestAnimationFrame(() => li.classList.add('in'));
+      };
+      bubble(naiveList);
+      bubble(stickyList);
+
+      // Router: only this message exists. Ambiguous input still forces a choice.
+      const c = classify(msg);
+      let naive = c.workflow;
+      if (!c.confident) {
+        const pool = KEYS.filter((k) => k !== lastNaive);
+        naive = pool[Math.floor(Math.random() * pool.length)];
+      }
+      const flipped = lastNaive && naive !== lastNaive;
+      if (flipped) flips++;
+      row(naiveList, naive,
+        c.confident ? (flipped ? 're-routed' : 'held') : (flipped ? 're-routed on a guess' : 'guessed'),
+        flipped ? 'bad' : '');
+      lastNaive = naive;
+      flipsEl.textContent = flips + (flips === 1 ? ' re-route' : ' re-routes');
+      flipsEl.classList.toggle('no', flips > 0);
+
+      // Sticky: classify once at intake, then the workflow owns the conversation.
+      if (!pinned) {
+        pinned = c.workflow || 'triage';
+        pinnedEl.textContent = 'pinned to wf.' + pinned;
+        row(stickyList, pinned, 'pinned at intake', 'good');
+      } else {
+        row(stickyList, pinned, 'still ' + pinned + ', turn ' + turn, 'good');
+      }
+
+      ask.value = '';
+      naiveList.scrollTop = naiveList.scrollHeight;
+      stickyList.scrollTop = stickyList.scrollHeight;
+    }
+
+    rig.querySelector('[data-send]').addEventListener('click', () => send(ask.value || ask.placeholder));
+    ask.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); send(ask.value || ask.placeholder); }
+    });
+    rig.querySelectorAll('[data-seed]').forEach((b) => b.addEventListener('click', () => send(b.dataset.seed)));
+    rig.querySelector('[data-reset]').addEventListener('click', () => {
+      pinned = null; lastNaive = null; flips = 0; turn = 0;
+      naiveList.innerHTML = ''; stickyList.innerHTML = '';
+      flipsEl.textContent = '0 re-routes'; flipsEl.classList.remove('no');
+      pinnedEl.textContent = 'unpinned';
+      emptyN.hidden = false; emptyS.hidden = false;
+      ask.focus();
+    });
+  }
+</script>
+
+<style>
+  .rig { margin-top: clamp(34px, 4vw, 56px); border: 1px solid var(--rule-dark); background: var(--void-2); }
+  .rig-in { padding: 20px 18px; border-bottom: 1px solid var(--rule-dark); }
+  .ask-l { color: var(--bone-dim); display: block; margin-bottom: 10px; }
+  .ask { display: flex; gap: 10px; }
+  .ask input {
+    flex: 1; min-width: 0; background: var(--void); border: 1px solid var(--rule-dark); color: var(--bone);
+    font-family: var(--mono); font-size: .84rem; padding: 13px 15px;
+  }
+  .ask input:focus { outline: none; border-color: var(--pass-lit); }
+  .ask input::placeholder { color: #4a4a55; }
+  .send {
+    background: var(--bone); color: var(--void); border: 0; padding: 13px 22px; cursor: pointer;
+    font-family: var(--mono); letter-spacing: .12em; text-transform: uppercase; font-size: .7rem;
+  }
+  .send:hover { background: var(--pass-lit); }
+
+  .seeds { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; color: #4a4a55; text-transform: none; letter-spacing: .03em; }
+  .seed {
+    font: inherit; cursor: pointer; background: none; border: 1px dashed var(--rule-dark);
+    color: var(--bone-dim); padding: 6px 11px;
+  }
+  .seed:hover { border-style: solid; border-color: var(--bone-dim); color: var(--bone); }
+  .seed.reset { border-color: transparent; text-decoration: underline; }
+
+  .lanes { display: grid; }
+  @media (min-width: 860px) { .lanes { grid-template-columns: 1fr 1fr; } }
+  .lane { padding: 18px; min-height: 260px; }
+  .lane + .lane { border-left: 1px solid var(--rule-dark); }
+  @media (max-width: 859px) { .lane + .lane { border-left: 0; border-top: 1px solid var(--rule-dark); } }
+  .lane header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-bottom: 16px; color: var(--bone-dim); }
+  .lane header b { color: var(--bone); font-weight: 500; }
+  .lane header span { text-transform: none; letter-spacing: .03em; color: #4a4a55; }
+  .tally { margin-left: auto; font-style: normal; color: var(--bone-dim); }
+  .tally.ok { color: var(--pass-lit); }
+  .tally.no { color: var(--fail-lit); }
+
+  .turns { display: grid; gap: 7px; }
+  /* These rows are built by the script, so they need global selectors to be styled. */
+  .lane :global(.said), .lane :global(.turn) {
+    opacity: 0; transform: translateY(6px); transition: opacity .3s ease, transform .3s ease;
+  }
+  .lane :global(.said.in), .lane :global(.turn.in) { opacity: 1; transform: none; }
+  .lane :global(.said) {
+    font-size: .92rem; color: #c3c3cb; background: #171720; padding: 9px 13px;
+    margin-top: 9px; border-left: 2px solid #2e2e3a;
+  }
+  .lane :global(.turn) { display: flex; gap: 12px; align-items: baseline; padding-left: 13px; }
+  .lane :global(.wf) { font-family: var(--mono); font-size: .74rem; letter-spacing: .06em; color: var(--bone-dim); }
+  .lane :global(.turn.good .wf) { color: var(--pass-lit); }
+  .lane :global(.turn.bad .wf) { color: var(--fail-lit); }
+  .lane :global(.note) { font-family: var(--mono); font-size: .72rem; color: #4a4a55; letter-spacing: .03em; }
+  .empty { color: #3d3d47; text-transform: none; letter-spacing: .03em; }
+
+  .foot-note { margin-top: 22px; color: var(--bone-dim); text-transform: none; letter-spacing: .03em; max-width: 60ch; line-height: 1.7; }
+</style>
