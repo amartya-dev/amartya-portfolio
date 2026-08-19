@@ -32,10 +32,10 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long'
   .wrap { max-width: 880px; }
   .back { color: var(--mid); text-decoration: none; display: inline-block; }
   .back:hover { color: var(--ink); }
-  .meta { color: var(--mid); margin: 34px 0 20px; }
+  .meta { color: var(--mid); margin: var(--s-4) 0 var(--s-2); }
   .post :global(.d-2) { font-size: clamp(1.9rem, 4.6vw, 3.5rem); }
-  .stand { font-size: clamp(1.15rem, 1.8vw, 1.45rem); line-height: 1.5; color: var(--ink-2); margin-top: 26px; font-style: italic; }
-  .prose { margin-top: clamp(40px, 5vw, 60px); }
+  .stand { font-size: var(--t-lede); line-height: 1.42; color: var(--ink-2); font-style: italic; }
+  .prose { margin-top: var(--s-5); }
   .prose :global(p) { margin-bottom: 1.3em; }
   .prose :global(h2) {
     font-family: var(--display); font-weight: 800; font-stretch: 116%; text-transform: uppercase;
