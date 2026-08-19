@@ -18,6 +18,8 @@
 
   --pass: #0b7a46;
   --fail: #cf3a20;
+  /* The same red, dark enough to be read at label sizes on paper. */
+  --fail-ink: #c4341c;
   --pass-lit: #35e08a;
   --fail-lit: #ff6244;
 
@@ -147,9 +149,17 @@ a { color: inherit; }
 .foot { border-top: 1px solid var(--rule-dark); }
 .foot-in { display: flex; flex-wrap: wrap; gap: 14px 32px; justify-content: space-between; padding-block: 26px; color: var(--bone-dim); }
 
+.top .brand .short { display: none; }
+
 @media (max-width: 720px) {
   body { font-size: 18px; }
-  .top .nav { gap: 16px; font-size: .68rem; }
-  .top .nav .hide-sm { display: none; }
+  .top .nav { gap: 15px; font-size: .68rem; }
   .eyebrow::before { display: none; }
+}
+/* Five destinations and a wordmark do not fit a phone. The wordmark gives way,
+   because you can already see whose site this is. */
+@media (max-width: 620px) {
+  .top .brand .full { display: none; }
+  .top .brand .short { display: inline; }
+  .top .nav { gap: 13px; font-size: .64rem; }
 }

@@ -5,6 +5,8 @@ date: 2026-03-02
 tags: ["evals", "ci", "agents"]
 ---
 
+import Bars from '../../components/Bars.astro';
+
 Most agent evaluation I have seen produces a number that goes in a slide. It is measured after the
 fact, it moves for reasons nobody can attribute, and when it drops, the response is a conversation
 rather than a rollback.
@@ -31,6 +33,18 @@ So the suite is built out of things that are deterministic given a fixed model a
 Roughly 250 scoring metrics across 739 regression cases and about 2,700 assertions. The ones that
 involve model judgment are graded, reported, and explicitly non-blocking. Only the deterministic
 ones can fail the build.
+
+<Bars
+  title="What is actually in the suite"
+  rows={[
+    { n: 'Assertions', v: 2700 },
+    { n: 'Regression cases', v: 739 },
+    { n: 'Scoring metrics', v: 250 }
+  ]}
+  note="Three different things, deliberately shown against each other. A case is one conversation. An
+  assertion is one checkable claim about it, and roughly three and a half of them ride on every case,
+  which is why a failure report has to name the assertion rather than the case."
+/>
 
 ## Every case came from something that broke
 

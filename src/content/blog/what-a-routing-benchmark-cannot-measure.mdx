@@ -5,6 +5,9 @@ date: 2026-08-10
 tags: ["agents", "routing", "evaluation"]
 ---
 
+import Bars from '../../components/Bars.astro';
+import Grid from '../../components/Grid.astro';
+
 Every multi-agent dialogue system answers the same question on every turn: which agent owns this one?
 The standard answer is a global router: one classifier scoring the current turn against the full
 catalogue of agents. It is stateless by construction, re-deriving the decision from nothing each time.
@@ -23,6 +26,21 @@ It matched. On the boundary stratum the fast model scored 0.985 for triage again
 the strong model, 0.985 against 0.975. Nothing significant in either direction, which is exactly what
 "matches" means. That was day one.
 
+<Bars
+  title="Boundary-stratum accuracy: the fully-informed global router against the local gate"
+  max={1}
+  dp={3}
+  rows={[
+    { n: 'Fast model, triage', v: 0.985 },
+    { n: 'Fast model, gate', v: 0.955 },
+    { n: 'Strong model, triage', v: 0.985 },
+    { n: 'Strong model, gate', v: 0.975 }
+  ]}
+  note="The gap is 0.03 on the fast model and 0.01 on the strong one, in the wrong direction both
+  times. The kill criterion said that if the stateless router matched the gate at boundaries, the
+  architecture argument was dead."
+/>
+
 ## Ten registrations, seven negative
 
 I kept going, because a dead hypothesis is not the same as a wasted instrument. Ten pre-registered
@@ -32,6 +50,24 @@ calls across two vendors.
 Seven came back negative. The gate never paid for itself: across eight deployments its margin over a
 tuned sticky baseline was −0.0009, −0.0015, −0.0008, −0.0015, −0.0037, −0.0031, +0.0019, −0.0060. One
 positive out of eight, and that one inside the noise.
+
+<Bars
+  zero
+  dp={4}
+  title="Margin of the gate over a tuned sticky baseline, across eight deployments"
+  rows={[
+    { n: 'Deployment 1', v: -0.0009 },
+    { n: 'Deployment 2', v: -0.0015 },
+    { n: 'Deployment 3', v: -0.0008 },
+    { n: 'Deployment 4', v: -0.0015 },
+    { n: 'Deployment 5', v: -0.0037 },
+    { n: 'Deployment 6', v: -0.0031 },
+    { n: 'Deployment 7', v: 0.0019 },
+    { n: 'Deployment 8', v: -0.0060 }
+  ]}
+  note="One of the eight is positive and it is smaller than the noise. This is what a design that does
+  not pay for itself looks like when you have written down in advance what paying would have meant."
+/>
 
 A cross-benchmark replication on MultiWOZ disconfirmed all four co-primaries. A threshold-sensitivity
 study came back at ρ = 0.325, p = 0.40. A promising in-context-state effect shrank by a factor of three
@@ -59,12 +95,37 @@ ABCD is different, and better: its state is *agent actions*, system events rathe
 participant said. Only 17% of completed actions are identifiable lexically, 43% by a model. That is the
 production condition: which procedure has completed is genuinely hidden.
 
+<Bars
+  title="How much of each corpus's state is recoverable from its own visible transcript"
+  unit="%"
+  max={100}
+  rows={[
+    { n: 'MultiWOZ, lexical', v: 92, bad: true },
+    { n: 'SGD, lexical', v: 92, bad: true },
+    { n: 'ABCD, model-graded', v: 43 },
+    { n: 'ABCD, lexical', v: 17 }
+  ]}
+  note="Red is the failure. Where the customer says the state out loud, the stateless router is handed
+  the state for free and the experiment you think you are running is not the one running. ABCD is the
+  only one of the three whose state is genuinely hidden, because its state is agent actions rather than
+  anything a participant said."
+/>
+
 And then ABCD fails for an entirely different reason.
 
 ## Zero out of one thousand and four
 
 ABCD has 10 flows and 96 subflows. Of its 1,004 test dialogues, the number containing more than one
 subflow is **zero**.
+
+<Grid
+  n={1004}
+  hit={0}
+  cols={44}
+  title="Every ABCD test dialogue. Marked: the ones containing more than one subflow"
+  legend="1,004 test dialogues"
+  note="There is nothing to find. That is a hard count rather than an estimate."
+/>
 
 Every dialogue runs one subflow start to finish. There is no "which workflow owns this turn" question,
 because the answer never changes. The boundary stratum is empty. Over-stickiness is never punished. A

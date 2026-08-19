@@ -83,13 +83,13 @@
   .track { flex: 1; min-width: 60px; height: 9px; background: var(--paper-2); display: block; }
   .track i { display: block; height: 100%; background: var(--ink); width: 0; }
   .read { font-variant-numeric: tabular-nums; min-width: 13ch; text-align: right; transition: color .2s ease; }
-  .flash .read { color: var(--fail); }
+  .flash .read { color: var(--fail-ink); }
 
   .ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 13px 20px; border-top: 1px solid var(--rule); background: var(--paper-2); }
   .tog { font: inherit; cursor: pointer; background: var(--paper); border: 1px solid var(--rule); padding: 9px 14px; color: var(--ink-2); }
   .tog:hover { border-color: var(--ink); }
   .tog code { font-family: var(--mono); font-size: .72rem; }
   .tog b { color: var(--pass); font-weight: 500; }
-  .tog[aria-pressed='false'] b { color: var(--fail); }
-  .div { color: var(--mid); text-transform: none; letter-spacing: .04em; }
+  .tog[aria-pressed='false'] b { color: var(--fail-ink); }
+  .div { color: #5f5f59; text-transform: none; letter-spacing: .04em; }
 </style>

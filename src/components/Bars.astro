@@ -1,0 +1,54 @@
+---
+// A bar chart for prose. Server-rendered, no script, no library.
+//
+// rows: [{ n, v, bad?, note? }]   n is the label, v the value
+// zero: draw a signed axis through the middle, for margins that can go either way
+// unit: printed after each value
+// max:  override the scale, e.g. to pin a percentage chart to 100
+const { title = '', unit = '', rows = [], zero = false, max: maxProp, note = '', dp = 0 } = Astro.props;
+
+const vals = rows.map((r) => Number(r.v));
+const lim = maxProp ?? Math.max(...vals.map(Math.abs));
+const fmt = (v) => (dp ? Number(v).toFixed(dp) : Number(v).toLocaleString('en-US'));
+
+const geom = rows.map((r) => {
+  const v = Number(r.v);
+  const w = (Math.abs(v) / lim) * (zero ? 50 : 100);
+  return { ...r, v, w, left: zero ? (v < 0 ? 50 - w : 50) : 0 };
+});
+---
+<figure class="fig">
+  {title && <figcaption class="mono cap">{title}</figcaption>}
+  <div class="rows">
+    {geom.map((r) => (
+      <div class="row">
+        <span class="mono lab">{r.n}</span>
+        <span class="track">
+          <i class:list={['bar', { bad: r.bad, neg: zero && r.v < 0 }]} style={`left:${r.left}%;width:${r.w}%`}></i>
+          {zero && <b class="axis"></b>}
+        </span>
+        <span class="mono val">{r.v > 0 && zero ? '+' : ''}{fmt(r.v)}{unit}</span>
+      </div>
+    ))}
+  </div>
+  {note && <p class="note">{note}</p>}
+</figure>
+
+<style>
+  .fig { margin: 2.2em 0; border-top: 1px solid var(--ink); padding-top: 16px; }
+  .cap { color: var(--ink); font-size: var(--t-micro); letter-spacing: .13em; margin-bottom: 18px; display: block; max-width: 62ch; line-height: 1.7; }
+  .rows { display: grid; gap: 9px; }
+  .row { display: grid; grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) 5.6rem; gap: 16px; align-items: center; }
+  .lab { color: var(--ink-2); font-size: .66rem; letter-spacing: .05em; text-transform: none; }
+  .track { position: relative; height: 13px; background: var(--paper-2); display: block; }
+  .bar { position: absolute; top: 0; bottom: 0; background: var(--pass); min-width: 2px; }
+  .bar.bad, .bar.neg { background: var(--fail); }
+  .axis { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--ink); }
+  .val { text-align: right; color: var(--ink); font-size: .66rem; letter-spacing: .03em; text-transform: none; font-variant-numeric: tabular-nums; }
+  .note { margin-top: 16px; color: var(--mid); font-size: .86rem; line-height: 1.7; max-width: 62ch; }
+
+  @media (max-width: 620px) {
+    .row { grid-template-columns: minmax(0, 7.5rem) minmax(0, 1fr) 4.4rem; gap: 10px; }
+    .lab { font-size: .6rem; }
+  }
+</style>

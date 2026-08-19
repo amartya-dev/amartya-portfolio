@@ -1,11 +1,12 @@
 ---
-// Ask the page. A model with a typed tool surface and retrieved passages, and no
-// other way to reach the visitor: prose it cannot source is rejected before it is
-// shown, and chart numbers come from series computed here rather than from the
-// model. Same argument as the data layer further down the page, pointed at me.
+// Ask the page. An agent with five tools, a catalogue of everything this site
+// holds, and no other way to reach you: prose it cannot source is rejected and
+// asked again in front of you, and chart numbers come from series this page counts
+// rather than from the model. Same argument as the data layer further down, turned
+// on me.
 //
-// The endpoint is functions/api/ask.js. Without it the box still answers, from the
-// index alone, and says so.
+// The endpoint is functions/api/ask.js and it needs ANTHROPIC_API_KEY. Without it
+// the box still answers from the index alone, and says that is what it is doing.
 import { getCollection } from 'astro:content';
 import { buildIndex, buildPlots } from '../data/ask.js';
 
@@ -13,12 +14,12 @@ const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf()
 const INDEX = buildIndex(posts);
 const PLOTS = buildPlots(posts);
 
-const CHIPS = [
+const OPENERS = [
   'How long has he been doing this?',
   'What has he actually shipped?',
-  'Anything with payments?',
+  'Has he done anything with payments?',
   'How does he test an agent?',
-  'What does he do outside work?',
+  'What does he do away from a keyboard?',
   'What salary does he want?'
 ];
 ---
@@ -26,36 +27,39 @@ const CHIPS = [
   <div class="wrap">
     <p class="mono eyebrow rv">Ask</p>
     <h2 class="d d-2 rv">Ask it about me.<br />It has to cite</h2>
-    <p class="lede rv">A model that can reach you through four tools and no other way. It decides what
-      to say and what to draw. It does not get to decide the numbers.</p>
+    <p class="lede rv">A model with five tools and no other way to reach you. It picks what to say,
+      what to look up and what to draw. It does not get to pick the numbers.</p>
 
     <div class="box rv" data-ask>
+      <div class="log" data-log>
+        <div class="turn bot">
+          <p class="cb">Ask me anything about Amartya. I read an index compiled from this site, {INDEX.length} passages
+            of it, and I will show you which ones I open. If the answer is not in there I will say so
+            rather than improvise, which is most of the reason this box is on the page.</p>
+          <div class="follows" data-openers>
+            {OPENERS.map((c, i) => <button type="button" class:list={['chip', { hard: i === OPENERS.length - 1 }]}>{c}</button>)}
+          </div>
+        </div>
+      </div>
+
       <form class="bar" data-form>
         <label class="sr" for="ask-q">Ask a question about Amartya</label>
-        <input id="ask-q" type="text" autocomplete="off" maxlength="300"
-          placeholder="Has he built anything with payments?" data-q />
+        <input id="ask-q" type="text" autocomplete="off" maxlength="400"
+          placeholder="Ask a follow-up, or something new" data-q />
         <button type="submit" class="mono" data-go>Ask</button>
+        <button type="button" class="mono reset" data-reset hidden>Start over</button>
       </form>
-
-      <div class="chips mono">
-        {CHIPS.map((c) => <button type="button" class="chip">{c}</button>)}
-      </div>
-
-      <div class="out" data-out aria-live="polite">
-        <p class="idle mono">{INDEX.length} passages indexed from this site: {PLOTS.projects} projects,
-          five roles, {PLOTS.posts} posts, and a page about the guitar. Ask it something, or take one
-          of those. The last one is there because refusing is the interesting part.</p>
-      </div>
     </div>
 
     <div class="how rv">
-      <p><b>How it cannot lie to you.</b> Your question is scored against the index in the browser, and
-      the best half-dozen passages go to the model with the question. Prose comes back through a tool
-      that requires the ids of the passages it used, and an answer citing a passage it was not given is
-      rejected and asked again. Charts come back as the name of a series this page computes, or as
-      points that each name the passage their number appears in; the ones that cannot are dropped
-      before you see the chart. The interesting case is the last suggestion, where the honest move is
-      to decline, so declining is one of the four things it can do.</p>
+      <p><b>Why you can trust what it says.</b> Your question is scored against the index in your
+      browser and the best few passages are opened for it. From there the model works: it can open
+      more from the catalogue when what it was handed does not fit, and you will see which. Prose
+      comes back through a tool that demands the ids it rested on, and an answer citing a passage it
+      never opened is rejected and asked again, which you will also see. Charts are either a series
+      this page counts for itself or points that each name their passage, and the ones that cannot
+      are dropped before the chart is drawn. Declining is one of the five tools rather than a failure,
+      which is why the last suggestion up there is worth a click.</p>
     </div>
   </div>
 
@@ -69,10 +73,15 @@ const CHIPS = [
     const sec = root.closest('section');
     const INDEX = JSON.parse(sec.querySelector('[data-index]').textContent);
     const PLOTS = JSON.parse(sec.querySelector('[data-plots]').textContent);
-    const out = root.querySelector('[data-out]');
+    const log = root.querySelector('[data-log]');
+    const form = root.querySelector('[data-form]');
     const input = root.querySelector('[data-q]');
     const go = root.querySelector('[data-go]');
+    const reset = root.querySelector('[data-reset]');
+    const openers = root.querySelector('[data-openers]');
     const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    /* ---------- retrieval, in the browser ---------- */
 
     const STOP = new Set(('a an the and or of to in on at is are was were be been being do does did done he his him she her ' +
       'they them their it its i you your my me we us what which who whom whose how why when where can could would should ' +
@@ -95,7 +104,6 @@ const CHIPS = [
       return out;
     };
 
-    // BM25, title counted three times. Small enough that the whole thing runs in a frame.
     const N = INDEX.length;
     const df = Object.create(null);
     let totalLen = 0;
@@ -107,6 +115,7 @@ const CHIPS = [
       Object.keys(d._f).forEach((w) => (df[w] = (df[w] || 0) + 1));
     });
     const avgLen = totalLen / N;
+    const byId = new Map(INDEX.map((d) => [d.id, d]));
 
     function search(q) {
       const qt = [...new Set(tok(q))].filter((w) => df[w]);
@@ -124,14 +133,7 @@ const CHIPS = [
       }).filter((x) => x.s > 0).sort((a, c) => c.s - a.s).slice(0, 6);
     }
 
-    /* ---------- rendering ---------- */
-
-    const sourceCard = (d) => {
-      const label = d.ext ? d.u.replace(/^https?:\/\//, '') : d.u;
-      return `<article class="card"><p class="mono ck">${esc(d.k || '')}</p>` +
-        `<h4 class="cn">${esc(d.t)}</h4><p class="cb">${esc(d.a)}</p>` +
-        `<a class="mono cc" href="${esc(d.u)}"${d.ext ? ' rel="noopener"' : ''}>${esc(label)}</a></article>`;
-    };
+    /* ---------- drawing ---------- */
 
     const valueBars = (rows, accent, unit) => {
       const max = Math.max(...rows.map((r) => r.v)) || 1;
@@ -152,119 +154,235 @@ const CHIPS = [
       }).join('') + '<p class="pax mono"><span>2020</span><span>2027</span></p></div>';
     };
 
-    function renderBlock(b) {
-      if (b.type === 'text') {
-        return `<div class="said"><p class="cb">${esc(b.text)}</p>` +
-          `<p class="mono cited">Cited ${b.sources.length} passage${b.sources.length === 1 ? '' : 's'}, below</p></div>`;
-      }
-      if (b.type === 'decline') {
-        return `<div class="said no"><p class="mono verdict no">It declined</p><p class="cb">${esc(b.reason)}</p>` +
-          `<a class="mono cc" href="mailto:amartya@hunr.ai">ask him instead</a></div>`;
-      }
-      if (b.type === 'chart') {
-        let body = '';
-        if (b.kind === 'roles_timeline') body = timelineBars(b.data);
-        else if (b.kind === 'composed') body = valueBars(b.data.map((p) => ({ n: p.n, v: p.v })), 'var(--pass-lit)', b.unit);
-        else body = valueBars(b.data, b.kind === 'projects_by_status' ? 'var(--pass-lit)' : 'var(--bone)', '');
-        const drop = b.dropped ? `<p class="mono dropped">${b.dropped} point${b.dropped === 1 ? '' : 's'} dropped for naming a passage it was not given</p>` : '';
-        return `<figure class="fig"><figcaption class="mono figc">${esc(b.title || '')}</figcaption>${body}${drop}</figure>`;
-      }
-      return '';
-    }
-
-    // Without the endpoint the box has no model to pick a chart, so it falls back to
-    // matching the three presets by phrasing. With the endpoint this is never used.
-    const LOCAL_PLOT = [
-      { re: /\b(timeline|career|history|chronolog|track record|how long|when did|what year|since when|overlap|experience|been doing)\b/i,
-        kind: 'roles_timeline', title: 'Five spans, four of them overlapping' },
-      { re: /\b(shipped|production|proven|unproven|research|prototype|proof|actually built|actually done|private)\b/i,
-        kind: 'projects_by_status', title: 'What the projects actually are' },
-      { re: /\b(breakdown|how many|how much|split|spread|distribut|what kind|what sort|areas|categor|overview|summar|balance|focus|everything)\b/i,
-        kind: 'projects_by_area', title: 'The projects by area' }
-    ];
-    const localPlot = (q) => {
-      const m = LOCAL_PLOT.find((p) => p.re.test(q));
-      if (!m) return null;
-      const key = { roles_timeline: 'roles', projects_by_area: 'group', projects_by_status: 'status' }[m.kind];
-      return { type: 'chart', kind: m.kind, title: m.title, data: PLOTS[key] };
+    const chartHTML = (b) => {
+      let plot;
+      if (b.kind === 'roles_timeline') plot = timelineBars(b.data);
+      else if (b.kind === 'composed') plot = valueBars(b.data.map((p) => ({ n: p.n, v: p.v })), 'var(--pass-lit)', b.unit);
+      else plot = valueBars(b.data, b.kind === 'projects_by_status' ? 'var(--pass-lit)' : 'var(--bone)', '');
+      const drop = b.dropped
+        ? `<p class="mono dropped">${b.dropped} point${b.dropped === 1 ? '' : 's'} dropped for naming a passage it had not opened</p>`
+        : '';
+      return `<figure class="fig"><figcaption class="mono figc">${esc(b.title || '')}</figcaption>${plot}${drop}</figure>`;
     };
+
+    const citeHTML = (sources) =>
+      '<div class="cites"><span class="mono clab">Sources</span>' +
+      sources.map((s) => {
+        const ext = /^https?:/.test(s.u);
+        return `<a class="mono cite" href="${esc(s.u)}"${ext ? ' rel="noopener"' : ''}>` +
+          `${esc(s.t)}<span aria-hidden="true">${ext ? ' ↗' : ' →'}</span></a>`;
+      }).join('') + '</div>';
+
+    const followHTML = (qs) =>
+      qs.length
+        ? '<div class="follows">' + qs.map((q) => `<button type="button" class="chip">${esc(q)}</button>`).join('') + '</div>'
+        : '';
+
+    /* ---------- transcript ---------- */
+
+    const el = (cls, html) => {
+      const d = document.createElement('div');
+      if (cls) d.className = cls;
+      if (html != null) d.innerHTML = html;
+      return d;
+    };
+    const nearBottom = () => log.scrollHeight - log.scrollTop - log.clientHeight < 90;
+    const toBottom = (force) => { if (force || nearBottom()) log.scrollTop = log.scrollHeight; };
+    const dots = (label) => esc(label) + '<span class="dots"><i>.</i><i>.</i><i>.</i></span>';
+
+    let turns = [];
+    let busy = false;
+    let endpoint = true;
+
+    function setBusy(v) {
+      busy = v;
+      go.disabled = v;
+      input.disabled = v;
+      go.textContent = v ? 'Working' : 'Ask';
+    }
 
     /* ---------- the ask ---------- */
 
-    let endpoint = true;
-
     async function ask(q) {
       q = q.trim();
-      if (!q) return;
-      go.disabled = true;
-      out.innerHTML = '<p class="idle mono work">Scoring the index<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>';
+      if (!q || busy) return;
+      setBusy(true);
+      log.querySelectorAll('.follows').forEach((f) => (f.hidden = true));
+      log.appendChild(el('turn you', `<p>${esc(q)}</p>`));
+      toBottom(true);
+      turns.push({ role: 'user', content: q });
+      reset.hidden = false;
+
+      const bot = el('turn bot');
+      const trace = el('trace');
+      const status = el('status mono', dots('Scoring the index'));
+      bot.append(trace, status);
+      log.appendChild(bot);
+      toBottom(true);
 
       const hits = search(q);
-      const sources = hits.map((h) => h.d);
+      const seed = hits.map((h) => h.d.id);
+      trace.appendChild(el('', seed.length
+        ? `<p class="mono step">Opened ${seed.length} passage${seed.length === 1 ? '' : 's'}: ` +
+          seed.map((id) => esc(byId.get(id).t)).join(', ') + '</p>'
+        : '<p class="mono step">Nothing scored above the floor</p>'));
 
-      let blocks = null;
+      let answered = false;
+      let streamed = null;
+      let said = '';
+      const dropStream = () => { if (streamed) { streamed.remove(); streamed = null; said = ''; } };
+
       if (endpoint) {
-        out.innerHTML = '<p class="idle mono work">' + (sources.length ? sources.length + ' passages retrieved. Asking the model' : 'Nothing retrieved. Asking anyway') +
-          '<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>';
+        status.innerHTML = dots('Thinking');
         try {
           const res = await fetch('/api/ask', {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
-              q,
-              passages: sources.map((d) => ({ id: d.id, t: d.t, a: d.a, u: d.u })),
-              plots: PLOTS
+              turns,
+              seed,
+              plots: PLOTS,
+              index: INDEX.map((d) => ({ id: d.id, t: d.t, a: d.a, u: d.u, k: d.k }))
             })
           });
-          if (res.status === 501 || res.status === 404 || res.status === 405) endpoint = false;
-          else if (res.ok) {
-            const j = await res.json();
-            if (Array.isArray(j.blocks) && j.blocks.length) blocks = j.blocks;
+
+          if (!res.ok || !res.body) {
+            endpoint = false;
+          } else {
+            const reader = res.body.getReader();
+            const dec = new TextDecoder();
+            let tail = '';
+
+            for (;;) {
+              const { value, done } = await reader.read();
+              if (done) break;
+              tail += dec.decode(value, { stream: true });
+              const lines = tail.split('\n');
+              tail = lines.pop();
+
+              for (const line of lines) {
+                if (!line.trim()) continue;
+                let ev;
+                try { ev = JSON.parse(line); } catch { continue; }
+
+                if (ev.e === 'status') {
+                  status.innerHTML = dots(ev.t[0].toUpperCase() + ev.t.slice(1));
+                } else if (ev.e === 'tool') {
+                  status.innerHTML = dots({
+                    answer: 'Writing the answer',
+                    fetch_passages: 'Opening more of the index',
+                    chart_preset: 'Drawing a series the page counts',
+                    chart: 'Composing a chart',
+                    decline: 'Deciding it does not know'
+                  }[ev.name] || ev.name);
+                } else if (ev.e === 'opened') {
+                  trace.appendChild(el('', `<p class="mono step">Opened ${ev.ids.length} more${ev.why ? ', ' + esc(ev.why) : ''}: ` +
+                    ev.ids.map((x) => esc(x.t)).join(', ') + '</p>'));
+                  toBottom();
+                } else if (ev.e === 'reject') {
+                  trace.appendChild(el('', `<p class="mono step bad">Rejected, ${esc(ev.why)}. Asked again.</p>`));
+                  dropStream();
+                  toBottom();
+                } else if (ev.e === 'delta') {
+                  if (!streamed) { streamed = el('cb stream'); status.before(streamed); }
+                  said += ev.t;
+                  streamed.textContent = said;
+                  toBottom();
+                } else if (ev.e === 'block') {
+                  const b = ev.block;
+                  if (b.type === 'text') {
+                    dropStream();
+                    status.before(el('said', `<p class="cb">${esc(b.text)}</p>${citeHTML(b.sources)}`));
+                    turns.push({ role: 'assistant', content: b.text });
+                    answered = true;
+                    if (b.follow_up && b.follow_up.length) status.before(el('', followHTML(b.follow_up)));
+                  } else if (b.type === 'decline') {
+                    dropStream();
+                    status.before(el('said no', `<p class="mono verdict no">It declined</p><p class="cb">${esc(b.reason)}</p>` +
+                      '<a class="mono cite solo" href="mailto:amartya@hunr.ai">ask him instead<span aria-hidden="true"> →</span></a>'));
+                    turns.push({ role: 'assistant', content: b.reason });
+                    answered = true;
+                    if (b.follow_up && b.follow_up.length) status.before(el('', followHTML(b.follow_up)));
+                  } else if (b.type === 'chart') {
+                    status.before(el('', chartHTML(b)));
+                  }
+                  toBottom();
+                } else if (ev.e === 'error') {
+                  dropStream();
+                  status.before(el('said no', `<p class="mono verdict no">${esc(ev.t)}</p>`));
+                  answered = true;
+                }
+              }
+            }
           }
         } catch {
           endpoint = false;
         }
       }
 
-      let html = '';
+      dropStream();
 
-      const fig = blocks ? null : localPlot(q);
-      // Without a model, a weak top score is not an answer. Refuse instead of shrugging.
-      if (!blocks && !fig && (!hits.length || hits[0].s < 3.4)) sources.length = 0;
-
-      if (blocks) {
-        html += blocks.map(renderBlock).join('');
-      } else if (fig) {
-        html += renderBlock(fig) +
-          '<p class="mono srcnote">Drawn from the series this page computes. The model that would have ' +
-          'chosen it is not configured on this deployment.</p>';
-      } else if (!sources.length) {
-        html += '<div class="said no"><p class="mono verdict no">Not in the index</p>' +
-          '<p class="cb">Everything this box can answer is on this page: ' + PLOTS.projects + ' projects, five roles, ' +
-          PLOTS.posts + ' posts, and a page about the guitar. Nothing in there matches that, and guessing would ' +
-          'undo the only thing that makes the rest of this worth reading.</p>' +
-          '<a class="mono cc" href="mailto:amartya@hunr.ai">ask him instead</a></div>';
-      } else {
-        html += '<div class="said"><p class="mono verdict">Answering from the index directly</p>' +
-          '<p class="cb">The model endpoint is not configured on this deployment, so this is the retrieval ' +
-          'on its own. These are the passages it would have been given.</p></div>';
-      }
-
-      if (sources.length) {
-        html += '<p class="mono srclabel">Retrieved passages</p>' + sources.slice(0, 3).map(sourceCard).join('');
-        if (sources.length > 3) {
-          html += '<details class="more"><summary class="mono">' + (sources.length - 3) + ' more considered</summary>' +
-            sources.slice(3).map(sourceCard).join('') + '</details>';
+      // No model on this deployment. Answer from the index and be honest about it.
+      if (!answered) {
+        turns.pop();
+        const fig = localPlot(q);
+        if (fig) status.before(el('', chartHTML(fig)));
+        if (!fig && (!hits.length || hits[0].s < 3.4)) {
+          status.before(el('said no',
+            '<p class="mono verdict no">Not in the index</p>' +
+            `<p class="cb">Everything this box holds is on this page: ${PLOTS.projects} projects, five roles, ` +
+            `${PLOTS.posts} posts, and a page about the guitar. Nothing in there matches that.</p>` +
+            '<a class="mono cite solo" href="mailto:amartya@hunr.ai">ask him instead<span aria-hidden="true"> →</span></a>'));
+        } else {
+          const top = hits.slice(0, 3).map((h) => h.d);
+          status.before(el('said',
+            '<p class="mono verdict">Answering from the index directly</p>' +
+            '<p class="cb">No model is configured on this deployment, so this is the retrieval on its own. ' +
+            'These are the passages it would have been handed.</p>' +
+            top.map((d) => `<p class="cb quoted">${esc(d.a)}</p>`).join('') +
+            (top.length ? citeHTML(top.map((d) => ({ t: d.t, u: d.u }))) : '')));
         }
       }
 
-      out.innerHTML = html;
-      go.disabled = false;
+      status.remove();
+      setBusy(false);
+      toBottom();
+      if (!matchMedia('(max-width: 760px)').matches) input.focus();
     }
 
-    root.querySelector('[data-form]').addEventListener('submit', (e) => { e.preventDefault(); ask(input.value); });
-    root.querySelectorAll('.chip').forEach((c) =>
-      c.addEventListener('click', () => { input.value = c.textContent; ask(c.textContent); }));
+    // Only reached when there is no model to choose a chart for itself.
+    const LOCAL_PLOT = [
+      { re: /\b(timeline|career|history|chronolog|track record|how long|when did|what year|since when|overlap|experience|been doing)\b/i,
+        kind: 'roles_timeline', title: 'Five spans, four of them overlapping', key: 'roles' },
+      { re: /\b(shipped|production|proven|unproven|research|prototype|proof|actually built|actually done|private)\b/i,
+        kind: 'projects_by_status', title: 'What the projects actually are', key: 'status' },
+      { re: /\b(breakdown|how many|how much|split|spread|distribut|what kind|what sort|areas|categor|overview|summar|balance|focus|everything)\b/i,
+        kind: 'projects_by_area', title: 'The projects by area', key: 'group' }
+    ];
+    const localPlot = (q) => {
+      const m = LOCAL_PLOT.find((p) => p.re.test(q));
+      return m ? { type: 'chart', kind: m.kind, title: m.title, data: PLOTS[m.key] } : null;
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = input.value;
+      input.value = '';
+      ask(v);
+    });
+    log.addEventListener('click', (e) => {
+      const c = e.target.closest('.chip');
+      if (c && !busy) ask(c.textContent);
+    });
+    reset.addEventListener('click', () => {
+      if (busy) return;
+      turns = [];
+      [...log.children].slice(1).forEach((t) => t.remove());
+      openers.hidden = false;
+      reset.hidden = true;
+      log.scrollTop = 0;
+      input.focus();
+    });
   }
 </script>
 
@@ -272,101 +390,111 @@ const CHIPS = [
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
   .box { margin-top: clamp(34px, 4vw, 54px); border: 1px solid var(--rule-dark); background: var(--void-2); }
-  .bar { display: flex; border-bottom: 1px solid var(--rule-dark); }
+
+  .log { padding: 26px 24px; display: grid; align-content: start; gap: 26px; max-height: 620px; overflow-y: auto; scrollbar-width: thin; }
+  /* Rows stretch so a chart gets the full width; the two things that must hug
+     their content say so themselves. */
+  .log :global(.turn) { display: grid; gap: 13px; }
+  .log :global(.turn.you) {
+    justify-self: end; max-width: 46ch; background: var(--bone); color: var(--void);
+    padding: 12px 17px; font-family: var(--mono); font-size: .76rem; letter-spacing: .02em; line-height: 1.5;
+  }
+  .log :global(.turn.you p) { margin: 0; }
+
+  .log :global(.cb) { color: #ccccd4; font-size: 1.04rem; line-height: 1.62; max-width: 70ch; margin: 0; }
+  .log :global(.quoted) { color: #a0a0aa; font-size: .94rem; border-left: 1px solid var(--rule-dark); padding-left: 15px; }
+  .log :global(.stream::after) {
+    content: ''; display: inline-block; width: .5em; height: 1.05em; margin-left: 3px; vertical-align: -.16em;
+    background: var(--pass-lit); animation: askcaret 1s steps(1) infinite;
+  }
+  @keyframes askcaret { 50% { opacity: 0; } }
+
+  .log :global(.trace) { display: grid; gap: 5px; }
+  .log :global(.step) { color: #86868f; font-size: var(--t-micro); letter-spacing: .09em; text-transform: none; line-height: 1.65; margin: 0; }
+  .log :global(.step)::before { content: '\00B7\00A0'; }
+  .log :global(.step.bad) { color: var(--fail-lit); }
+  .log :global(.status) { color: var(--pass-lit); font-size: var(--t-micro); letter-spacing: .12em; }
+  .log :global(.dots i) { animation: askblink 1.1s infinite; opacity: .25; font-style: normal; }
+  .log :global(.dots i:nth-child(2)) { animation-delay: .18s; }
+  .log :global(.dots i:nth-child(3)) { animation-delay: .36s; }
+  @keyframes askblink { 40% { opacity: 1; } }
+
+  .log :global(.said) { display: grid; gap: 13px; justify-items: start; }
+  .log :global(.said) :global(.cb) { justify-self: stretch; }
+  .log :global(.said.no) { border-left: 2px solid var(--fail-lit); padding-left: 16px; }
+  .log :global(.verdict) { color: var(--pass-lit); text-transform: none; letter-spacing: .05em; font-size: .72rem; }
+  .log :global(.verdict.no) { color: var(--fail-lit); }
+
+  .log :global(.cites) { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .log :global(.clab) { color: #86868f; font-size: var(--t-micro); letter-spacing: .16em; margin-right: 4px; }
+  .log :global(.cite) {
+    font-family: var(--mono); font-size: .66rem; letter-spacing: .04em; text-transform: none;
+    color: #c8c8d0; text-decoration: none; border: 1px solid #2e2e38; padding: 6px 11px;
+    transition: color .16s ease, border-color .16s ease;
+  }
+  .log :global(.cite:hover) { color: var(--pass-lit); border-color: var(--pass-lit); }
+  .log :global(.cite.solo) { border-color: #4b2b26; color: #cf9a90; }
+  .log :global(.cite.solo:hover) { color: var(--fail-lit); border-color: var(--fail-lit); }
+
+  .log :global(.follows) { display: flex; flex-wrap: wrap; gap: 8px; }
+  .log :global(.follows[hidden]) { display: none; }
+  .log :global(.chip) {
+    font: inherit; font-family: var(--mono); font-size: .68rem; letter-spacing: .04em; cursor: pointer;
+    background: none; border: 1px dashed #33333d; color: #a0a0aa; padding: 8px 13px; text-align: left;
+    transition: all .18s ease;
+  }
+  .log :global(.chip:hover) { border-style: solid; border-color: var(--bone); color: var(--bone); }
+  .log :global(.chip.hard) { border-color: #533029; color: #cf9a90; }
+  .log :global(.chip.hard:hover) { border-color: var(--fail-lit); color: var(--fail-lit); }
+
+  .log :global(.fig) { margin: 0; display: grid; gap: 14px; border-left: 2px solid var(--pass-lit); padding-left: 16px; width: 100%; }
+  .log :global(.figc) { color: var(--bone); font-size: .72rem; letter-spacing: .05em; text-transform: none; }
+  .log :global(.plot) { display: grid; gap: 8px; }
+  .log :global(.prow) { display: grid; grid-template-columns: 152px minmax(0, 1fr) 200px; gap: 16px; align-items: center; }
+  .log :global(.pn) { color: var(--bone); font-size: .68rem; letter-spacing: .05em; text-transform: none; }
+  .log :global(.pt) { height: 12px; background: #1c1c25; display: block; position: relative; }
+  .log :global(.pt i) { display: block; height: 100%; width: var(--w); background: var(--c, var(--bone)); animation: askgrow .6s cubic-bezier(.2,.8,.2,1); transform-origin: left; }
+  .log :global(.pv) { color: #9a9aa4; font-size: .64rem; letter-spacing: .05em; text-transform: none; }
+  .log :global(.tl .pt i) { position: absolute; left: var(--s); width: var(--w); min-width: 7px; background: var(--bone); animation: none; }
+  .log :global(.tl .pt i.side) { background: none; border: 1px solid #7e7e8a; }
+  .log :global(.tl .pt i.now) { background: var(--pass-lit); border: 0; }
+  .log :global(.pax) { display: flex; justify-content: space-between; color: #86868f; font-size: .6rem; letter-spacing: .1em; margin: 2px 0 0; padding: 0 200px 0 168px; }
+  .log :global(.dropped) { color: var(--fail-lit); font-size: var(--t-micro); letter-spacing: .1em; text-transform: none; }
+  @keyframes askgrow { from { transform: scaleX(0); } }
+
+  .bar { display: flex; border-top: 1px solid var(--rule-dark); }
   .bar input {
     flex: 1; min-width: 0; background: none; border: 0; color: var(--bone);
-    font: inherit; font-size: 1.05rem; padding: 20px 22px;
+    font: inherit; font-size: 1.02rem; padding: 19px 24px;
   }
   .bar input::placeholder { color: #7e7e8a; }
   .bar input:focus { outline: none; background: rgba(53,224,138,.05); }
+  .bar input:disabled { opacity: .5; }
   .bar button {
     font: inherit; font-family: var(--mono); font-size: var(--t-label); letter-spacing: .09em; text-transform: uppercase;
     background: var(--bone); color: var(--void); border: 0; padding: 0 30px; cursor: pointer; flex: none;
     transition: background-color .18s ease;
   }
   .bar button:hover:not(:disabled) { background: var(--pass-lit); }
-  .bar button:disabled { opacity: .4; cursor: default; }
-
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 22px; border-bottom: 1px solid var(--rule-dark); }
-  .chip {
-    font: inherit; font-family: var(--mono); font-size: .68rem; letter-spacing: .04em; cursor: pointer;
-    background: none; border: 1px dashed #33333d; color: #a0a0aa; padding: 8px 13px; transition: all .18s ease;
-  }
-  .chip:hover { border-style: solid; border-color: var(--bone); color: var(--bone); }
-  .chip:last-child { border-color: #533029; color: #cf9a90; }
-  .chip:last-child:hover { border-color: var(--fail-lit); color: var(--fail-lit); }
-
-  .out { padding: 24px 22px 28px; min-height: 200px; display: grid; align-content: start; gap: 18px; }
-  .idle { color: #9a9aa4; text-transform: none; letter-spacing: .03em; line-height: 1.8; max-width: 70ch; font-size: .78rem; }
-  .out :global(.work) { color: var(--pass-lit); }
-  .out :global(.dots i) { animation: askblink 1.1s infinite; opacity: .25; font-style: normal; }
-  .out :global(.dots i:nth-child(2)) { animation-delay: .18s; }
-  .out :global(.dots i:nth-child(3)) { animation-delay: .36s; }
-  @keyframes askblink { 40% { opacity: 1; } }
-
-  .out :global(.said) { display: grid; gap: 9px; }
-  .out :global(.said.no) { border-left: 2px solid var(--fail-lit); padding-left: 16px; }
-  .out :global(.verdict) { color: var(--pass-lit); text-transform: none; letter-spacing: .05em; font-size: .72rem; }
-  .out :global(.verdict.no) { color: var(--fail-lit); }
-  .out :global(.cited), .out :global(.dropped) { color: #86868f; font-size: var(--t-micro); letter-spacing: .1em; }
-  .out :global(.dropped) { color: var(--fail-lit); margin-top: 10px; }
-  .out :global(.cb) { color: #ccccd4; font-size: 1.02rem; line-height: 1.62; max-width: 72ch; margin: 0; }
-
-  .out :global(.srcnote) { color: #86868f; font-size: var(--t-micro); letter-spacing: .1em; text-transform: none; line-height: 1.7; max-width: 70ch; }
-  .out :global(.srclabel) { color: #86868f; font-size: var(--t-micro); letter-spacing: .16em; margin-top: 6px; }
-  .out :global(.card) { border-top: 1px solid var(--rule-dark); padding-top: 15px; display: grid; gap: 7px; }
-  .out :global(.ck) { color: #86868f; font-size: var(--t-micro); letter-spacing: .13em; }
-  .out :global(.cn) {
-    font-family: var(--display); font-weight: 700; font-stretch: 110%; text-transform: uppercase;
-    font-size: 1.06rem; line-height: 1.08; letter-spacing: -.012em; color: var(--bone); margin: 0;
-  }
-  .out :global(.card .cb) { color: #a8a8b2; font-size: .92rem; line-height: 1.58; }
-  .out :global(.cc) {
-    font-family: var(--mono); font-size: var(--t-micro); letter-spacing: .1em; text-transform: uppercase;
-    color: var(--pass-lit); text-decoration: none; border-bottom: 1px solid currentColor;
-    justify-self: start; padding-bottom: 3px;
-  }
-  .out :global(.cc:hover) { color: var(--bone); }
-  .out :global(.more) { border-top: 1px solid var(--rule-dark); }
-  .out :global(.more summary) {
-    cursor: pointer; color: #86868f; font-size: var(--t-micro); letter-spacing: .13em;
-    padding: 13px 0; list-style: none;
-  }
-  .out :global(.more summary::-webkit-details-marker) { display: none; }
-  .out :global(.more summary::before) { content: '+ '; }
-  .out :global(.more[open] summary::before) { content: '\2212 '; }
-  .out :global(.more summary:hover) { color: var(--bone); }
-  .out :global(.more .card:last-child) { padding-bottom: 6px; }
-
-  .out :global(.fig) { margin: 0; display: grid; gap: 14px; border-left: 2px solid var(--pass-lit); padding-left: 16px; }
-  .out :global(.figc) { color: var(--bone); font-size: .72rem; letter-spacing: .05em; text-transform: none; }
-  .out :global(.plot) { display: grid; gap: 8px; }
-  .out :global(.prow) { display: grid; grid-template-columns: 152px 1fr 200px; gap: 16px; align-items: center; }
-  .out :global(.pn) { color: var(--bone); font-size: .68rem; letter-spacing: .05em; text-transform: none; }
-  .out :global(.pt) { height: 12px; background: #1c1c25; display: block; position: relative; }
-  .out :global(.pt i) { display: block; height: 100%; width: var(--w); background: var(--c, var(--bone)); animation: askgrow .6s cubic-bezier(.2,.8,.2,1); transform-origin: left; }
-  .out :global(.pv) { color: #9a9aa4; font-size: .64rem; letter-spacing: .05em; text-transform: none; }
-  .out :global(.tl .pt i) { position: absolute; left: var(--s); width: var(--w); min-width: 7px; background: var(--bone); animation: none; }
-  .out :global(.tl .pt i.side) { background: none; border: 1px solid #7e7e8a; }
-  .out :global(.tl .pt i.now) { background: var(--pass-lit); border: 0; }
-  .out :global(.pax) { display: flex; justify-content: space-between; color: #86868f; font-size: .6rem; letter-spacing: .1em; margin: 2px 0 0; padding: 0 200px 0 168px; }
-  @keyframes askgrow { from { transform: scaleX(0); } }
+  .bar button:disabled { opacity: .45; cursor: default; }
+  .bar .reset { background: none; color: #86868f; padding: 0 20px; border-left: 1px solid var(--rule-dark); }
+  .bar .reset:hover:not(:disabled) { background: none; color: var(--bone); }
 
   .how { margin-top: var(--s-3); border-top: 1px solid var(--rule-dark); padding-top: var(--s-3); }
-  .how p { color: #9a9aa4; font-size: var(--t-small); max-width: 76ch; line-height: 1.75; }
+  .how p { color: #9a9aa4; font-size: var(--t-small); max-width: 78ch; line-height: 1.75; }
   .how b { color: var(--bone); font-weight: 500; }
 
   @media (max-width: 760px) {
+    .log { padding: 20px 18px; max-height: 560px; }
     .bar { flex-wrap: wrap; }
-    .bar input { flex-basis: 100%; padding: 17px 18px; font-size: 1rem; }
-    .bar button { flex: 1; padding: 15px 0; border-top: 1px solid var(--rule-dark); }
-    .out :global(.prow) { grid-template-columns: 104px 1fr 56px; gap: 10px; }
-    .out :global(.tl .prow) { grid-template-columns: 104px 1fr; }
-    .out :global(.tl .pv) { display: none; }
-    .out :global(.pax) { padding: 0 0 0 114px; }
+    .bar input { flex-basis: 100%; padding: 16px 18px; font-size: 1rem; }
+    .bar button { flex: 1; padding: 15px 0; }
+    .log :global(.prow) { grid-template-columns: 104px minmax(0, 1fr) 56px; gap: 10px; }
+    .log :global(.tl .prow) { grid-template-columns: 104px minmax(0, 1fr); }
+    .log :global(.tl .pv) { display: none; }
+    .log :global(.pax) { padding: 0 0 0 114px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .out :global(.pt i) { animation: none; }
-    .out :global(.dots i) { animation: none; opacity: .7; }
+    .log :global(.pt i), .log :global(.dots i), .log :global(.stream::after) { animation: none; }
   }
 </style>

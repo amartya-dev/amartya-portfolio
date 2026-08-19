@@ -5,6 +5,8 @@ date: 2026-08-18
 tags: ["infrastructure", "containers", "security"]
 ---
 
+import Bars from '../../components/Bars.astro';
+
 Some workloads want an image each. A build that needs a specific toolchain, a test that needs a
 specific database client, a task whose dependencies are described by something other than a human.
 
@@ -73,6 +75,18 @@ crane rebase myimg:variant \
 No pull, no push of anything large, no rebuild. In my case the base is cached by the fingerprint of its
 package list. Building it fresh takes about fourteen seconds, and thereafter assembling a variant is a
 manifest write measured at **0.227 seconds with zero layer uploads**.
+
+<Bars
+  title="Time to a runnable image, once the base is cached"
+  unit="s"
+  dp={3}
+  rows={[
+    { n: 'Base, built fresh', v: 14, bad: true },
+    { n: 'Variant, rebased', v: 0.227 }
+  ]}
+  note="The second bar is a manifest write. Nothing is pulled and nothing large is pushed, because
+  swapping a base underneath a set of layers is a metadata operation rather than a build."
+/>
 
 The shape that falls out:
 

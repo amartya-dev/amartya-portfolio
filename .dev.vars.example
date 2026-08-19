@@ -1,0 +1,16 @@
+# Copy to .dev.vars (gitignored) to run the ask box locally:
+#
+#   cp .dev.vars.example .dev.vars   and put a real key in it
+#   npm run serve                    builds, then serves dist with the function
+#
+# In production these are set in the Cloudflare Pages project, under
+# Settings -> Environment variables. ANTHROPIC_API_KEY must be an encrypted one.
+
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Optional. Defaults to claude-haiku-4-5-20251001.
+# ASK_MODEL=claude-haiku-4-5-20251001
+
+# Optional caps, only applied when an ASK_KV namespace is bound.
+# ASK_DAILY_PER_IP=40
+# ASK_DAILY_TOTAL=1500

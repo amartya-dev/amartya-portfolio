@@ -1,0 +1,37 @@
+---
+// One cell per item, so a count you cannot picture becomes a shape you can.
+// Used for the two counts on this site that are worth seeing rather than reading:
+// 739 regression cases, and 1,004 dialogues none of which contain the decision.
+//
+// n:    how many cells
+// hit:  how many are marked, spread evenly. Zero draws a field with nothing in it,
+//       which is the point wherever it is used.
+const { n = 100, hit = 0, cols = 46, title = '', legend = '', note = '' } = Astro.props;
+const step = hit > 0 ? n / hit : 0;
+const marked = new Set(hit > 0 ? Array.from({ length: hit }, (_, i) => Math.floor(i * step + step / 2)) : []);
+---
+<figure class="fig">
+  {title && <figcaption class="mono cap">{title}</figcaption>}
+  <div class="field" style={`--cols:${cols}`} aria-hidden="true">
+    {Array.from({ length: n }, (_, i) => <i class={marked.has(i) ? 'on' : ''}></i>)}
+  </div>
+  <p class="mono legend">
+    <span class="k"><b class="sw"></b>{legend || `${n.toLocaleString('en-US')} in total`}</span>
+    {hit > 0 && <span class="k"><b class="sw on"></b>{hit.toLocaleString('en-US')} marked</span>}
+  </p>
+  {note && <p class="note">{note}</p>}
+</figure>
+
+<style>
+  .fig { margin: 2.2em 0; border-top: 1px solid var(--ink); padding-top: 16px; }
+  .cap { color: var(--ink); font-size: var(--t-micro); letter-spacing: .13em; margin-bottom: 18px; display: block; max-width: 62ch; line-height: 1.7; }
+  .field { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: 2px; }
+  .field i { display: block; aspect-ratio: 1; background: var(--paper-2); border: 1px solid var(--rule); }
+  .field i.on { background: var(--fail); border-color: var(--fail); }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 14px; color: var(--mid); font-size: var(--t-micro); letter-spacing: .1em; }
+  .k { display: inline-flex; align-items: center; gap: 8px; }
+  .sw { width: 9px; height: 9px; background: var(--paper-2); border: 1px solid var(--rule); display: inline-block; }
+  .sw.on { background: var(--fail); border-color: var(--fail); }
+  .note { margin-top: 14px; color: var(--mid); font-size: .86rem; line-height: 1.7; max-width: 62ch; }
+  @media (max-width: 620px) { .field { --cols: 30 !important; } }
+</style>
