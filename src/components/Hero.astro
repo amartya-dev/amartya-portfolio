@@ -1,181 +1,66 @@
+---
+const FACTS = [
+  { k: 'Now', v: 'Founder of hunr.ai' },
+  { k: 'Before', v: 'Five years at Newfold Digital' },
+  { k: 'Where', v: 'Bengaluru, remote' }
+];
+---
 <section class="hero chamber">
-  <canvas id="swarm" aria-hidden="true"></canvas>
-  <div class="hero-scrim" aria-hidden="true"></div>
-
   <div class="wrap hero-in">
-    <p class="mono eyebrow">Agent orchestration · Evals · Infrastructure</p>
-    <h1 class="d d-1">Amartya<br />Gaur</h1>
-    <p class="hero-sub">
-      I build the layer agents run on — orchestration that survives a failed tool call, evaluation that can stop a deploy, and the infrastructure under both. Currently building <a href="https://hunr.ai" rel="noopener">hunr.ai</a>.
+    <p class="mono eyebrow rv">Amartya Gaur — AI systems engineer</p>
+
+    <h1 class="d rv">
+      I build the<br />machinery behind<br /><em>AI assistants</em>
+    </h1>
+
+    <p class="sub rv">The part that decides what they should do, checks they actually did it, and keeps the
+      whole thing standing up when one of them fails at three in the morning.</p>
+
+    <dl class="facts mono rv">
+      {FACTS.map((f) => (
+        <div><dt>{f.k}</dt><dd>{f.v}</dd></div>
+      ))}
+    </dl>
+
+    <p class="try mono rv">
+      <a href="#router">Three of them are on this page, working</a>
+      <span aria-hidden="true">↓</span>
     </p>
   </div>
-
-  <div class="readout mono" id="readout">
-    <span>eval run <b data-run>000</b></span>
-    <span class="ok">passing <b data-pass>0</b></span>
-    <span class="no">failing <b data-fail>0</b></span>
-    <span class="dimmed">739 cases</span>
-  </div>
-  <div class="controls">
-    <button type="button" class="view mono" data-view aria-pressed="false" aria-label="Show the suite as a matrix">
-      <span data-view-label>Order</span>
-    </button>
-    <button type="button" class="view mono" data-pause aria-pressed="false">
-      <span data-pause-label>Pause</span>
-    </button>
-  </div>
-  <a class="cue mono" href="#what">Scroll<span aria-hidden="true"></span></a>
 </section>
-
-<script>
-  const canvas = document.getElementById('swarm');
-  const readout = document.getElementById('readout');
-  const viewBtn = document.querySelector('[data-view]');
-  const viewLabel = document.querySelector('[data-view-label]');
-  const pauseBtn = document.querySelector('[data-pause]');
-  const pauseLabel = document.querySelector('[data-pause-label]');
-
-  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const stillPreferred = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // Scramble the control, never the content — it is feedback that the state moved.
-  function morph(el, to) {
-    if (stillPreferred()) { el.textContent = to; return; }
-    clearInterval(el._t);
-    const len = Math.max(el.textContent.length, to.length);
-    let f = 0;
-    el._t = setInterval(() => {
-      el.textContent = Array.from({ length: len }, (_, i) =>
-        i < f / 2.2 ? (to[i] || '') : CHARS[(Math.random() * 26) | 0]).join('');
-      if (f++ > len * 2.2 + 2) { clearInterval(el._t); el.textContent = to; }
-    }, 40);
-  }
-
-  // The still version: 739 cells, painted once. ~1KB, no dependencies, and it is
-  // what everyone gets until the device says it can take more.
-  function paintStill() {
-    const ctx = canvas.getContext('2d');
-    const r = canvas.getBoundingClientRect();
-    const dpr = Math.min(devicePixelRatio || 1, 2);
-    canvas.width = r.width * dpr;
-    canvas.height = r.height * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, r.width, r.height);
-    const cols = r.width < 760 ? 20 : 37;
-    const rows = Math.ceil(739 / cols);
-    const cell = Math.min((r.width * (r.width < 760 ? 0.86 : 0.5)) / cols, (r.height * 0.62) / rows);
-    const ox = r.width < 760 ? (r.width - cols * cell) / 2 : r.width - cols * cell - r.width * 0.06;
-    const oy = (r.height - rows * cell) / 2;
-    let pass = 0, fail = 0;
-    for (let i = 0; i < 739; i++) {
-      const bad = ((i * 2654435761) % 100) < 4;
-      bad ? fail++ : pass++;
-      ctx.fillStyle = bad ? '#ff6244' : '#35e08a';
-      ctx.globalAlpha = bad ? 0.9 : 0.5 + ((i * 37) % 50) / 100;
-      const c = i % cols, w = Math.floor(i / cols);
-      ctx.fillRect(ox + c * cell, oy + w * cell, cell * 0.62, cell * 0.62);
-    }
-    ctx.globalAlpha = 1;
-    if (readout) {
-      readout.querySelector('[data-pass]').textContent = pass.toLocaleString('en-US');
-      readout.querySelector('[data-fail]').textContent = fail.toLocaleString('en-US');
-      readout.querySelector('[data-run]').textContent = '001';
-    }
-  }
-
-  function still() {
-    paintStill();
-    addEventListener('resize', paintStill, { passive: true });
-    document.querySelector('.controls').hidden = true;
-  }
-
-  // Capability is an upgrade gate, never a degrade gate: these reads are undefined
-  // in Safari and Firefox, so the light path has to be the default.
-  const roomy = (navigator.hardwareConcurrency || 8) > 4 && !navigator.connection?.saveData;
-
-  if (!canvas) { /* nothing to do */ }
-  else if (stillPreferred() || !roomy) { still(); }
-  else {
-    let started = false;
-    const io = new IntersectionObserver((entries) => {
-      if (started || !entries.some((e) => e.isIntersecting)) return;
-      started = true;
-      io.disconnect();
-      import('../scripts/swarm.js')
-        .then(({ mountSwarm }) => {
-          const swarm = mountSwarm(canvas, readout);
-          let ordered = false, held = false;
-          viewBtn.addEventListener('click', () => {
-            ordered = !ordered;
-            swarm.setOrder(ordered);
-            viewBtn.setAttribute('aria-pressed', String(ordered));
-            viewBtn.setAttribute('aria-label', ordered ? 'Show the suite as an object' : 'Show the suite as a matrix');
-            morph(viewLabel, ordered ? 'Flow' : 'Order');
-          });
-          pauseBtn.addEventListener('click', () => {
-            held = !held;
-            swarm.setPaused(held);
-            pauseBtn.setAttribute('aria-pressed', String(held));
-            morph(pauseLabel, held ? 'Play' : 'Pause');
-          });
-        })
-        .catch(still);
-    }, { rootMargin: '200px' });
-    io.observe(canvas);
-  }
-</script>
 
 <style>
   .hero {
-    position: relative;
-    min-height: 100svh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    overflow: hidden;
+    min-height: 100svh; display: flex; align-items: center;
+    border-bottom: 1px solid var(--rule-dark);
   }
-  #swarm { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .hero-scrim {
-    position: absolute; inset: 0;
-    background: linear-gradient(100deg, #08080a 10%, rgba(8,8,10,.92) 38%, rgba(8,8,10,.15) 68%);
-  }
-  .hero-in { position: relative; padding-block: 120px 40px; }
-  .hero-in :global(.d-1) { margin-bottom: clamp(24px, 3vw, 38px); }
-  .hero-sub {
-    max-width: 34ch; font-size: clamp(1.05rem, 1.55vw, 1.35rem); line-height: 1.5;
-    color: #c9c9cf;
-  }
-  .hero-sub a { color: var(--pass-lit); text-decoration-thickness: 1px; text-underline-offset: 4px; }
+  .hero-in { padding-block: 140px 80px; width: 100%; }
+  .eyebrow { color: var(--bone-dim); margin-bottom: clamp(28px, 4vw, 44px); }
 
-  .readout {
-    position: absolute; left: var(--gut); bottom: 30px; z-index: 2;
-    display: flex; flex-wrap: wrap; gap: 8px 24px; color: var(--bone-dim);
+  h1 {
+    font-size: clamp(2.6rem, 7.6vw, 6.6rem);
+    margin-bottom: clamp(28px, 3.5vw, 44px);
   }
-  .readout b { font-weight: 500; font-variant-numeric: tabular-nums; }
-  .readout .ok b { color: var(--pass-lit); }
-  .readout .no b { color: var(--fail-lit); }
+  h1 em { font-style: normal; color: var(--pass-lit); }
 
-  .controls { position: absolute; right: var(--gut); top: 96px; z-index: 3; display: flex; gap: 8px; }
-  .controls[hidden] { display: none; }
-  .view {
-    font: inherit; font-family: var(--mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
-    background: none; border: 1px solid #2b2b35; color: var(--bone-dim);
-    padding: 9px 16px; cursor: pointer; min-width: 84px; transition: border-color .2s ease, color .2s ease;
+  .sub {
+    max-width: 40ch; font-size: clamp(1.1rem, 1.6vw, 1.42rem); line-height: 1.5;
+    color: #c4c4cc;
   }
-  .view:hover { border-color: var(--bone-dim); color: var(--bone); }
-  .view[aria-pressed='true'] { border-color: var(--pass-lit); color: var(--pass-lit); }
 
-  .cue {
-    position: absolute; right: var(--gut); bottom: 30px; z-index: 2;
-    color: var(--bone-dim); text-decoration: none; display: flex; align-items: center; gap: 10px;
+  .facts {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 20px 40px; margin-top: clamp(48px, 6vw, 82px);
+    border-top: 1px solid var(--rule-dark); padding-top: 24px;
   }
-  .cue span { width: 34px; height: 1px; background: currentColor; display: block; }
-  .cue:hover { color: var(--bone); }
+  .facts dt { color: #55555f; text-transform: uppercase; letter-spacing: .14em; font-size: .6rem; margin-bottom: 8px; }
+  .facts dd { margin: 0; color: var(--bone); font-size: .82rem; letter-spacing: .02em; }
 
-  @media (max-width: 860px) {
-    .hero-scrim { background: linear-gradient(180deg, rgba(8,8,10,.92) 0%, rgba(8,8,10,.62) 24%, rgba(8,8,10,.9) 52%, rgba(8,8,10,.97) 100%); }
-    .hero-in { padding-block: 128px 92px; }
-    .cue { display: none; }
-    .controls { top: auto; bottom: 74px; right: var(--gut); }
+  .try { margin-top: clamp(34px, 4vw, 52px); display: flex; align-items: center; gap: 12px; color: var(--bone-dim); }
+  .try a { color: inherit; text-decoration: none; border-bottom: 1px solid #33333d; padding-bottom: 4px; }
+  .try a:hover { color: var(--bone); border-color: var(--bone); }
+
+  @media (max-width: 660px) {
+    .hero-in { padding-block: 120px 64px; }
   }
 </style>

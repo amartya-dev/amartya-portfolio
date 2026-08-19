@@ -27,16 +27,12 @@ const FILTERS = [
     <div class="wrap">
       <p class="mono eyebrow rv">What I do</p>
       <h2 class="d d-2 rv">I build systems<br />that hold a line</h2>
-      <p class="lede rv">Routing that won&rsquo;t change its mind. Evals that can fail a build. A data layer that
-        would rather argue than hand you a wrong number. Three of them are on this page — go on, break them.</p>
+      <p class="lede rv">Three of them are on this page. Go on, break them.</p>
 
       <dl class="pillars rv">
-        <div><dt class="mono">Orchestration</dt><dd>State machines over cleverness. Roughly a thousand support
-          conversations an hour went through the last one.</dd></div>
-        <div><dt class="mono">Evaluation</dt><dd>739 cases in a deploy pipeline as a blocking gate. A suite that
-          cannot say no is a dashboard.</dd></div>
-        <div><dt class="mono">Infrastructure</dt><dd>Sandboxes, GitOps, and the unglamorous parts underneath, mostly
-          on Azure and mostly alone.</dd></div>
+        <div><dt class="mono">Orchestration</dt><dd>State machines over cleverness.</dd></div>
+        <div><dt class="mono">Evaluation</dt><dd>A suite that cannot say no is a dashboard.</dd></div>
+        <div><dt class="mono">Infrastructure</dt><dd>Sandboxes and the unglamorous parts underneath.</dd></div>
       </dl>
     </div>
   </section>
@@ -87,22 +83,25 @@ const FILTERS = [
       <ol class="projects">
         {P.map((p, i) => (
           <li class="proj rv" data-group={p.g} data-first={P.findIndex((q) => q.g === p.g) === i ? p.g : undefined}>
-            <div class="p-id">
-              {p.href
-                ? <a class="d d-3 p-name" href={p.href} rel="noopener">{p.n}<span class="ext" aria-hidden="true">↗</span></a>
-                : <span class="d d-3 p-name">{p.n}</span>}
-              <p class="mono p-meta">{p.w} · {p.y}</p>
-              <p class="mono p-status" data-s={p.s}>{p.s}</p>
-            </div>
-            <div class="p-body">
-              <p>{p.d}</p>
-              {p.widget === 'units' && <div class="p-widget"><Units /></div>}
-            </div>
+            <details>
+              <summary>
+                <span class="d d-3 p-name">{p.n}</span>
+                <span class="p-hook">{p.h}</span>
+                <span class="mono p-meta">{p.w}</span>
+                <span class="mono p-year">{p.y}</span>
+                <span class="mono p-status" data-s={p.s}>{p.s}</span>
+              </summary>
+              <div class="p-detail">
+                <p>{p.d}</p>
+                {p.href && <p class="mono p-link"><a href={p.href} rel="noopener">{p.href.replace('https://', '')}</a></p>}
+                {p.widget === 'units' && <div class="p-widget"><Units /></div>}
+              </div>
+            </details>
           </li>
         ))}
       </ol>
-      <p class="mono early rv">Before: internships at American Express and Bruce Clay, a B.Tech from VIT, and four
-        WordCamp talks I am contractually obliged to mention.</p>
+      <p class="mono early rv">Earlier: American Express, Bruce Clay, a B.Tech from VIT, and four WordCamp talks I am
+        contractually obliged to mention.</p>
     </div>
   </section>
 
@@ -113,8 +112,7 @@ const FILTERS = [
     <div class="wrap">
       <p class="mono eyebrow rv">Writing</p>
       <h2 class="d d-2 rv">Working notes,<br />published early</h2>
-      <p class="lede rv">Some of these carry the demo from this page inside them, so you can argue with the thing
-        rather than the paragraph about the thing.</p>
+      <p class="lede rv">Some carry the demo inside them, so you can argue with the thing itself.</p>
       <ul class="posts rv">
         {posts.map((p) => (
           <li>
@@ -134,8 +132,7 @@ const FILTERS = [
     <div class="wrap">
       <p class="mono eyebrow rv">Contact</p>
       <h2 class="d d-2 rv">Tell me<br />what&rsquo;s breaking</h2>
-      <p class="lede rv">Building agents and the platform under them keeps giving way? Hiring engineers and the first
-        screen is not working? Either of those.</p>
+      <p class="lede rv">Agents, evals, or the platform underneath. Either of those.</p>
       <a class="d bigmail rv" href="mailto:amartya@hunr.ai">amartya@hunr.ai</a>
       <ul class="links mono rv">
         <li><a href="https://hunr.ai" rel="noopener">hunr.ai</a></li>
@@ -185,25 +182,42 @@ const FILTERS = [
   .chip:hover { border-color: var(--ink); color: var(--ink); }
   .chip[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 
-  .projects { margin-top: 26px; border-top: 1px solid var(--rule); }
+  .projects { margin-top: 26px; border-top: 1px solid var(--ink); }
   /* A rule and a label where each group starts, so the list reads as three lists. */
   .proj[data-first]::before {
-    content: attr(data-first); grid-column: 1 / -1;
+    display: block; content: attr(data-first);
     font-family: var(--mono); font-size: .62rem; letter-spacing: .16em; text-transform: uppercase;
-    color: var(--fail); padding-bottom: 14px; margin-top: 6px;
+    color: var(--fail); padding: 30px 0 12px;
   }
   .proj[data-first='agents']::before { content: 'Agent systems'; }
   .proj[data-first='infra']::before { content: 'Infrastructure'; }
   .proj[data-first='merged']::before { content: 'Merged into other repositories'; }
   .proj[data-first][hidden]::before { display: none; }
-  .proj { display: grid; grid-template-columns: 300px 1fr; gap: 26px; padding: 26px 0; border-bottom: 1px solid var(--rule); }
+  .proj { border-bottom: 1px solid var(--rule); }
   .proj[hidden] { display: none; }
+  .proj details { display: block; }
+  .proj summary {
+    display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 10rem 5.5rem;
+    gap: 10px 22px; align-items: baseline; padding: 15px 0; cursor: pointer; list-style: none;
+    transition: background .15s ease;
+  }
+  .proj summary::-webkit-details-marker { display: none; }
+  .proj summary:hover { background: var(--paper-2); }
+  .proj summary:hover .p-name { color: var(--fail); }
+  .proj[open] summary { padding-bottom: 8px; }
+  .p-name { font-size: 1.06rem; transition: color .15s ease; }
+  .p-hook { color: var(--ink-2); font-size: .95rem; }
+  .p-meta { color: var(--mid); }
+  .p-year { color: var(--mid); text-align: right; font-variant-numeric: tabular-nums; }
+  .p-detail { padding: 4px 0 26px; max-width: 70ch; }
+  .p-detail p { color: var(--ink-2); font-size: .96rem; }
+  .p-link { margin-top: 12px; }
+  .p-link a { color: var(--fail); }
   .p-name { display: inline-flex; gap: .3em; align-items: baseline; text-decoration: none; }
   a.p-name:hover { color: var(--fail); }
   .ext { font-size: .5em; opacity: .55; }
-  .p-meta { color: var(--mid); margin-top: 9px; }
   .p-status {
-    display: inline-block; margin-top: 10px; padding: 4px 9px; font-size: .6rem;
+    justify-self: start; padding: 3px 8px; font-size: .58rem; white-space: nowrap;
     border: 1px solid var(--rule); color: var(--mid);
   }
   .p-status[data-s^='Live'], .p-status[data-s^='In production'], .p-status[data-s^='Shipped'] { border-color: var(--pass); color: var(--pass); }

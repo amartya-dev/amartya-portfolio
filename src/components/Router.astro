@@ -11,16 +11,16 @@ const SEEDS = [
   <div class={bare ? '' : 'wrap'}>
     {!bare && (
       <Fragment>
-        <p class="mono eyebrow rv">Orchestration</p>
-        <h2 class="d d-2 rv">Ask it twice,<br />get two answers</h2>
-        <p class="lede rv">A router that re-decides every turn will change its mind on you. Type at both of these and
-          watch which one keeps the plot.</p>
+        <p class="mono eyebrow rv">Demo one</p>
+        <h2 class="d d-2 rv">The support bot<br />that forgets</h2>
+        <p class="lede rv">You message a company. Something has to decide which team handles it. Type the same thing at
+          both of these and watch one of them lose the plot.</p>
       </Fragment>
     )}
 
     <div class="rig rv">
       <div class="rig-in">
-        <label class="mono ask-l" for="ask">say something to support</label>
+        <label class="mono ask-l" for="ask">Type a message to support, then keep going</label>
         <div class="ask">
           <input id="ask" type="text" autocomplete="off" spellcheck="false"
                  placeholder="my dns records are not propagating" data-ask />
@@ -36,8 +36,8 @@ const SEEDS = [
       <div class="lanes">
         <article class="lane" data-lane="naive">
           <header class="mono">
-            <b>Router</b><span>re-decides every turn</span>
-            <em class="tally" data-flips>0 re-routes</em>
+            <b>Decides every message</b><span>the usual way</span>
+            <em class="tally" data-flips>no transfers yet</em>
           </header>
           <ol class="turns" data-turns="naive"></ol>
           <p class="empty mono" data-empty-naive>Nothing yet. Go on.</p>
@@ -45,18 +45,18 @@ const SEEDS = [
 
         <article class="lane" data-lane="sticky">
           <header class="mono">
-            <b>Sticky orchestrator</b><span>decides once, holds</span>
-            <em class="tally ok" data-pinned>unpinned</em>
+            <b>Decides once, then stays</b><span>the way I build it</span>
+            <em class="tally ok" data-pinned>no team yet</em>
           </header>
           <ol class="turns" data-turns="sticky"></ol>
-          <p class="empty mono" data-empty-sticky>Same input. Calmer outcome.</p>
+          <p class="empty mono" data-empty-sticky>Same messages. Calmer outcome.</p>
         </article>
       </div>
     </div>
 
     {!bare && (
-      <p class="foot-note mono rv">Eight turns at 94% per-turn accuracy is a 61% chance of finishing where you started.
-        Deciding once is cheating, and I recommend it.</p>
+      <p class="foot-note rv">Every transfer is a chance to lose the thread — you re-explain, the agent re-reads, and
+        somebody gives up. The fix was not a cleverer decision. It was asking once and writing the answer down.</p>
     )}
   </div>
 </section>
@@ -64,6 +64,7 @@ const SEEDS = [
 <script>
   const rig = document.querySelector('#router .rig');
   if (rig) {
+    const NAMES = { dns: 'Domains', billing: 'Billing', email: 'Email', hosting: 'Hosting' };
     const WORKFLOWS = {
       dns: ['dns', 'domain', 'nameserver', 'record', 'cname', 'propagat', 'a record', 'mx'],
       billing: ['invoice', 'charge', 'refund', 'bill', 'payment', 'price', 'renew', 'subscription', 'card'],
@@ -96,7 +97,7 @@ const SEEDS = [
       const li = document.createElement('li');
       li.className = 'turn' + (tone ? ' ' + tone : '');
       li.innerHTML =
-        '<span class="mono wf">' + (workflow ? 'wf.' + workflow : 'wf.unknown') + '</span>' +
+        '<span class="mono wf">→ ' + (NAMES[workflow] || 'Not sure') + '</span>' +
         '<span class="mono note">' + note + '</span>';
       list.appendChild(li);
       requestAnimationFrame(() => li.classList.add('in'));
@@ -129,19 +130,19 @@ const SEEDS = [
       const flipped = lastNaive && naive !== lastNaive;
       if (flipped) flips++;
       row(naiveList, naive,
-        c.confident ? (flipped ? 're-routed' : 'held') : (flipped ? 're-routed on a guess' : 'guessed'),
+        flipped ? 'transferred you' : (c.confident ? 'stayed put' : 'guessed, stayed put'),
         flipped ? 'bad' : '');
       lastNaive = naive;
-      flipsEl.textContent = flips + (flips === 1 ? ' re-route' : ' re-routes');
+      flipsEl.textContent = flips === 0 ? 'no transfers' : flips + (flips === 1 ? ' transfer' : ' transfers');
       flipsEl.classList.toggle('no', flips > 0);
 
       // Sticky: classify once at intake, then the workflow owns the conversation.
       if (!pinned) {
         pinned = c.workflow || 'triage';
-        pinnedEl.textContent = 'pinned to wf.' + pinned;
-        row(stickyList, pinned, 'pinned at intake', 'good');
+        pinnedEl.textContent = 'stays with ' + (NAMES[pinned] || 'Triage');
+        row(stickyList, pinned, 'picked this up', 'good');
       } else {
-        row(stickyList, pinned, 'still ' + pinned + ', turn ' + turn, 'good');
+        row(stickyList, pinned, 'still the same team, message ' + turn, 'good');
       }
 
       ask.value = '';
@@ -157,8 +158,8 @@ const SEEDS = [
     rig.querySelector('[data-reset]').addEventListener('click', () => {
       pinned = null; lastNaive = null; flips = 0; turn = 0;
       naiveList.innerHTML = ''; stickyList.innerHTML = '';
-      flipsEl.textContent = '0 re-routes'; flipsEl.classList.remove('no');
-      pinnedEl.textContent = 'unpinned';
+      flipsEl.textContent = 'no transfers yet'; flipsEl.classList.remove('no');
+      pinnedEl.textContent = 'no team yet';
       emptyN.hidden = false; emptyS.hidden = false;
       ask.focus();
     });
@@ -221,5 +222,5 @@ const SEEDS = [
   .lane :global(.note) { font-family: var(--mono); font-size: .72rem; color: #4a4a55; letter-spacing: .03em; }
   .empty { color: #3d3d47; text-transform: none; letter-spacing: .03em; }
 
-  .foot-note { margin-top: 22px; color: var(--bone-dim); text-transform: none; letter-spacing: .03em; max-width: 60ch; line-height: 1.7; }
+  .foot-note { margin-top: 26px; color: #a8a8b2; max-width: 58ch; line-height: 1.6; font-size: 1rem; }
 </style>

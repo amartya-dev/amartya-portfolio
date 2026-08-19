@@ -1,39 +1,41 @@
 ---
 const { bare = false } = Astro.props;
+// The task: stop a runaway program from calling something ten thousand times.
+// The first four checks are the ones anybody thinks of. The rest are the job.
 const TESTS = [
-  { name: 'accepts a burst under the limit',            ref: 1, naive: 1, weak: true },
-  { name: 'rejects the eleventh call in a window',      ref: 1, naive: 1, weak: true },
-  { name: 'releases capacity when the window rolls',    ref: 1, naive: 1, weak: true },
-  { name: 'keeps buckets isolated per API key',         ref: 1, naive: 1, weak: true },
-  { name: 'two concurrent callers share one bucket',    ref: 1, naive: 0, weak: false },
-  { name: 'a backwards clock grants no free calls',     ref: 1, naive: 0, weak: false },
-  { name: 'in-flight retries cancel on shutdown',       ref: 1, naive: 1, weak: false },
-  { name: 'idle keys do not leak memory',               ref: 1, naive: 0, weak: false }
+  { name: 'Lets through a normal burst',                 ref: 1, naive: 1, weak: true },
+  { name: 'Blocks the eleventh request in a minute',     ref: 1, naive: 1, weak: true },
+  { name: 'Lets you back in when the minute is up',      ref: 1, naive: 1, weak: true },
+  { name: 'Keeps one customer from spending another\u2019s',  ref: 1, naive: 1, weak: true },
+  { name: 'Still holds when two people click at once',   ref: 1, naive: 0, weak: false },
+  { name: 'Gives nothing away if the clock jumps back',  ref: 1, naive: 0, weak: false },
+  { name: 'Stops cleanly when the service shuts down',   ref: 1, naive: 1, weak: false },
+  { name: 'Does not grow forever in memory',             ref: 1, naive: 0, weak: false }
 ];
 ---
 <section id="gate" class={bare ? 'embed gate' : 'chamber sec gate'}>
   <div class={bare ? '' : 'wrap'}>
     {!bare && (
       <Fragment>
-        <p class="mono eyebrow rv">The mechanic</p>
-        <h2 class="d d-2 rv">The gate</h2>
-        <p class="lede rv">A generated coding challenge tells you nothing unless you can prove it separates a strong
-          candidate from a weak one. So every one of mine carries two solutions — what an expert would write, and what
-          a plausible engineer would — and it ships only if the hidden tests can tell them apart. Run it.</p>
+        <p class="mono eyebrow rv">Demo two</p>
+        <h2 class="d d-2 rv">A test that<br />cannot fail anyone</h2>
+        <p class="lede rv">Two people hand in the same task. One understood it; one wrote something that looks right.
+          If the marking cannot tell them apart, the marking is worthless — so I check that first, before any candidate
+          sees it.</p>
       </Fragment>
     )}
 
     <div class="rig rv">
       <header class="rig-bar mono">
         <span class="rig-dot" aria-hidden="true"></span>
-        <span>challenge · rate-limit the tool-call loop</span>
-        <span class="rig-meta">python · 90 min · hidden suite</span>
+        <span>The task: stop a runaway program from calling something ten thousand times</span>
+        <span class="rig-meta">90 minutes</span>
       </header>
 
       <div class="rig-body">
         <div class="sols">
           <article class="sol" data-sol="ref">
-            <p class="mono sol-h"><b>reference.py</b> what an expert ships</p>
+            <p class="mono sol-h"><b>Answer A</b> someone who understood the problem</p>
             <pre class="code"><code>class Limiter:
     def __init__(self, rate, per):
         self._buckets = TTLCache(ttl=per * 2)
@@ -46,7 +48,7 @@ const TESTS = [
           </article>
 
           <article class="sol" data-sol="naive">
-            <p class="mono sol-h"><b>naive.py</b> plausible, and wrong</p>
+            <p class="mono sol-h"><b>Answer B</b> looks fine, is not</p>
             <pre class="code"><code>counts = {}
 
 def take(key):
@@ -61,9 +63,9 @@ def take(key):
         </div>
 
         <div class="suite">
-          <p class="mono suite-h"><span>hidden test suite</span><span data-suite-count>8 cases</span></p>
+          <p class="mono suite-h"><span>What the marking checks</span><span data-suite-count>8 cases</span></p>
           <p class="test head mono" aria-hidden="true">
-            <span></span><span>case</span><span class="tres"><b>ref</b><b>naive</b></span>
+            <span></span><span>check</span><span class="tres"><b>A</b><b>B</b></span>
           </p>
           <ol class="tests">
             {TESTS.map((t) => (
@@ -88,14 +90,14 @@ def take(key):
         </button>
         <label class="weaken mono">
           <input type="checkbox" data-weaken />
-          <span>Weaken the suite — keep only the obvious cases</span>
+          <span>Only check the obvious things, then run it again</span>
         </label>
       </footer>
     </div>
 
     {!bare && (
-      <p class="gate-note mono rv">Fail either half and the challenge never reaches a candidate. Mutation testing,
-        pointed at the assessment instead of the code.</p>
+      <p class="gate-note rv">Nearly every take-home test ever set is the second version — it looks rigorous and it
+        cannot separate anybody. Writing the wrong answer on purpose is what makes the difference visible.</p>
     )}
   </div>
 </section>
@@ -160,8 +162,8 @@ def take(key):
       await wait(340);
       word.textContent = publishes ? 'Publishes' : 'Blocked';
       why.textContent = publishes
-        ? `reference ${refPass}/${tests.length} · naive fails ${naiveFail} · the suite separates them`
-        : `reference ${refPass}/${tests.length} · naive fails ${naiveFail} · nothing here tells the two apart`;
+        ? `A passed all ${tests.length}. B failed ${naiveFail}. The marking can tell them apart, so it is worth setting.`
+        : `A passed all ${tests.length}. B passed too. Everyone looks identical, so this would grade nobody.`;
       verdict.dataset.state = publishes ? 'pass' : 'fail';
       verdict.hidden = false;
       rig.classList.remove('running');
@@ -248,7 +250,7 @@ def take(key):
   .weaken { display: flex; align-items: center; gap: 10px; color: var(--bone-dim); cursor: pointer; text-transform: none; letter-spacing: .03em; }
   .weaken input { accent-color: var(--fail-lit); width: 15px; height: 15px; }
 
-  .gate-note { margin-top: 22px; color: var(--bone-dim); text-transform: none; letter-spacing: .03em; max-width: 58ch; line-height: 1.7; }
+  .gate-note { margin-top: 26px; color: #a8a8b2; max-width: 58ch; line-height: 1.6; font-size: 1rem; }
 
   @media (max-width: 939px) { .sols { border-right: 0; border-bottom: 1px solid var(--rule-dark); } }
 </style>
