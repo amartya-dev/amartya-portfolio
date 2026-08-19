@@ -1,0 +1,127 @@
+---
+title: "Taking the network away from a Cloud Run job"
+description: "Running untrusted code with no egress, on managed infrastructure, without a VM you have to operate. The trick is one prefix — and the reason it looks broken at first is that loopback starts down."
+date: 2026-08-16
+tags: ["infrastructure", "sandboxing", "cloud-run"]
+---
+
+If you execute other people's code, at some point you have to decide what it is allowed to reach. Mine
+should reach nothing: no package registry, no pastebin, no callback to a server that tells it the
+answer. It should see its own filesystem, its own loopback interface, and the end of the world in every
+other direction.
+
+The usual answers are all heavy. Run your own Kubernetes with a deny-all NetworkPolicy and now you
+operate a cluster. Use Firecracker directly and now you operate a fleet. Both are correct and both cost
+you an ops function you may not want.
+
+What I wanted was the managed thing — hand a container to a platform, get told when it exited — with
+the network removed. Here is how that works on Cloud Run, and the two details that are not in the docs.
+
+## The prefix
+
+A Cloud Run Job runs whatever command you give it. So give it a command that drops the network first:
+
+```
+unshare -rn -- ./run-the-untrusted-thing
+```
+
+`unshare -r` maps your current user to root inside a new user namespace, which is what earns you the
+right to create the next one without privileges. `-n` is the one that matters: a new network namespace.
+A fresh network namespace contains no interfaces except a loopback device, and no route to anything.
+Nothing you can do inside it reaches the outside, because from in there, there is no outside.
+
+<figure class="diagram">
+<svg viewBox="0 0 640 200" role="img" aria-label="A Cloud Run job containing a network namespace with only a loopback interface and no route out.">
+  <rect x="8" y="8" width="624" height="184" fill="none" stroke="currentColor" stroke-opacity=".25"/>
+  <text x="22" y="30" font-family="ui-monospace, monospace" font-size="11" fill="currentColor" opacity=".55">cloud run job · gen2 microvm</text>
+  <rect x="30" y="46" width="330" height="126" fill="none" stroke="currentColor" stroke-opacity=".5" stroke-dasharray="4 4"/>
+  <text x="44" y="70" font-family="ui-monospace, monospace" font-size="11" fill="currentColor" opacity=".75">unshare -rn</text>
+  <rect x="44" y="84" width="140" height="34" fill="none" stroke="currentColor" stroke-opacity=".4"/>
+  <text x="56" y="105" font-family="ui-monospace, monospace" font-size="11" fill="currentColor">candidate code</text>
+  <rect x="44" y="126" width="140" height="30" fill="none" stroke="currentColor" stroke-opacity=".4"/>
+  <text x="56" y="146" font-family="ui-monospace, monospace" font-size="11" fill="currentColor">lo · 127.0.0.1</text>
+  <path d="M200 141 L340 141" stroke="currentColor" stroke-opacity=".5" stroke-width="1"/>
+  <path d="M196 133 L204 149 M204 133 L196 149" stroke="currentColor" stroke-width="1.4"/>
+  <text x="212" y="134" font-family="ui-monospace, monospace" font-size="11" fill="currentColor" opacity=".6">no route out</text>
+  <text x="400" y="105" font-family="ui-monospace, monospace" font-size="11" fill="currentColor" opacity=".45">registries, pastebins,</text>
+  <text x="400" y="122" font-family="ui-monospace, monospace" font-size="11" fill="currentColor" opacity=".45">a server with the answer</text>
+</svg>
+</figure>
+
+Pull happens before this. The image is already on the machine when your command starts, so removing
+egress at the top of the run costs you nothing you needed.
+
+## Why the execution environment matters
+
+That prefix only works on Cloud Run's **second-generation** execution environment, and the difference
+is the whole reason to care which one you are on.
+
+Gen1 is gVisor: a user-space kernel that intercepts syscalls and implements a subset of them. Gen2 is a
+microVM with a real Linux kernel. Creating user and network namespaces is exactly the sort of operation
+a syscall-filtering layer declines to support, so on gen1 the `unshare` fails and you are left
+wondering why a command that works on your laptop does not work in the job.
+
+```
+executionEnvironment: EXECUTION_ENVIRONMENT_GEN2
+```
+
+One field. Worth writing a comment above it, because it looks like a performance knob and it is
+actually a capability boundary.
+
+## The detail that will waste your afternoon
+
+Drop the network and every test that talks to a local server fails. Not the interesting ones — all of
+them. A web framework's test client, a database on `127.0.0.1`, anything that binds a port and connects
+to itself.
+
+This is not the sandbox working. This is a fresh network namespace starting with its **loopback
+interface down**. `lo` exists, it is just not up, and nothing has told it to be.
+
+So the run phase needs a shim that raises loopback and then gets out of the way:
+
+```python
+import fcntl, socket, struct, os, sys
+
+SIOCGIFFLAGS, SIOCSIFFLAGS, IFF_UP = 0x8913, 0x8914, 0x1
+
+def raise_loopback():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    ifr = struct.pack("16sh", b"lo", 0)
+    flags = struct.unpack("16sh", fcntl.ioctl(sock, SIOCGIFFLAGS, ifr))[1]
+    fcntl.ioctl(sock, SIOCSIFFLAGS, struct.pack("16sh", b"lo", flags | IFF_UP))
+
+raise_loopback()
+os.execvp(sys.argv[1], sys.argv[1:])
+```
+
+Ten lines, and it does not weaken anything. Loopback goes nowhere by definition; the namespace still has
+no route off the box. You get the isolation you asked for and tests that pass for the right reasons.
+
+The `execvp` at the end is deliberate — the shim replaces itself with the real command rather than
+supervising it, so there is no extra process in the tree, no signal forwarding to get wrong, and the
+exit code is the exit code.
+
+## Turn off retries
+
+The last one is not about networking, and it is the one I would most want somebody to tell me.
+
+Managed job runners retry failed executions by default. That is right for a data pipeline and quietly
+catastrophic for anything that grades. A flaky test that fails, retries, and passes has just been
+recorded as a pass. Nobody in the system is lying; the platform did what it was configured to do, and
+the result is wrong.
+
+```
+maxRetries: 0
+```
+
+If a run fails, it failed. Deciding what that means is your job, not the platform's.
+
+## What this does not give you
+
+A namespace is an isolation boundary, not a security guarantee against a determined attacker with a
+kernel exploit — and you are on a shared managed platform. Set your CPU and memory limits, set a
+deadline, treat everything the run produces as hostile input, and do not confuse "cannot reach the
+network" with "cannot do anything".
+
+It does, however, get you a very strong property for one config field, one prefix, and ten lines of
+ioctl: code you did not write, running on infrastructure you do not operate, with nowhere to phone.

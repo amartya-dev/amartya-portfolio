@@ -1,0 +1,93 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import Base from '../layouts/Base.astro';
+
+const dir = path.join(process.cwd(), 'public', 'media');
+const files = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+const label = (f) => f.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+const photos = files.filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(f)).sort();
+const videos = files.filter((f) => /\.(mp4|webm)$/i.test(f)).sort();
+const hasMedia = photos.length > 0 || videos.length > 0;
+---
+<Base title="Off the clock — Amartya Gaur" description="The parts of Amartya Gaur that are not infrastructure: music, martial arts, and talking to rooms full of people about WordPress." theme="light">
+  <article class="light sec about">
+    <div class="wrap">
+      <p class="mono eyebrow">Off the clock</p>
+      <h1 class="d d-2">The rest of it</h1>
+      <p class="lede">Everywhere else on this site I am an engineer. Here I am a person who owns
+        several instruments and is competent on some of them.</p>
+
+      <div class="cols">
+        <section>
+          <h2 class="mono sub">Music</h2>
+          <p>I sing, and I play harmonium, tabla and guitar. The harmonium and the tabla came first and are the ones
+            I would put money on; the guitar is the one I actually pick up, which tells you something about how
+            practice works.</p>
+          <p>There is a straight line between this and the day job, and I only noticed it recently. Tabla is a
+            grammar — a fixed vocabulary of strokes, composed into cycles, where the interesting part is the return
+            to the first beat rather than anything clever in the middle. I have spent five years building systems
+            that behave the same way and calling it architecture.</p>
+        </section>
+
+        <section>
+          <h2 class="mono sub">Rooms full of people</h2>
+          <p>Four WordCamps — Mumbai, Ahmedabad, Delhi, Kolkata — mostly the same talk about building Gutenberg
+            blocks, given three times, improving slightly each time. Speaking is the fastest way I know to find out
+            whether you actually understand something. An audience finds the hole in your explanation in about
+            forty seconds.</p>
+        </section>
+
+        <section>
+          <h2 class="mono sub">Elsewhere</h2>
+          <p>I built the site for the Jeet Kune Do Federation of India for nothing, which is the sort of thing you
+            do when the cause is close to you.</p>
+          <p>Bengaluru, mostly. An Arctic Code Vault contributor, which means only that I was committing to the
+            right repositories in 2020.</p>
+        </section>
+      </div>
+
+      {hasMedia ? (
+        <div class="gallery">
+          {videos.map((f) => (
+            <figure class="shot wide">
+              <video src={`/media/${f}`} controls preload="none" playsinline></video>
+              <figcaption class="mono">{label(f)}</figcaption>
+            </figure>
+          ))}
+          {photos.map((f) => (
+            <figure class="shot">
+              <img src={`/media/${f}`} alt={label(f)} loading="lazy" decoding="async" />
+              <figcaption class="mono">{label(f)}</figcaption>
+            </figure>
+          ))}
+        </div>
+      ) : (
+        <p class="empty mono">Pictures of any of this to follow, once I find some that I like.</p>
+      )}
+
+      <p class="back mono"><a href="/">← back to the infrastructure</a></p>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .about { padding-top: clamp(120px, 14vw, 190px); }
+  .about .lede { margin-top: 22px; max-width: 42ch; }
+  .cols { display: grid; gap: clamp(34px, 4vw, 56px); margin-top: clamp(48px, 6vw, 80px); border-top: 1px solid var(--rule); padding-top: 36px; }
+  @media (min-width: 900px) { .cols { grid-template-columns: repeat(3, 1fr); } }
+  .sub { color: var(--fail); margin-bottom: 16px; }
+  .cols p { color: var(--ink-2); font-size: .98rem; }
+  .cols p + p { margin-top: 1em; }
+
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; margin-top: clamp(44px, 5vw, 72px); }
+  .shot { margin: 0; }
+  .shot.wide { grid-column: span 2; }
+  @media (max-width: 620px) { .shot.wide { grid-column: span 1; } }
+  .shot img, .shot video { width: 100%; height: auto; display: block; background: var(--paper-2); border: 1px solid var(--rule); }
+  .shot figcaption { margin-top: 9px; color: var(--mid); }
+  .empty { margin-top: clamp(44px, 5vw, 68px); color: var(--mid); border-top: 1px solid var(--rule); padding-top: 26px; }
+  .back { margin-top: clamp(50px, 6vw, 80px); color: var(--mid); }
+  .back a { text-decoration: none; }
+  .back a:hover { color: var(--ink); }
+</style>

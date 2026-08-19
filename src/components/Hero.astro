@@ -22,8 +22,17 @@ const FACTS = [
       ))}
     </dl>
 
+    <ul class="quick mono rv">
+      <li><a href="https://github.com/amartya-dev" rel="me noopener">GitHub</a></li>
+      <li><a href="https://linkedin.com/in/amartya-gaur" rel="me noopener">LinkedIn</a></li>
+      <li><a href="https://hunr.ai" rel="noopener">hunr.ai</a></li>
+      <li><a href="/blog">Writing</a></li>
+      <li><a href="/about">About me</a></li>
+      <li><a href="mailto:amartya@hunr.ai">Email</a></li>
+    </ul>
+
     <p class="try mono rv">
-      <a href="#router">Three of them are on this page, working</a>
+      <a href="#router">Three of these are on this page, working</a>
       <span aria-hidden="true">↓</span>
     </p>
   </div>
@@ -56,7 +65,14 @@ const FACTS = [
   .facts dt { color: #55555f; text-transform: uppercase; letter-spacing: .14em; font-size: .6rem; margin-bottom: 8px; }
   .facts dd { margin: 0; color: var(--bone); font-size: .82rem; letter-spacing: .02em; }
 
-  .try { margin-top: clamp(34px, 4vw, 52px); display: flex; align-items: center; gap: 12px; color: var(--bone-dim); }
+  .quick { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+  .quick a {
+    display: block; color: var(--bone-dim); text-decoration: none;
+    border: 1px solid #2a2a34; padding: 8px 14px; transition: all .18s ease;
+  }
+  .quick a:hover { color: var(--void); background: var(--pass-lit); border-color: var(--pass-lit); }
+
+  .try { margin-top: clamp(26px, 3vw, 38px); display: flex; align-items: center; gap: 12px; color: var(--bone-dim); }
   .try a { color: inherit; text-decoration: none; border-bottom: 1px solid #33333d; padding-bottom: 4px; }
   .try a:hover { color: var(--bone); border-color: var(--bone); }
 

@@ -30,14 +30,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 <body class={theme === 'light' ? 'light' : ''}>
 <a class="skip" href="#main">Skip to content</a>
 
-<header class="top">
+<header class="top" id="top-bar" data-over="dark">
   <div class="wrap top-in mono">
     <a href="/">Amartya Gaur</a>
     <nav class="nav" aria-label="Sections">
       <a href="/#work">Work</a>
       <a href="/blog">Writing</a>
+      <a href="/about">About</a>
       <a href="/#contact">Contact</a>
-      <a class="hide-sm" href="/plain">Plain</a>
     </nav>
   </div>
 </header>
@@ -53,6 +53,41 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 
 <script>
   document.documentElement.classList.add('js');
+
+  // Nav: knows whether it is over a light or dark section, hides going down,
+  // returns coming up. A 6px deadzone so a trackpad twitch does not flap it.
+  const bar = document.getElementById('top-bar');
+  if (bar) {
+    let lastY = window.scrollY;
+    let ticking = false;
+    const sections = [...document.querySelectorAll('main > section, main > article')];
+
+    const themeAt = (y) => {
+      for (const s of sections) {
+        const top = s.offsetTop;
+        if (y >= top - 63 && y < top + s.offsetHeight - 63) {
+          return s.classList.contains('light') ? 'light' : 'dark';
+        }
+      }
+      return 'dark';
+    };
+
+    const update = () => {
+      const y = window.scrollY;
+      bar.dataset.over = themeAt(y);
+      if (y > 8) bar.setAttribute('data-stuck', ''); else bar.removeAttribute('data-stuck');
+      if (y > 220 && y > lastY + 6) bar.setAttribute('data-hidden', '');
+      else if (y < lastY - 6 || y < 220) bar.removeAttribute('data-hidden');
+      lastY = y;
+      ticking = false;
+    };
+
+    update();
+    addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    addEventListener('resize', update, { passive: true });
+  }
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
       if (!e.isIntersecting) return;

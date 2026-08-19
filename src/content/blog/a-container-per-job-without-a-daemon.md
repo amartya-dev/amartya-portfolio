@@ -1,0 +1,101 @@
+---
+title: "A container per job, without a daemon"
+description: "Building a bespoke image for every unit of work, from a package list rather than a Dockerfile — and why having no build step at all is the security property, not a limitation."
+date: 2026-08-18
+tags: ["infrastructure", "containers", "security"]
+---
+
+Some workloads want an image each. A build that needs a specific toolchain, a test that needs a
+specific database client, a task whose dependencies are described by something other than a human.
+
+The instinct is a Dockerfile and a builder. That means a daemon or a rootless equivalent, a build job
+in the path of every request, a registry filling with near-identical layers, and — the part that turned
+out to matter — an arbitrary program running at build time on input you did not write.
+
+There is another way to get an image, and it starts by giving up the thing everyone assumes you need.
+
+## An image is just files and a manifest
+
+A container image is a set of tarballs plus a JSON document describing them. Nothing requires that the
+tarballs were produced by executing commands. If you can state which packages you want, a tool can
+resolve them, lay them out, and write the manifest — no shell, no intermediate containers, nothing
+executed at all.
+
+That is what [apko](https://github.com/chainguard-dev/apko) does. You hand it a package list:
+
+```yaml
+contents:
+  repositories: [https://packages.wolfi.dev/os]
+  packages:
+    - python-3.12
+    - py3.12-pytest
+    - busybox
+accounts:
+  users: [{ username: runner, uid: 65532 }]
+  run-as: 65532
+entrypoint:
+  command: /bin/sh -l
+```
+
+and it produces an OCI image. Reproducibly — same list, same image digest — because there is no
+build-time entropy to be non-deterministic about.
+
+## The absence of RUN is the whole point
+
+Look at what is missing from that file. There is no `RUN`. There is nowhere to put one.
+
+If a person, or a model, or a pipeline describes an environment, and that description is a **package
+list**, then the worst thing a malicious description can do is ask for a package. It cannot curl a
+script. It cannot read your build secrets. It cannot write to a layer and then delete the evidence.
+The input is data, and it is treated as data.
+
+With a Dockerfile the input is a program, and the build is an execution of it, on your builder, with
+whatever that builder can reach. Every hardening measure after that point — rootless, no network,
+scrubbed environment — is you re-imposing a constraint that the format gave away by design.
+
+Removing the build step does not weaken the sandbox. It removes a sandbox you would otherwise have had
+to build.
+
+## Assembly is a manifest rewrite
+
+The other benefit shows up when you want many similar images: one base, small variations.
+
+Because an image is layers plus a manifest, swapping a base underneath a set of layers is a metadata
+operation. `crane rebase` does it against the registry:
+
+```
+crane rebase myimg:variant \
+  --old_base base:v1 \
+  --new_base base:v2 \
+  --tag       myimg:variant-v2
+```
+
+No pull, no push of anything large, no rebuild. In my case the base is cached by the fingerprint of its
+package list — building it fresh takes about fourteen seconds, and thereafter assembling a variant is a
+manifest write measured at **0.227 seconds with zero layer uploads**.
+
+The shape that falls out:
+
+1. Fingerprint the package list. Base already built? Reuse it.
+2. Lay the job's own files in as one thin layer.
+3. Rebase and tag. Done in under a second.
+4. The runner pulls by digest.
+
+Pin by digest rather than tag, and add a CI check that fails if a manifest's digest drifts from what
+the repository says it should be. Otherwise "reproducible" quietly becomes "reproducible until
+somebody moves a tag."
+
+## What you give up
+
+This is not a general replacement for Docker builds, and pretending otherwise would waste your time.
+
+You are limited to what is packaged. Wolfi's repository is good and fast-moving, but if your dependency
+is not there you are building an apk, which is a real cost. Anything genuinely requiring a build step —
+compiling from source, running a bundler — still needs a builder; the honest pattern is to build those
+artefacts somewhere with a real toolchain and have apko compose the runtime image around them.
+
+And you need to actually want the property. If the environment descriptions all come from your own
+team and go through review, a Dockerfile is fine and you know how it works. This trade only pays when
+something other than a person is writing the description — and in that case it pays immediately,
+because the question "what can this input do to my builder" gets the best possible answer, which is
+nothing.
