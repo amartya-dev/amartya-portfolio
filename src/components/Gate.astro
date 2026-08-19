@@ -1,4 +1,5 @@
 ---
+const { bare = false } = Astro.props;
 const TESTS = [
   { name: 'accepts a burst under the limit',            ref: 1, naive: 1, weak: true },
   { name: 'rejects the eleventh call in a window',      ref: 1, naive: 1, weak: true },
@@ -10,14 +11,17 @@ const TESTS = [
   { name: 'idle keys do not leak memory',               ref: 1, naive: 0, weak: false }
 ];
 ---
-<section id="gate" class="chamber sec gate">
-  <div class="wrap">
-    <p class="mono eyebrow rv">02 — something I designed</p>
-    <h2 class="d d-2 rv">The gate</h2>
-    <p class="lede rv">Building hunr, I hit a problem nobody had solved: a generated coding challenge tells you nothing
-      unless you can prove it separates a strong candidate from a weak one. So every challenge carries two solutions —
-      one an expert would write, one a plausible engineer would — and it only goes live if the hidden tests can tell
-      them apart. Run it yourself.</p>
+<section id="gate" class={bare ? 'embed gate' : 'chamber sec gate'}>
+  <div class={bare ? '' : 'wrap'}>
+    {!bare && (
+      <Fragment>
+        <p class="mono eyebrow rv">The mechanic</p>
+        <h2 class="d d-2 rv">The gate</h2>
+        <p class="lede rv">A generated coding challenge tells you nothing unless you can prove it separates a strong
+          candidate from a weak one. So every one of mine carries two solutions — what an expert would write, and what
+          a plausible engineer would — and it ships only if the hidden tests can tell them apart. Run it.</p>
+      </Fragment>
+    )}
 
     <div class="rig rv">
       <header class="rig-bar mono">
@@ -89,8 +93,10 @@ def take(key):
       </footer>
     </div>
 
-    <p class="gate-note mono rv">Fail either half and the challenge never reaches a candidate. It is mutation testing,
-      pointed at the assessment instead of the code.</p>
+    {!bare && (
+      <p class="gate-note mono rv">Fail either half and the challenge never reaches a candidate. Mutation testing,
+        pointed at the assessment instead of the code.</p>
+    )}
   </div>
 </section>
 
@@ -171,6 +177,8 @@ def take(key):
 
 <style>
   .gate .lede { margin-top: 20px; max-width: 46ch; }
+  .embed { display: block; margin: 2.4em 0; }
+  .embed .rig { margin-top: 0; }
   .rig {
     margin-top: clamp(38px, 5vw, 64px);
     border: 1px solid var(--rule-dark);

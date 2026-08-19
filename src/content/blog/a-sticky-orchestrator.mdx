@@ -4,6 +4,7 @@ description: "We kept trying to make the router smarter. What actually fixed sup
 date: 2026-05-18
 tags: ["agents", "orchestration", "production"]
 ---
+import Router from '../../components/Router.astro';
 
 For a long stretch, the production support agents I worked on lost conversations in a way that was
 maddening to debug. A customer would come in about a billing charge, get three turns into it, mention
@@ -30,6 +31,10 @@ plenty of noise.
 Accuracy per decision was around 94%, which sounds fine until you compound it. Eight turns of
 independent 94% decisions is a 61% chance of staying on the intended workflow for the whole
 conversation. The number that matters is not per-turn accuracy. It is per-conversation.
+
+Here are both, side by side. Type at them — the ambiguous fragments are where it shows.
+
+<Router bare />
 
 ## Stickiness as a state machine
 

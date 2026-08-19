@@ -75,6 +75,7 @@ export function mountSwarm(canvas, readout) {
   const CYCLE = 8.6; // seconds for one sweep, wall-clock so a slow frame rate can't stall it
   let sweep = -0.05, cycle = 0, passing = 0, failing = 0, raf = null, live = true, phase0 = 0;
   let order = 0, orderTarget = 0; // 0 = flow, 1 = order
+  let paused = false;
 
   function resize() {
     const r = canvas.getBoundingClientRect();
@@ -174,7 +175,7 @@ export function mountSwarm(canvas, readout) {
     raf = requestAnimationFrame(frame);
   }
 
-  function play() { if (!raf && live) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  function play() { if (!raf && live && !paused) { last = performance.now(); raf = requestAnimationFrame(frame); } }
   function pause() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
 
   resize();
@@ -199,5 +200,8 @@ export function mountSwarm(canvas, readout) {
     play();
   }
 
-  return { setOrder: (v) => { orderTarget = v ? 1 : 0; if (!raf && live) play(); } };
+  return {
+    setOrder: (v) => { orderTarget = v ? 1 : 0; play(); },
+    setPaused: (v) => { paused = v; if (v) pause(); else play(); }
+  };
 }

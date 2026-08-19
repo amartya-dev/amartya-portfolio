@@ -10,51 +10,118 @@
     </p>
   </div>
 
-  <div class="readout mono" id="readout" aria-hidden="true">
+  <div class="readout mono" id="readout">
     <span>eval run <b data-run>000</b></span>
     <span class="ok">passing <b data-pass>0</b></span>
     <span class="no">failing <b data-fail>0</b></span>
     <span class="dimmed">739 cases</span>
   </div>
-  <button type="button" class="view mono" data-view aria-pressed="false">
-    <span data-view-label>Order</span>
-  </button>
+  <div class="controls">
+    <button type="button" class="view mono" data-view aria-pressed="false" aria-label="Show the suite as a matrix">
+      <span data-view-label>Order</span>
+    </button>
+    <button type="button" class="view mono" data-pause aria-pressed="false">
+      <span data-pause-label>Pause</span>
+    </button>
+  </div>
   <a class="cue mono" href="#what">Scroll<span aria-hidden="true"></span></a>
 </section>
 
 <script>
-  import { mountSwarm } from '../scripts/swarm.js';
   const canvas = document.getElementById('swarm');
-  if (canvas) {
-    const swarm = mountSwarm(canvas, document.getElementById('readout'));
-    const btn = document.querySelector('[data-view]');
-    const label = document.querySelector('[data-view-label]');
-    const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    let ordered = false, timer = null;
+  const readout = document.getElementById('readout');
+  const viewBtn = document.querySelector('[data-view]');
+  const viewLabel = document.querySelector('[data-view-label]');
+  const pauseBtn = document.querySelector('[data-pause]');
+  const pauseLabel = document.querySelector('[data-pause-label]');
 
-    // Scramble the control, never the content — it is feedback that the state moved.
-    function morph(to) {
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) { label.textContent = to; return; }
-      clearInterval(timer);
-      const from = label.textContent;
-      const len = Math.max(from.length, to.length);
-      let f = 0;
-      timer = setInterval(() => {
-        label.textContent = Array.from({ length: len }, (_, i) => {
-          if (i < f / 2.2) return to[i] || '';
-          return CHARS[(Math.random() * 26) | 0];
-        }).join('');
-        if (f++ > len * 2.2 + 2) { clearInterval(timer); label.textContent = to; }
-      }, 40);
+  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const stillPreferred = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Scramble the control, never the content — it is feedback that the state moved.
+  function morph(el, to) {
+    if (stillPreferred()) { el.textContent = to; return; }
+    clearInterval(el._t);
+    const len = Math.max(el.textContent.length, to.length);
+    let f = 0;
+    el._t = setInterval(() => {
+      el.textContent = Array.from({ length: len }, (_, i) =>
+        i < f / 2.2 ? (to[i] || '') : CHARS[(Math.random() * 26) | 0]).join('');
+      if (f++ > len * 2.2 + 2) { clearInterval(el._t); el.textContent = to; }
+    }, 40);
+  }
+
+  // The still version: 739 cells, painted once. ~1KB, no dependencies, and it is
+  // what everyone gets until the device says it can take more.
+  function paintStill() {
+    const ctx = canvas.getContext('2d');
+    const r = canvas.getBoundingClientRect();
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    canvas.width = r.width * dpr;
+    canvas.height = r.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, r.width, r.height);
+    const cols = r.width < 760 ? 20 : 37;
+    const rows = Math.ceil(739 / cols);
+    const cell = Math.min((r.width * (r.width < 760 ? 0.86 : 0.5)) / cols, (r.height * 0.62) / rows);
+    const ox = r.width < 760 ? (r.width - cols * cell) / 2 : r.width - cols * cell - r.width * 0.06;
+    const oy = (r.height - rows * cell) / 2;
+    let pass = 0, fail = 0;
+    for (let i = 0; i < 739; i++) {
+      const bad = ((i * 2654435761) % 100) < 4;
+      bad ? fail++ : pass++;
+      ctx.fillStyle = bad ? '#ff6244' : '#35e08a';
+      ctx.globalAlpha = bad ? 0.9 : 0.5 + ((i * 37) % 50) / 100;
+      const c = i % cols, w = Math.floor(i / cols);
+      ctx.fillRect(ox + c * cell, oy + w * cell, cell * 0.62, cell * 0.62);
     }
+    ctx.globalAlpha = 1;
+    if (readout) {
+      readout.querySelector('[data-pass]').textContent = pass.toLocaleString('en-US');
+      readout.querySelector('[data-fail]').textContent = fail.toLocaleString('en-US');
+      readout.querySelector('[data-run]').textContent = '001';
+    }
+  }
 
-    btn.addEventListener('click', () => {
-      ordered = !ordered;
-      swarm.setOrder(ordered);
-      btn.setAttribute('aria-pressed', String(ordered));
-      btn.setAttribute('aria-label', ordered ? 'Show the suite as an object' : 'Show the suite as a matrix');
-      morph(ordered ? 'Flow' : 'Order');
-    });
+  function still() {
+    paintStill();
+    addEventListener('resize', paintStill, { passive: true });
+    document.querySelector('.controls').hidden = true;
+  }
+
+  // Capability is an upgrade gate, never a degrade gate: these reads are undefined
+  // in Safari and Firefox, so the light path has to be the default.
+  const roomy = (navigator.hardwareConcurrency || 8) > 4 && !navigator.connection?.saveData;
+
+  if (!canvas) { /* nothing to do */ }
+  else if (stillPreferred() || !roomy) { still(); }
+  else {
+    let started = false;
+    const io = new IntersectionObserver((entries) => {
+      if (started || !entries.some((e) => e.isIntersecting)) return;
+      started = true;
+      io.disconnect();
+      import('../scripts/swarm.js')
+        .then(({ mountSwarm }) => {
+          const swarm = mountSwarm(canvas, readout);
+          let ordered = false, held = false;
+          viewBtn.addEventListener('click', () => {
+            ordered = !ordered;
+            swarm.setOrder(ordered);
+            viewBtn.setAttribute('aria-pressed', String(ordered));
+            viewBtn.setAttribute('aria-label', ordered ? 'Show the suite as an object' : 'Show the suite as a matrix');
+            morph(viewLabel, ordered ? 'Flow' : 'Order');
+          });
+          pauseBtn.addEventListener('click', () => {
+            held = !held;
+            swarm.setPaused(held);
+            pauseBtn.setAttribute('aria-pressed', String(held));
+            morph(pauseLabel, held ? 'Play' : 'Pause');
+          });
+        })
+        .catch(still);
+    }, { rootMargin: '200px' });
+    io.observe(canvas);
   }
 </script>
 
@@ -88,11 +155,12 @@
   .readout .ok b { color: var(--pass-lit); }
   .readout .no b { color: var(--fail-lit); }
 
+  .controls { position: absolute; right: var(--gut); top: 96px; z-index: 3; display: flex; gap: 8px; }
+  .controls[hidden] { display: none; }
   .view {
-    position: absolute; right: var(--gut); top: 96px; z-index: 3;
     font: inherit; font-family: var(--mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
     background: none; border: 1px solid #2b2b35; color: var(--bone-dim);
-    padding: 9px 16px; cursor: pointer; min-width: 92px; transition: border-color .2s ease, color .2s ease;
+    padding: 9px 16px; cursor: pointer; min-width: 84px; transition: border-color .2s ease, color .2s ease;
   }
   .view:hover { border-color: var(--bone-dim); color: var(--bone); }
   .view[aria-pressed='true'] { border-color: var(--pass-lit); color: var(--pass-lit); }
@@ -108,6 +176,6 @@
     .hero-scrim { background: linear-gradient(180deg, rgba(8,8,10,.92) 0%, rgba(8,8,10,.62) 24%, rgba(8,8,10,.9) 52%, rgba(8,8,10,.97) 100%); }
     .hero-in { padding-block: 128px 92px; }
     .cue { display: none; }
-    .view { top: auto; bottom: 76px; right: var(--gut); }
+    .controls { top: auto; bottom: 74px; right: var(--gut); }
   }
 </style>

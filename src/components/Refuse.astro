@@ -14,13 +14,13 @@ const maxReach = Math.max(...PLATFORMS.map((p) => p.reach));
   <div class="wrap">
     <p class="mono eyebrow rv">Data layers</p>
     <h2 class="d d-2 rv">A number is not<br />the same as a fact</h2>
-    <p class="lede rv">Ella is an analytics agent for creators on six platforms. Ask it the obvious question and it
-      argues with you.</p>
+    <p class="lede rv">An analytics layer I built over six platforms that count a &ldquo;view&rdquo; six different ways.
+      Ask it the obvious question and it argues with you.</p>
 
     <div class="chat rv" data-chat>
       <div class="log" data-log>
         <p class="msg bot mono">Ask me about last month. I know three questions, because this is a portfolio and not
-          the actual product.</p>
+          the real thing.</p>
       </div>
 
       <div class="asks mono">
@@ -31,7 +31,7 @@ const maxReach = Math.max(...PLATFORMS.map((p) => p.reach));
     </div>
 
     <p class="src mono rv">Real counting rules, real drift dates, simulated numbers — the platforms don&rsquo;t hand out
-      API access to people building demos.</p>
+      API access to people building demos. Built for a private assessment, so this is the idea rather than the code.</p>
   </div>
 </section>
 
@@ -120,7 +120,7 @@ const maxReach = Math.max(...PLATFORMS.map((p) => p.reach));
         btn.classList.add('done');
         root.querySelectorAll('.q').forEach((b) => (b.disabled = false));
         if (asked.size === 3) {
-          await push('That&rsquo;s everything I know. The real one writes TypeScript against the data layer and runs it.', 'bot', 500);
+          await push('That is everything I know. The real one writes TypeScript against the data layer and runs it.', 'bot', 500);
         }
       });
     });

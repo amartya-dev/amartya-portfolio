@@ -85,6 +85,7 @@ const FILTERS = [
                 ? <a class="d d-3 p-name" href={p.href} rel="noopener">{p.n}<span class="ext" aria-hidden="true">↗</span></a>
                 : <span class="d d-3 p-name">{p.n}</span>}
               <p class="mono p-meta">{p.w} · {p.y}</p>
+              <p class="mono p-status" data-s={p.s}>{p.s}</p>
             </div>
             <div class="p-body">
               <p>{p.d}</p>
@@ -98,34 +99,40 @@ const FILTERS = [
     </div>
   </section>
 
-  <section id="end" class="chamber sec">
+  <section id="writing" class="chamber sec">
     <div class="wrap">
-      <div class="end-grid">
-        <div>
-          <p class="mono eyebrow rv">Writing</p>
-          <ul class="posts rv">
-            {posts.map((p) => (
-              <li>
-                <a href={`/blog/${p.id}/`}>
-                  <span class="mono p-date">{fmt(p.data.date)}</span>
-                  <span class="p-title">{p.data.title}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-          <a class="cta mono rv" href="/blog">All of it<span aria-hidden="true">→</span></a>
-        </div>
-        <div id="contact">
-          <p class="mono eyebrow rv">Contact</p>
-          <h2 class="d d-2 rv">Tell me<br />what&rsquo;s breaking</h2>
-          <a class="d bigmail rv" href="mailto:amartya@hunr.ai">amartya@hunr.ai</a>
-          <ul class="links mono rv">
-            <li><a href="https://hunr.ai" rel="noopener">hunr.ai</a></li>
-            <li><a href="https://github.com/amartya-dev" rel="me noopener">github</a></li>
-            <li><a href="https://linkedin.com/in/amartya-gaur" rel="me noopener">linkedin</a></li>
-          </ul>
-        </div>
-      </div>
+      <p class="mono eyebrow rv">Writing</p>
+      <h2 class="d d-2 rv">Working notes,<br />published early</h2>
+      <p class="lede rv">Some of these carry the demo from this page inside them, so you can argue with the thing
+        rather than the paragraph about the thing.</p>
+      <ul class="posts rv">
+        {posts.map((p) => (
+          <li>
+            <a href={`/blog/${p.id}/`}>
+              <span class="mono p-date">{fmt(p.data.date)}</span>
+              <span class="p-title">{p.data.title}</span>
+              <span class="p-blurb">{p.data.description}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <a class="cta mono rv" href="/blog">All of it<span aria-hidden="true">→</span></a>
+    </div>
+  </section>
+
+  <section id="contact" class="light sec section-end">
+    <div class="wrap">
+      <p class="mono eyebrow rv">Contact</p>
+      <h2 class="d d-2 rv">Tell me<br />what&rsquo;s breaking</h2>
+      <p class="lede rv">Building agents and the platform under them keeps giving way? Hiring engineers and the first
+        screen is not working? Either of those.</p>
+      <a class="d bigmail rv" href="mailto:amartya@hunr.ai">amartya@hunr.ai</a>
+      <ul class="links mono rv">
+        <li><a href="https://hunr.ai" rel="noopener">hunr.ai</a></li>
+        <li><a href="https://github.com/amartya-dev" rel="me noopener">github</a></li>
+        <li><a href="https://linkedin.com/in/amartya-gaur" rel="me noopener">linkedin</a></li>
+        <li><a href="/rss.xml">rss</a></li>
+      </ul>
     </div>
   </section>
 
@@ -172,28 +179,35 @@ const FILTERS = [
   a.p-name:hover { color: var(--fail); }
   .ext { font-size: .5em; opacity: .55; }
   .p-meta { color: var(--mid); margin-top: 9px; }
+  .p-status {
+    display: inline-block; margin-top: 10px; padding: 4px 9px; font-size: .6rem;
+    border: 1px solid var(--rule); color: var(--mid);
+  }
+  .p-status[data-s^='Live'], .p-status[data-s^='In production'], .p-status[data-s^='Shipped'] { border-color: var(--pass); color: var(--pass); }
+  .p-status[data-s^='Merged'] { border-color: var(--ink); color: var(--ink); }
+  .p-status[data-s^='Unpublished'], .p-status[data-s^='Private'] { border-style: dashed; }
   .p-body p { color: var(--ink-2); font-size: .98rem; max-width: 68ch; }
   .p-widget { margin-top: 20px; max-width: 560px; }
   .early { margin-top: 34px; color: var(--mid); text-transform: none; letter-spacing: .03em; max-width: 70ch; line-height: 1.8; }
 
-  .end-grid { display: grid; gap: clamp(48px, 7vw, 96px); }
-  @media (min-width: 940px) { .end-grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); } }
-  .posts { border-top: 1px solid var(--rule-dark); }
+  .posts { border-top: 1px solid var(--rule-dark); margin-top: clamp(30px, 4vw, 48px); }
   .posts li { border-bottom: 1px solid var(--rule-dark); }
-  .posts a { display: grid; gap: 8px; padding: 18px 0; text-decoration: none; }
+  .posts a { display: grid; grid-template-columns: 130px minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: baseline; padding: 24px 0; text-decoration: none; }
   .p-date { color: var(--bone-dim); }
-  .p-title { font-size: 1.05rem; color: var(--bone); transition: color .2s ease; }
+  .p-title { font-family: var(--display); font-weight: 700; font-stretch: 112%; text-transform: uppercase; letter-spacing: -.015em; font-size: 1.15rem; line-height: 1.1; color: var(--bone); transition: color .2s ease; }
   .posts a:hover .p-title { color: var(--pass-lit); }
+  .p-blurb { color: var(--bone-dim); font-size: .95rem; }
+  @media (max-width: 860px) { .posts a { grid-template-columns: 1fr; gap: 10px; } }
   .cta { display: inline-flex; gap: 10px; align-items: center; margin-top: 26px; text-decoration: none; color: var(--bone-dim); border-bottom: 1px solid currentColor; padding-bottom: 5px; }
   .cta:hover { color: var(--bone); }
   .cta span { transition: transform .25s ease; }
   .cta:hover span { transform: translateX(5px); }
 
-  .bigmail { display: inline-block; margin-top: 8px; font-size: clamp(1.4rem, 4.4vw, 3rem); text-decoration: none; color: var(--bone); word-break: break-word; border-bottom: 3px solid var(--rule-dark); }
-  .bigmail:hover { color: var(--pass-lit); border-color: var(--pass-lit); }
-  .links { display: flex; flex-wrap: wrap; gap: 12px 28px; margin-top: 32px; color: var(--bone-dim); }
+  .bigmail { display: inline-block; margin-top: clamp(28px, 4vw, 44px); font-size: clamp(1.4rem, 4.8vw, 3.4rem); text-decoration: none; color: var(--ink); word-break: break-word; border-bottom: 3px solid var(--rule); }
+  .bigmail:hover { color: var(--fail); border-color: var(--fail); }
+  .links { display: flex; flex-wrap: wrap; gap: 12px 28px; margin-top: 34px; color: var(--mid); }
   .links a { text-decoration: none; }
-  .links a:hover { color: var(--bone); }
+  .links a:hover { color: var(--ink); }
 
   @media (max-width: 900px) {
     .axis { margin-left: 0; }

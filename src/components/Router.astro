@@ -1,4 +1,5 @@
 ---
+const { bare = false } = Astro.props;
 const SEEDS = [
   'my dns records are not propagating',
   'and the invoice for last month',
@@ -6,12 +7,16 @@ const SEEDS = [
   'still failing'
 ];
 ---
-<section id="router" class="chamber sec rig-sec">
-  <div class="wrap">
-    <p class="mono eyebrow rv">Orchestration</p>
-    <h2 class="d d-2 rv">Ask it twice,<br />get two answers</h2>
-    <p class="lede rv">A router that re-decides every turn will change its mind on you. Type at both of these and watch
-      which one keeps the plot.</p>
+<section id="router" class={bare ? 'embed' : 'chamber sec rig-sec'}>
+  <div class={bare ? '' : 'wrap'}>
+    {!bare && (
+      <Fragment>
+        <p class="mono eyebrow rv">Orchestration</p>
+        <h2 class="d d-2 rv">Ask it twice,<br />get two answers</h2>
+        <p class="lede rv">A router that re-decides every turn will change its mind on you. Type at both of these and
+          watch which one keeps the plot.</p>
+      </Fragment>
+    )}
 
     <div class="rig rv">
       <div class="rig-in">
@@ -49,8 +54,10 @@ const SEEDS = [
       </div>
     </div>
 
-    <p class="foot-note mono rv">Eight turns at 94% per-turn accuracy is a 61% chance of finishing where you started.
-      Deciding once is cheating, and I recommend it.</p>
+    {!bare && (
+      <p class="foot-note mono rv">Eight turns at 94% per-turn accuracy is a 61% chance of finishing where you started.
+        Deciding once is cheating, and I recommend it.</p>
+    )}
   </div>
 </section>
 
@@ -159,6 +166,8 @@ const SEEDS = [
 </script>
 
 <style>
+  .embed { display: block; margin: 2.4em 0; }
+  .embed .rig { margin-top: 0; }
   .rig { margin-top: clamp(34px, 4vw, 56px); border: 1px solid var(--rule-dark); background: var(--void-2); }
   .rig-in { padding: 20px 18px; border-bottom: 1px solid var(--rule-dark); }
   .ask-l { color: var(--bone-dim); display: block; margin-bottom: 10px; }

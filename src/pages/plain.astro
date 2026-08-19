@@ -71,7 +71,7 @@ const groups = [
         {P.filter((p) => p.g === g.k).map((p) => (
           <li>
             <strong>{p.href ? <a href={p.href}>{p.n}</a> : p.n}</strong>
-            <span class="meta"> — {p.w} · {p.y}</span>
+            <span class="meta"> — {p.w} · {p.y} · {p.s}</span>
             <br />{p.d}
           </li>
         ))}

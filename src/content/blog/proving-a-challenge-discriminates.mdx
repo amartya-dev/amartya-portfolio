@@ -4,6 +4,7 @@ description: "Every hunr challenge ships with two solutions — one an expert wo
 date: 2026-07-04
 tags: ["hiring", "evals", "hunr"]
 ---
+import Gate from '../../components/Gate.astro';
 
 Generating a coding challenge is a solved problem. Any model will write you one in a few seconds,
 with a brief, starter files, and a test suite that goes green. That is exactly the problem. A
@@ -34,6 +35,10 @@ publishes = reference passes every hidden test
 
 Fail either half and the challenge does not reach a candidate. If the reference fails, the tests are
 wrong. If the naive one passes, the tests are asleep.
+
+Run it yourself. Then weaken the suite to the obvious cases and run it again.
+
+<Gate bare />
 
 ## Why the naive half is the interesting half
 
