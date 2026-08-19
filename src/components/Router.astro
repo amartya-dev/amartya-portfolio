@@ -1,10 +1,12 @@
 ---
 const { bare = false } = Astro.props;
+// Order matters: hold through two empty messages first, then hand over on a real
+// change of subject. Clicked left to right, that is the entire argument.
 const SEEDS = [
   'my dns records are not propagating',
-  'and the invoice for last month',
   'the second one',
-  'still failing'
+  'still failing',
+  'and the invoice for last month'
 ];
 ---
 <section id="router" class={bare ? 'embed' : 'chamber sec rig-sec'}>
@@ -13,8 +15,8 @@ const SEEDS = [
       <Fragment>
         <p class="mono eyebrow rv">Demo one</p>
         <h2 class="d d-2 rv">The support bot<br />that forgets</h2>
-        <p class="lede rv">You message a company. Something has to decide which team handles it. Type the same thing at
-          both of these and watch one of them lose the plot.</p>
+        <p class="lede rv">You message a company. Something decides which team handles it. Say something vague — the
+          second one, still failing — and then genuinely change the subject. Watch what each one does with both.</p>
       </Fragment>
     )}
 
@@ -27,7 +29,7 @@ const SEEDS = [
           <button type="button" class="send mono" data-send>Send</button>
         </div>
         <div class="seeds mono">
-          <span>or borrow one:</span>
+          <span>in this order, ideally:</span>
           {SEEDS.map((s) => <button type="button" class="seed" data-seed={s}>{s}</button>)}
           <button type="button" class="seed reset" data-reset>start over</button>
         </div>
@@ -45,7 +47,7 @@ const SEEDS = [
 
         <article class="lane" data-lane="sticky">
           <header class="mono">
-            <b>Decides once, then stays</b><span>the way I build it</span>
+            <b>Stays until it cannot</b><span>the way I build it</span>
             <em class="tally ok" data-pinned>no team yet</em>
           </header>
           <ol class="turns" data-turns="sticky"></ol>
@@ -55,8 +57,10 @@ const SEEDS = [
     </div>
 
     {!bare && (
-      <p class="foot-note rv">Every transfer is a chance to lose the thread — you re-explain, the agent re-reads, and
-        somebody gives up. The fix was not a cleverer decision. It was asking once and writing the answer down.</p>
+      <p class="foot-note rv">Sticky on its own would just be stuck. The part that makes it safe is the second
+        question — <em>can whoever has this actually handle it?</em> — asked of one team about one message, which is a
+        far easier question than picking from a list. A vague message answers it fine and you hold. A real change of
+        subject answers it too, and you hand over on purpose, with a reason attached, once.</p>
     )}
   </div>
 </section>
@@ -91,7 +95,7 @@ const SEEDS = [
     const emptyN = rig.querySelector('[data-empty-naive]');
     const emptyS = rig.querySelector('[data-empty-sticky]');
 
-    let pinned = null, lastNaive = null, flips = 0, turn = 0;
+    let pinned = null, lastNaive = null, flips = 0, blind = 0, handoffs = 0, turn = 0;
 
     function row(list, workflow, note, tone) {
       const li = document.createElement('li');
@@ -128,22 +132,32 @@ const SEEDS = [
         naive = pool[Math.floor(Math.random() * pool.length)];
       }
       const flipped = lastNaive && naive !== lastNaive;
-      if (flipped) flips++;
+      if (flipped) { flips++; if (!c.confident) blind++; }
       row(naiveList, naive,
         flipped ? 'transferred you' : (c.confident ? 'stayed put' : 'guessed, stayed put'),
         flipped ? 'bad' : '');
       lastNaive = naive;
-      flipsEl.textContent = flips === 0 ? 'no transfers' : flips + (flips === 1 ? ' transfer' : ' transfers');
+      flipsEl.textContent = flips === 0
+        ? 'no transfers'
+        : flips + (flips === 1 ? ' transfer' : ' transfers') + (blind ? ', ' + blind + ' on nothing' : '');
       flipsEl.classList.toggle('no', flips > 0);
 
-      // Sticky: classify once at intake, then the workflow owns the conversation.
+      // Sticky: the active team owns the conversation and is asked one question each
+      // turn — can you still handle this? Ambiguity is not an answer, so it holds.
+      // A confident match elsewhere is, so it hands over deliberately, with a reason.
       if (!pinned) {
         pinned = c.workflow || 'triage';
-        pinnedEl.textContent = 'stays with ' + (NAMES[pinned] || 'Triage');
         row(stickyList, pinned, 'picked this up', 'good');
+      } else if (c.confident && c.workflow !== pinned) {
+        const from = pinned;
+        pinned = c.workflow;
+        handoffs++;
+        row(stickyList, pinned, 'handed over, ' + (NAMES[from] || 'triage') + ' cannot take this', 'hand');
       } else {
-        row(stickyList, pinned, 'still the same team, message ' + turn, 'good');
+        row(stickyList, pinned, c.confident ? 'still theirs, holds' : 'nothing here says otherwise, holds', 'good');
       }
+      pinnedEl.textContent = (NAMES[pinned] || 'Triage') +
+        (handoffs ? ' · ' + handoffs + (handoffs === 1 ? ' hand-off' : ' hand-offs') : ' · no hand-offs');
 
       ask.value = '';
       naiveList.scrollTop = naiveList.scrollHeight;
@@ -156,7 +170,7 @@ const SEEDS = [
     });
     rig.querySelectorAll('[data-seed]').forEach((b) => b.addEventListener('click', () => send(b.dataset.seed)));
     rig.querySelector('[data-reset]').addEventListener('click', () => {
-      pinned = null; lastNaive = null; flips = 0; turn = 0;
+      pinned = null; lastNaive = null; flips = 0; blind = 0; handoffs = 0; turn = 0;
       naiveList.innerHTML = ''; stickyList.innerHTML = '';
       flipsEl.textContent = 'no transfers yet'; flipsEl.classList.remove('no');
       pinnedEl.textContent = 'no team yet';
@@ -219,8 +233,11 @@ const SEEDS = [
   .lane :global(.wf) { font-family: var(--mono); font-size: .74rem; letter-spacing: .06em; color: var(--bone-dim); }
   .lane :global(.turn.good .wf) { color: var(--pass-lit); }
   .lane :global(.turn.bad .wf) { color: var(--fail-lit); }
+  .lane :global(.turn.hand .wf) { color: var(--bone); }
+  .lane :global(.turn.hand .note) { color: #8b8b95; }
   .lane :global(.note) { font-family: var(--mono); font-size: .72rem; color: #4a4a55; letter-spacing: .03em; }
   .empty { color: #3d3d47; text-transform: none; letter-spacing: .03em; }
 
-  .foot-note { margin-top: 26px; color: #a8a8b2; max-width: 58ch; line-height: 1.6; font-size: 1rem; }
+  .foot-note { margin-top: 26px; color: #a8a8b2; max-width: 60ch; line-height: 1.6; font-size: 1rem; }
+  .foot-note em { color: var(--bone); font-style: italic; }
 </style>
