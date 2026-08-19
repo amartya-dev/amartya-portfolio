@@ -15,9 +15,10 @@
 //   ANTHROPIC_API_KEY   required. Without it this returns 501 and the page falls
 //                       back to plain retrieval and says so.
 //   ASK_MODEL           optional, defaults to claude-haiku-4-5-20251001
-//   ASK_KV              optional KV namespace. Bind it and you get rate limiting.
-//   ASK_DAILY_PER_IP    optional, defaults to 40
-//   ASK_DAILY_TOTAL     optional, defaults to 1500
+//   ASK_KV              a KV namespace. Bind it. Without it there is no rate limit
+//                       and a bored visitor can spend real money on your behalf.
+//   ASK_DAILY_PER_IP    optional, defaults to 12
+//   ASK_DAILY_TOTAL     optional, defaults to 400
 
 const MAX_Q = 400;
 const MAX_TURNS = 12;
@@ -201,8 +202,8 @@ function partialText(buf) {
 async function limited(env, ip) {
   if (!env.ASK_KV) return null;
   const day = new Date().toISOString().slice(0, 10);
-  const perIp = Number(env.ASK_DAILY_PER_IP || 40);
-  const total = Number(env.ASK_DAILY_TOTAL || 1500);
+  const perIp = Number(env.ASK_DAILY_PER_IP || 12);
+  const total = Number(env.ASK_DAILY_TOTAL || 400);
   const kIp = `ip:${day}:${ip}`;
   const kAll = `all:${day}`;
   const [a, b] = await Promise.all([env.ASK_KV.get(kIp), env.ASK_KV.get(kAll)]);
@@ -266,7 +267,10 @@ export async function onRequestPost({ request, env }) {
   });
 
   const model = env.ASK_MODEL || 'claude-haiku-4-5-20251001';
-  const system = SYSTEM(catalogue);
+  // Tools and system are identical for every question and are most of the input,
+  // so one cache breakpoint on the system block covers both. A follow-up asked
+  // within five minutes reads them at a tenth of the price.
+  const system = [{ type: 'text', text: SYSTEM(catalogue), cache_control: { type: 'ephemeral' } }];
 
   const stream = new ReadableStream({
     async start(ctrl) {

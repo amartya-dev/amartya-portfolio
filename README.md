@@ -66,10 +66,14 @@ README in that folder. `public/media/` itself is work footage referenced explici
 
 ## Deploying
 
-Static output, so anything works. Set `site` in `astro.config.mjs` to the real domain first: the
-canonical tags, sitemap and RSS links all derive from it.
+Cloudflare Pages, free plan, with the ask box wired to a Pages Function. Domain
+options, environment variables, rate limiting and what a question costs are all in
+[DEPLOY.md](DEPLOY.md).
 
-- **Cloudflare Pages.** Import the repo, build `npm run build`, output `dist`. This is the one the
-  ask endpoint expects, since it needs a Pages Function.
-- **Vercel / Netlify.** Same build and output. Port `functions/api/ask.js` to their function format.
-- **GitHub Pages.** Build and publish `dist/`. The ask box falls back to its local index.
+```bash
+npm run serve    # build and serve with the function attached, needs .dev.vars
+npm run deploy   # build and push to Cloudflare Pages
+```
+
+Set `site` in `astro.config.mjs` to the real domain before the first deploy: the
+canonical tags, sitemap and RSS links all derive from it.
