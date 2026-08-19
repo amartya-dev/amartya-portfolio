@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amartya Gaur — AI Systems Engineer</title>
+<meta name="description" content="Amartya Gaur builds agent orchestration, evals, and the infrastructure underneath them. Founder of hunr.ai; five years in Newfold Digital's AI Center of Excellence.">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="Amartya Gaur — AI Systems Engineer">
+<meta property="og:description" content="Agent orchestration, evals, and infrastructure. Founder of hunr.ai.">
+<meta property="og:type" content="profile">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230C1118'/%3E%3Ccircle cx='9' cy='16' r='3' fill='%23F5A524'/%3E%3Ccircle cx='23' cy='9' r='2.5' fill='%239B8CFF'/%3E%3Ccircle cx='23' cy='23' r='2.5' fill='%234AD6C8'/%3E%3Cpath d='M11.5 15 20.5 9.8M11.5 17 20.5 22.2' stroke='%232A3A4D' stroke-width='1.4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<a class="skip" href="#trace">Skip to content</a>
+
+<!-- cold start: the orchestrator booting, once per session -->
+<div class="boot" id="boot" aria-hidden="true">
+  <div class="boot-inner">
+    <p class="mono boot-kicker">cold start</p>
+    <p class="display boot-name">amartya-gaur<span>.orchestrator</span></p>
+    <div class="boot-track"><span id="boot-fill"></span></div>
+    <div class="boot-lines mono">
+      <p class="boot-line"><span>registry.load</span><b>12 workflows</b></p>
+      <p class="boot-line"><span>graph.compile</span><b>11 nodes</b></p>
+      <p class="boot-line"><span>evals.attach</span><b>739 cases</b></p>
+      <p class="boot-line"><span>orchestrator.ready</span><b>ok</b></p>
+    </div>
+  </div>
+  <p class="boot-skip mono">press any key to skip</p>
+</div>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="mono tag" href="#top">AG — AI Systems</a>
+    <nav class="mono nav" aria-label="Sections">
+      <a href="#trace">Trace</a>
+      <a href="#systems">Systems</a>
+      <a href="#stack">Stack</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="name">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="mono eyebrow rv">Agent orchestration · Evals · Infrastructure</p>
+        <h1 id="name" class="display rv">Amartya<br><em>Gaur</em></h1>
+        <p class="thesis rv">I build the layer agents actually run on: a sticky orchestrator carrying about a
+          thousand support conversations an hour, an eval suite of 739 regression cases that can fail a deploy,
+          and the infrastructure holding both up.</p>
+        <p class="mono status rv"><span class="live" aria-hidden="true"></span> Full-time on <a href="https://hunr.ai" rel="noopener">hunr.ai</a> since August 2026</p>
+      </div>
+
+      <figure class="graph" aria-labelledby="graph-cap">
+        <canvas id="orchestrator" role="img" aria-label="Animated diagram of an agent orchestration graph: requests enter, route through a workflow registry and tool calls, pass a verification step with a repair loop, and resolve."></canvas>
+        <figcaption id="graph-cap" class="mono">orchestrator · sticky routing · live</figcaption>
+      </figure>
+    </div>
+
+    <div class="wrap">
+      <dl class="facts mono rv">
+        <div><dt>Now</dt><dd>Founder &amp; engineer, hunr.ai — Kodaksh Private Limited</dd></div>
+        <div><dt>Until August 2026</dt><dd>Senior Software Developer, AI Center of Excellence, Newfold Digital</dd></div>
+        <div><dt>Based</dt><dd>Bengaluru, India · remote</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section id="trace" class="section" aria-labelledby="trace-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="trace-h" class="display h2 rv">Five years,<br>three spans</h2>
+        <p class="lede rv">Where the work happened, on a real time axis. Two of them ran concurrently for most of it.
+          Open a span to see what was inside.</p>
+      </div>
+
+      <div class="panel rv">
+        <div class="panel-bar mono">
+          <span class="dot" aria-hidden="true"></span>
+          <span class="panel-title">trace · amartya-gaur</span>
+          <span class="panel-meta">3 spans · 5y 5mo</span>
+        </div>
+
+        <div class="axis mono" aria-hidden="true">
+          <span style="--t:0">2021</span><span style="--t:.1667">2022</span><span style="--t:.3333">2023</span
+          ><span style="--t:.5">2024</span><span style="--t:.6667">2025</span><span style="--t:.8333">2026</span>
+        </div>
+
+        <ol class="trace-list">
+          <li class="span" style="--s:.0417;--e:.938">
+            <button class="span-row" type="button" aria-expanded="true" aria-controls="d-1">
+              <span class="span-label">
+                <span class="chev" aria-hidden="true"></span>
+                <span class="org">Newfold Digital</span>
+                <span class="role">Senior Software Developer, AI Center of Excellence</span>
+              </span>
+              <span class="plot"><span class="bar"></span></span>
+              <span class="mono dur">5y 5mo</span>
+            </button>
+            <div class="detail" id="d-1">
+              <p>Remote, April 2021 to August 2026. I owned the agent orchestration framework behind the production
+                support agents for Network Solutions and BigRock, the eval harness that gated their releases, and the
+                generation stack behind the AI-native website builder. Before the AI work: roughly 100,000 Microsoft 365
+                accounts migrated to NCE, and async systems rebuilt to fit low-memory hosting.</p>
+              <p class="attrs mono"><span>LangGraph</span><span>Semantic Kernel</span><span>MCP</span><span>promptfoo</span><span>FastAPI</span><span>Cloudflare</span><span>OCI</span></p>
+            </div>
+          </li>
+
+          <li class="span span-side" style="--s:.1667;--e:.6667">
+            <button class="span-row" type="button" aria-expanded="false" aria-controls="d-2">
+              <span class="span-label">
+                <span class="chev" aria-hidden="true"></span>
+                <span class="org">PayCrunch</span>
+                <span class="role">Founding consultant &amp; technical architect · part-time</span>
+              </span>
+              <span class="plot"><span class="bar"></span></span>
+              <span class="mono dur">2022 – 2025</span>
+            </button>
+            <div class="detail" id="d-2" hidden>
+              <p>Architected the backend from zero for a UPI credit lending product at a Y Combinator-backed fintech —
+                lending and payment rail integrations with underwriting logic on top — and built the Flutter client
+                alongside it. Hired and led the company&rsquo;s first three engineers.</p>
+              <p class="attrs mono"><span>Python</span><span>UPI rails</span><span>Underwriting</span><span>Flutter</span></p>
+            </div>
+          </li>
+
+          <li class="span span-live" style="--s:.8333;--e:.938">
+            <button class="span-row" type="button" aria-expanded="false" aria-controls="d-3">
+              <span class="span-label">
+                <span class="chev" aria-hidden="true"></span>
+                <span class="org">hunr.ai</span>
+                <span class="role">Founder &amp; engineer · Kodaksh Private Limited</span>
+              </span>
+              <span class="plot"><span class="bar"></span></span>
+              <span class="mono dur">2026 —<span class="live" aria-label="ongoing"></span></span>
+            </button>
+            <div class="detail" id="d-3" hidden>
+              <p>A technical screening platform, built solo. Candidates get a real build-and-justify challenge with AI
+                explicitly allowed; hidden deterministic tests and adaptive comprehension scoring decide the rest.
+                175 applicants so far across two design partners. Started on the side, full-time since August 2026.</p>
+              <p class="attrs mono"><span>FastAPI</span><span>LangGraph</span><span>RabbitMQ</span><span>Redis Streams</span><span>Postgres</span><span>Pulumi</span><span>ArgoCD</span></p>
+            </div>
+          </li>
+        </ol>
+        <p class="legend mono">Solid bars are full-time. Hollow bars ran alongside one.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section metrics-section" aria-label="Numbers">
+    <div class="wrap">
+      <ul class="metrics rv">
+        <li>
+          <span class="display fig" data-count="1000" data-format="comma">0</span>
+          <span class="mono cap">support conversations an hour,<br>through the orchestrator</span>
+        </li>
+        <li>
+          <span class="display fig" data-count="739">0</span>
+          <span class="mono cap">regression cases in the eval gate,<br>~2,700 assertions behind them</span>
+        </li>
+        <li>
+          <span class="display fig" data-count="48" data-suffix="%">0</span>
+          <span class="mono cap">faster to first preview,<br>11m54s down to 6m12s</span>
+        </li>
+        <li>
+          <span class="display fig" data-count="175">0</span>
+          <span class="mono cap">applicants screened on hunr.ai,<br>across two design partners</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="systems" class="section" aria-labelledby="systems-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="systems-h" class="display h2 rv">Systems, and<br>the part that was hard</h2>
+        <p class="lede rv">Six things in production, or on their way there.</p>
+      </div>
+      <ul class="cards">
+        <li class="card rv">
+          <p class="mono card-org">hunr.ai · founder</p>
+          <h3>AI technical screening</h3>
+          <p>Build-and-justify challenges where using AI is the point, backed by hidden deterministic test suites and
+            adaptive comprehension scoring. Built solo on FastAPI and LangGraph with RabbitMQ, Redis Streams SSE,
+            Postgres, sandboxed code execution, Pulumi on Azure, ArgoCD GitOps, and self-hosted observability across
+            three data-residency regions.</p>
+          <p class="card-hard"><span class="mono k">Hard part</span> Telling the candidate who understands the code from the one who only pasted it.</p>
+        </li>
+        <li class="card rv">
+          <p class="mono card-org">Newfold Digital</p>
+          <h3>Agent orchestration framework</h3>
+          <p>A state-machine sticky orchestrator with a workflow registry, running the production support agents for
+            Network Solutions and BigRock at roughly a thousand conversations an hour.</p>
+          <p class="card-hard"><span class="mono k">Hard part</span> Holding a conversation on the right workflow while agents hand off mid-thread.</p>
+        </li>
+        <li class="card rv">
+          <p class="mono card-org">Newfold Digital</p>
+          <h3>Evals that can fail a build</h3>
+          <p>A promptfoo evaluation framework — 739 regression cases, about 2,700 assertions, roughly 250 scoring
+            metrics across routing, tool-call correctness, and handoff quality — wired in as a blocking Jenkins gate.</p>
+          <p class="card-hard"><span class="mono k">Hard part</span> Scoring an agent&rsquo;s judgment strictly enough to stop a bad release without stopping good ones.</p>
+        </li>
+        <li class="card rv">
+          <p class="mono card-org">Newfold Digital</p>
+          <h3>AI-native website builder</h3>
+          <p>Prompt to live hosted site: a LangGraph generation harness, sandbox orchestration, and atomic publishes
+            across OCI and Cloudflare. Top contributor, 149 of 334 commits.</p>
+          <p class="card-hard"><span class="mono k">Result</span> Time to preview down 48%. The contrast-repair loop went from four attempts to none.</p>
+        </li>
+        <li class="card rv">
+          <p class="mono card-org">Newfold Digital</p>
+          <h3>Public MCP server for deploys</h3>
+          <p>Ships to managed VPS straight from Claude Code and Codex. I built the infrastructure, the DevOps around it,
+            the tool interface, and Cloudflare Enterprise endpoint authorisation.</p>
+        </li>
+        <li class="card rv">
+          <p class="mono card-org">PayCrunch</p>
+          <h3>UPI credit lending backend</h3>
+          <p>Built from zero for a YC-backed fintech: lending and payment rail integrations with underwriting logic on
+            top, plus the Flutter client. Hired and led the first three engineers.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="stack" class="section" aria-labelledby="stack-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="stack-h" class="display h2 rv">Stack</h2>
+        <p class="lede rv">Grouped by the job it does.</p>
+      </div>
+      <dl class="stack rv">
+        <div><dt class="mono">Agent systems</dt><dd>LangGraph · Semantic Kernel · MCP · multi-agent orchestration · promptfoo evals · sandboxed execution · RAG and semantic search</dd></div>
+        <div><dt class="mono">Backend</dt><dd>Python · FastAPI · PostgreSQL · Redis · RabbitMQ</dd></div>
+        <div><dt class="mono">Infrastructure</dt><dd>Azure · GCP · OCI · Kubernetes · Pulumi · ArgoCD · Cloudflare · OpenTelemetry</dd></div>
+      </dl>
+
+      <div class="aside rv">
+        <div>
+          <h3 class="mono sub">Open source</h3>
+          <ul class="plain">
+            <li><strong>OpenMontage</strong> — Azure Speech STT provider, merged, ~900 LOC. Azure TTS, and a repo-grounded UI animation pipeline, ~3,400 LOC.</li>
+            <li><strong>Openverse / Creative Commons</strong> — PR-test CI workflow, merged.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="mono sub">Talks &amp; education</h3>
+          <ul class="plain">
+            <li>Speaker at WordCamp Mumbai, Delhi, and Kolkata.</li>
+            <li>B.Tech Computer Science, Vellore Institute of Technology, 2021 — CGPA 8.99/10.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section section-end" aria-labelledby="contact-h">
+    <div class="wrap">
+      <h2 id="contact-h" class="display h2 rv">Tell me<br>what&rsquo;s breaking</h2>
+      <p class="lede lede-wide rv">If you&rsquo;re building agents, evals, or the platform underneath them, that&rsquo;s the
+        conversation I want.</p>
+      <a class="display bigmail rv" href="mailto:amartya@hunr.ai">amartya@hunr.ai<span class="arrow" aria-hidden="true">→</span></a>
+      <ul class="links mono rv">
+        <li><a href="https://hunr.ai" rel="noopener">hunr.ai</a></li>
+        <li><a href="https://github.com/amartya-dev" rel="me noopener">github.com/amartya-dev</a></li>
+        <li><a href="https://linkedin.com/in/amartya-gaur" rel="me noopener">linkedin.com/in/amartya-gaur</a></li>
+        <li><a href="tel:+919003409944">+91 90034 09944</a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap mono foot-inner">
+    <span>Amartya Gaur</span>
+    <span>Bengaluru · UTC+5:30</span>
+  </div>
+</footer>
+
+<div class="grain" aria-hidden="true"></div>
+<script src="assets/main.js"></script>
+</body>
+</html>
