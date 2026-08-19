@@ -81,8 +81,6 @@ const OPENERS = [
     const openers = root.querySelector('[data-openers]');
     const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-    /* ---------- retrieval, in the browser ---------- */
-
     const STOP = new Set(('a an the and or of to in on at is are was were be been being do does did done he his him she her ' +
       'they them their it its i you your my me we us what which who whom whose how why when where can could would should ' +
       'will has have had with for from about any some all more most much many that this these those tell show give know ' +
@@ -133,8 +131,6 @@ const OPENERS = [
       }).filter((x) => x.s > 0).sort((a, c) => c.s - a.s).slice(0, 6);
     }
 
-    /* ---------- drawing ---------- */
-
     const valueBars = (rows, accent, unit) => {
       const max = Math.max(...rows.map((r) => r.v)) || 1;
       return '<div class="plot">' + rows.map((r) =>
@@ -178,8 +174,6 @@ const OPENERS = [
         ? '<div class="follows">' + qs.map((q) => `<button type="button" class="chip">${esc(q)}</button>`).join('') + '</div>'
         : '';
 
-    /* ---------- transcript ---------- */
-
     const el = (cls, html) => {
       const d = document.createElement('div');
       if (cls) d.className = cls;
@@ -200,8 +194,6 @@ const OPENERS = [
       input.disabled = v;
       go.textContent = v ? 'Working' : 'Ask';
     }
-
-    /* ---------- the ask ---------- */
 
     async function ask(q) {
       q = q.trim();
