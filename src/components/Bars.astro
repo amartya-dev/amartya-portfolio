@@ -36,19 +36,19 @@ const geom = rows.map((r) => {
 
 <style>
   .fig { margin: 2.2em 0; border-top: 1px solid var(--ink); padding-top: 16px; }
-  .cap { color: var(--ink); font-size: var(--t-micro); letter-spacing: .13em; margin-bottom: 18px; display: block; max-width: 62ch; line-height: 1.7; }
+  .cap { color: var(--ink); font-family: var(--body); font-size: 1rem; letter-spacing: 0; text-transform: none; margin-bottom: 20px; display: block; max-width: 58ch; line-height: 1.5; }
   .rows { display: grid; gap: 9px; }
-  .row { display: grid; grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) 5.6rem; gap: 16px; align-items: center; }
-  .lab { color: var(--ink-2); font-size: .66rem; letter-spacing: .05em; text-transform: none; }
-  .track { position: relative; height: 13px; background: var(--paper-2); display: block; }
+  .row { display: grid; grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) 6.2rem; gap: 16px; align-items: center; }
+  .lab { color: var(--ink-2); font-size: .73rem; letter-spacing: .02em; text-transform: none; }
+  .track { position: relative; height: 15px; background: var(--paper-2); display: block; }
   .bar { position: absolute; top: 0; bottom: 0; background: var(--pass); min-width: 2px; }
   .bar.bad, .bar.neg { background: var(--fail); }
   .axis { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--ink); }
-  .val { text-align: right; color: var(--ink); font-size: .66rem; letter-spacing: .03em; text-transform: none; font-variant-numeric: tabular-nums; }
+  .val { text-align: right; color: var(--ink); font-size: .73rem; letter-spacing: 0; text-transform: none; font-variant-numeric: tabular-nums; }
   .note { margin-top: 16px; color: var(--mid); font-size: .86rem; line-height: 1.7; max-width: 62ch; }
 
   @media (max-width: 620px) {
     .row { grid-template-columns: minmax(0, 7.5rem) minmax(0, 1fr) 4.4rem; gap: 10px; }
-    .lab { font-size: .6rem; }
+    .lab { font-size: .7rem; }
   }
 </style>

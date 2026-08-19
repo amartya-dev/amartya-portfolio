@@ -35,7 +35,7 @@
   --t-small: .95rem;
   --t-lede: clamp(1.35rem, 1.9vw, 1.72rem);
   --t-label: .7rem;
-  --t-micro: .62rem;
+  --t-micro: .69rem;
 
   /* vertical rhythm */
   --s-1: 8px;
@@ -153,7 +153,7 @@ a { color: inherit; }
 
 @media (max-width: 720px) {
   body { font-size: 18px; }
-  .top .nav { gap: 15px; font-size: .68rem; }
+  .top .nav { gap: 15px; font-size: 0.69rem; }
   .eyebrow::before { display: none; }
 }
 /* Five destinations and a wordmark do not fit a phone. The wordmark gives way,
@@ -161,5 +161,5 @@ a { color: inherit; }
 @media (max-width: 620px) {
   .top .brand .full { display: none; }
   .top .brand .short { display: inline; }
-  .top .nav { gap: 13px; font-size: .64rem; }
+  .top .nav { gap: 13px; font-size: 0.69rem; }
 }

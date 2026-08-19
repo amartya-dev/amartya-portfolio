@@ -24,11 +24,11 @@ const marked = new Set(hit > 0 ? Array.from({ length: hit }, (_, i) => Math.floo
 
 <style>
   .fig { margin: 2.2em 0; border-top: 1px solid var(--ink); padding-top: 16px; }
-  .cap { color: var(--ink); font-size: var(--t-micro); letter-spacing: .13em; margin-bottom: 18px; display: block; max-width: 62ch; line-height: 1.7; }
+  .cap { color: var(--ink); font-family: var(--body); font-size: 1rem; letter-spacing: 0; text-transform: none; margin-bottom: 20px; display: block; max-width: 58ch; line-height: 1.5; }
   .field { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: 2px; }
   .field i { display: block; aspect-ratio: 1; background: var(--paper-2); border: 1px solid var(--rule); }
   .field i.on { background: var(--fail); border-color: var(--fail); }
-  .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 14px; color: var(--mid); font-size: var(--t-micro); letter-spacing: .1em; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 14px; color: var(--mid); font-size: .7rem; letter-spacing: .04em; text-transform: none; }
   .k { display: inline-flex; align-items: center; gap: 8px; }
   .sw { width: 9px; height: 9px; background: var(--paper-2); border: 1px solid var(--rule); display: inline-block; }
   .sw.on { background: var(--fail); border-color: var(--fail); }

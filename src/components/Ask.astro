@@ -26,7 +26,7 @@ const OPENERS = [
 <section id="ask" class="chamber sec">
   <div class="wrap">
     <p class="mono eyebrow rv">Ask</p>
-    <h2 class="d d-2 rv">Ask it about me.<br />It has to cite</h2>
+    <h2 class="d d-2 rv">Ask it. It has to cite.</h2>
     <p class="lede rv">A model with five tools and no other way to reach you. It picks what to say,
       what to look up and what to draw. It does not get to pick the numbers.</p>
 
@@ -58,7 +58,7 @@ const OPENERS = [
       comes back through a tool that demands the ids it rested on, and an answer citing a passage it
       never opened is rejected and asked again, which you will also see. Charts are either a series
       this page counts for itself or points that each name their passage, and the ones that cannot
-      are dropped before the chart is drawn. Declining is one of the five tools rather than a failure,
+      are dropped before the chart is drawn. Declining is one of the five tools, not a failure,
       which is why the last suggestion up there is worth a click.</p>
     </div>
   </div>
@@ -420,7 +420,7 @@ const OPENERS = [
   .log :global(.cites) { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .log :global(.clab) { color: #86868f; font-size: var(--t-micro); letter-spacing: .16em; margin-right: 4px; }
   .log :global(.cite) {
-    font-family: var(--mono); font-size: .66rem; letter-spacing: .04em; text-transform: none;
+    font-family: var(--mono); font-size: 0.69rem; letter-spacing: .04em; text-transform: none;
     color: #c8c8d0; text-decoration: none; border: 1px solid #2e2e38; padding: 6px 11px;
     transition: color .16s ease, border-color .16s ease;
   }
@@ -431,7 +431,7 @@ const OPENERS = [
   .log :global(.follows) { display: flex; flex-wrap: wrap; gap: 8px; }
   .log :global(.follows[hidden]) { display: none; }
   .log :global(.chip) {
-    font: inherit; font-family: var(--mono); font-size: .68rem; letter-spacing: .04em; cursor: pointer;
+    font: inherit; font-family: var(--mono); font-size: 0.69rem; letter-spacing: .04em; cursor: pointer;
     background: none; border: 1px dashed #33333d; color: #a0a0aa; padding: 8px 13px; text-align: left;
     transition: all .18s ease;
   }
@@ -440,17 +440,17 @@ const OPENERS = [
   .log :global(.chip.hard:hover) { border-color: var(--fail-lit); color: var(--fail-lit); }
 
   .log :global(.fig) { margin: 0; display: grid; gap: 14px; border-left: 2px solid var(--pass-lit); padding-left: 16px; width: 100%; }
-  .log :global(.figc) { color: var(--bone); font-size: .72rem; letter-spacing: .05em; text-transform: none; }
+  .log :global(.figc) { color: var(--bone); font-family: var(--body); font-size: .98rem; letter-spacing: 0; text-transform: none; }
   .log :global(.plot) { display: grid; gap: 8px; }
   .log :global(.prow) { display: grid; grid-template-columns: 152px minmax(0, 1fr) 200px; gap: 16px; align-items: center; }
-  .log :global(.pn) { color: var(--bone); font-size: .68rem; letter-spacing: .05em; text-transform: none; }
+  .log :global(.pn) { color: var(--bone); font-size: .73rem; letter-spacing: .02em; text-transform: none; }
   .log :global(.pt) { height: 12px; background: #1c1c25; display: block; position: relative; }
   .log :global(.pt i) { display: block; height: 100%; width: var(--w); background: var(--c, var(--bone)); animation: askgrow .6s cubic-bezier(.2,.8,.2,1); transform-origin: left; }
-  .log :global(.pv) { color: #9a9aa4; font-size: .64rem; letter-spacing: .05em; text-transform: none; }
+  .log :global(.pv) { color: #9a9aa4; font-size: .72rem; letter-spacing: .02em; text-transform: none; }
   .log :global(.tl .pt i) { position: absolute; left: var(--s); width: var(--w); min-width: 7px; background: var(--bone); animation: none; }
   .log :global(.tl .pt i.side) { background: none; border: 1px solid #7e7e8a; }
   .log :global(.tl .pt i.now) { background: var(--pass-lit); border: 0; }
-  .log :global(.pax) { display: flex; justify-content: space-between; color: #86868f; font-size: .6rem; letter-spacing: .1em; margin: 2px 0 0; padding: 0 200px 0 168px; }
+  .log :global(.pax) { display: flex; justify-content: space-between; color: #86868f; font-size: .69rem; letter-spacing: .04em; text-transform: none; margin: 2px 0 0; padding: 0 200px 0 168px; }
   .log :global(.dropped) { color: var(--fail-lit); font-size: var(--t-micro); letter-spacing: .1em; text-transform: none; }
   @keyframes askgrow { from { transform: scaleX(0); } }
 

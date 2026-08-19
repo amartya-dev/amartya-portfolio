@@ -27,7 +27,7 @@ const FILTERS = [
   <section id="what" class="light sec">
     <div class="wrap">
       <p class="mono eyebrow rv">What I do</p>
-      <h2 class="d d-2 rv">I build systems<br />that hold a line</h2>
+      <h2 class="d d-2 rv">I build the part that has to hold</h2>
       <p class="lede rv">Three of them are on this page. Go on, break them.</p>
 
       <dl class="pillars rv">
@@ -44,7 +44,7 @@ const FILTERS = [
   <section id="work" class="light sec">
     <div class="wrap">
       <p class="mono eyebrow rv">The record</p>
-      <h2 class="d d-2 rv">Six years,<br />five spans</h2>
+      <h2 class="d d-2 rv">Six years, five spans</h2>
       <p class="lede rv">Most of them overlapping. That is not a boast, it is just what the calendar looked like.</p>
 
       <div class="panel rv">
@@ -130,7 +130,7 @@ const FILTERS = [
   <section id="writing" class="chamber sec">
     <div class="wrap">
       <p class="mono eyebrow rv">Writing</p>
-      <h2 class="d d-2 rv">Working notes,<br />published early</h2>
+      <h2 class="d d-2 rv">Working notes</h2>
       <p class="lede rv">Some carry the demo inside them, so you can argue with the thing itself.</p>
       <ul class="posts rv">
         {posts.map((p) => (
@@ -150,7 +150,7 @@ const FILTERS = [
   <section id="contact" class="light sec section-end">
     <div class="wrap">
       <p class="mono eyebrow rv">Contact</p>
-      <h2 class="d d-2 rv">Tell me<br />what&rsquo;s breaking</h2>
+      <h2 class="d d-2 rv">What&rsquo;s breaking?</h2>
       <p class="lede rv">Agents, evals, or the platform underneath. Either of those.</p>
       <a class="d bigmail rv" href="mailto:amartya@hunr.ai">amartya@hunr.ai</a>
       <ul class="links mono rv">
@@ -183,7 +183,7 @@ const FILTERS = [
 
   .panel { margin-top: var(--s-4); border: 1px solid var(--ink); }
   .axis { position: relative; height: 28px; margin-left: 280px; border-bottom: 1px solid var(--rule); color: var(--mid); }
-  .axis span { position: absolute; left: calc(var(--t) * 100%); top: 8px; padding-left: 8px; border-left: 1px solid var(--rule); height: 20px; line-height: 1; font-size: .62rem; }
+  .axis span { position: absolute; left: calc(var(--t) * 100%); top: 8px; padding-left: 8px; border-left: 1px solid var(--rule); height: 20px; line-height: 1; font-size: 0.69rem; }
   .span + .span { border-top: 1px solid var(--rule); }
   .span-row { display: grid; grid-template-columns: 280px 1fr auto; gap: 16px; align-items: center; padding: 16px 20px 16px 0; }
   .sl { display: flex; flex-direction: column; gap: 3px; padding-left: 20px; }
@@ -193,7 +193,7 @@ const FILTERS = [
   .bar { position: absolute; inset-block: 0; left: calc(var(--s) * 100%); width: calc((var(--e) - var(--s)) * 100%); background: var(--ink); }
   .side .bar { background: none; border: 1px solid var(--ink); }
   .live .bar { background: var(--pass); }
-  .dur { color: var(--mid); font-size: .66rem; }
+  .dur { color: var(--mid); font-size: 0.69rem; }
 
   .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--s-5); }
   .chip { font: inherit; cursor: pointer; background: none; color: var(--mid); border: 1px solid var(--rule); padding: 9px 16px; transition: all .18s ease; }
@@ -204,7 +204,7 @@ const FILTERS = [
   /* A rule and a label where each group starts, so the list reads as three lists. */
   .proj[data-first]::before {
     display: block; content: attr(data-first);
-    font-family: var(--mono); font-size: .62rem; letter-spacing: .16em; text-transform: uppercase;
+    font-family: var(--mono); font-size: 0.69rem; letter-spacing: .16em; text-transform: uppercase;
     color: var(--fail-ink); padding: 30px 0 12px;
   }
   .proj[data-first='agents']::before { content: 'Agent systems'; }
@@ -217,7 +217,7 @@ const FILTERS = [
   /* Five columns and a sign, so the status chip sits on the row it belongs to
      and the row admits it opens. */
   .proj summary {
-    display: grid; grid-template-columns: minmax(0, 16rem) minmax(0, 1fr) 9rem 5.4rem 8.5rem 1.2rem;
+    display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 10.5rem 5.6rem 9.2rem 1.2rem;
     gap: var(--s-1) 20px; align-items: baseline; padding: 18px 0; cursor: pointer; list-style: none;
     transition: background .15s ease;
   }
@@ -243,7 +243,7 @@ const FILTERS = [
   a.p-name:hover { color: var(--fail); }
   .ext { font-size: .5em; opacity: .55; }
   .p-status {
-    justify-self: start; padding: 3px 8px; font-size: .58rem; white-space: nowrap;
+    justify-self: start; padding: 3px 8px; font-size: 0.69rem; white-space: nowrap;
     border: 1px solid var(--rule); color: var(--mid); line-height: 1.5;
   }
   .p-status[data-s^='Live'], .p-status[data-s^='In production'], .p-status[data-s^='Shipped'] { border-color: var(--pass); color: var(--pass); }

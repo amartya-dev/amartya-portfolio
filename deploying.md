@@ -26,11 +26,9 @@ the real price.
 
 Two things worth knowing:
 
-- **`.ai` is expensive.** $70 to $95 a year depending on registrar, minimum two-year
-  term. hunr.ai already carries that cost; a second one for a personal site does not
-  earn it back.
-- **`.in` is cheap** if you want a second one pointing at the same site, usually
-  ₹500 to ₹800 a year.
+`.ai` runs $70 to $95 a year depending on registrar, with a two-year minimum. hunr.ai already
+carries that cost and a second one for a personal site does not earn it back. `.in` is cheap if you
+want a second domain pointing at the same site, usually ₹500 to ₹800 a year.
 
 `amartyagaur.com` is the obvious one. If it is taken, `amartya.dev` and
 `amartyagaur.in` are the next two that read as a person rather than a startup.
@@ -88,9 +86,9 @@ default cap runs into its own ceiling before KV's, which is the right way round.
 Haiku 4.5 is $1 per million input tokens and $5 per million output. A question costs
 roughly 7,000 input tokens across its rounds and about 500 output, so:
 
-- **About one cent per question**, cold.
-- **About half that in a conversation**, because the tools and system prompt are
-  cached and a follow-up asked within five minutes reads them at a tenth of the price.
+about one cent per question cold, and roughly half that inside a conversation, because the tools
+and system prompt are cached and a follow-up asked within five minutes reads them at a tenth of
+the price.
 
 At the 400-a-day cap that is a $4 worst case, and a realistic month on a personal
 site is a couple of dollars. If it ever starts mattering, drop `ASK_DAILY_TOTAL`.
@@ -108,12 +106,11 @@ path visitors get if the key is ever missing, so it is worth looking at.
 
 ## 4. The rest
 
-- **Analytics.** Cloudflare Web Analytics is free, needs no cookie banner, and there
-  is nothing to consent to. Turn it on in the dashboard; do not add Google Analytics
-  and then a banner apologising for it.
-- **Redirects.** Point `www` at the apex with a bulk redirect rule.
-- **Email.** Cloudflare Email Routing forwards `amartya@yourdomain` to a real inbox
-  for free, if you ever want an address on the personal domain as well as hunr's.
+Cloudflare Web Analytics is free, needs no cookie banner, and there is nothing to consent to. Turn
+it on in the dashboard; do not add Google Analytics and then a banner apologising for it.
+
+Point `www` at the apex with a bulk redirect rule. And if you ever want an address on the personal
+domain as well as hunr's, Cloudflare Email Routing forwards it to a real inbox for free.
 
 ## If you would rather not use Cloudflare
 

@@ -14,10 +14,9 @@ npm run build    # static output in dist/
 A résumé is a claim. A proof is a different thing, and proving things is what hunr does, so the
 page alternates between the two.
 
-- **Light sections carry the claims.** Who, what, the record. Paper ground, Archivo set extra-wide,
-  Newsreader for prose.
-- **Black chambers carry the proof.** Three demos you can operate, each one embedded again inside
-  the post that argues for it.
+Light sections carry the claims: who, what, the record. Paper ground, Archivo set extra-wide,
+Newsreader for prose. The black chambers carry the proof, which is three demos you can operate,
+each one embedded again inside the post that argues for it.
 
 The only two accents in the whole system are the two verdicts a test can return: `--pass` and
 `--fail`. Nothing else gets a colour.
@@ -68,7 +67,7 @@ README in that folder. `public/media/` itself is work footage referenced explici
 
 Cloudflare Pages, free plan, with the ask box wired to a Pages Function. Domain
 options, environment variables, rate limiting and what a question costs are all in
-[DEPLOY.md](DEPLOY.md).
+[deploying.md](deploying.md).
 
 ```bash
 npm run serve    # build and serve with the function attached, needs .dev.vars
