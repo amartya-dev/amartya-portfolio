@@ -4,6 +4,7 @@ description: "Generated product videos show software that does not exist. Fixing
 date: 2026-08-19
 tags: ["agents", "pipelines", "provenance"]
 ---
+import Film from '../../components/Film.astro';
 
 Ask any capable model for a product demo video and you will get something beautiful and false. The
 buttons are in the wrong place. The colours are nearly right. There is a settings panel your product
@@ -14,6 +15,13 @@ it is a correctness problem, and prompting cannot touch it, because the model ha
 thing it is describing. It is drawing from a description of your product rather than from your product.
 
 The fix is not a better prompt. It is a shorter distance between the film and the source.
+
+<Film
+  src="/media/hunr-a-thousand-resumes.mp4"
+  poster="/media/hunr-a-thousand-resumes.jpg"
+  length="1:05"
+  caption="Cut by the pipeline described below, from my own product's source."
+/>
 
 ## Grounding is not a promise, it is a chain
 

@@ -1,0 +1,63 @@
+---
+const { src, poster, length = '', caption = '' } = Astro.props;
+---
+<figure class="plate">
+  <div class="frame">
+    <video src={src} poster={poster} preload="none" playsinline data-film></video>
+    <button type="button" class="play" data-play>
+      <span class="disc" aria-hidden="true"></span>
+      <span class="mono lab">Play<span class="len">{length}</span></span>
+    </button>
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<script>
+  document.querySelectorAll('.plate').forEach((plate) => {
+    const video = plate.querySelector('[data-film]');
+    const btn = plate.querySelector('[data-play]');
+    if (!video || !btn) return;
+    btn.addEventListener('click', () => {
+      video.controls = true;
+      plate.classList.add('playing');
+      video.play();
+      video.focus();
+    });
+    video.addEventListener('ended', () => {
+      plate.classList.remove('playing');
+      video.controls = false;
+      video.load();
+    });
+  });
+</script>
+
+<style>
+  .plate { margin: 0; }
+  .frame { position: relative; background: #0b0b0e; overflow: hidden; }
+  .frame video { width: 100%; display: block; aspect-ratio: 16 / 9; object-fit: cover; }
+
+  .play {
+    position: absolute; inset: 0; width: 100%; border: 0; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    background: linear-gradient(180deg, rgba(8,8,10,.28), rgba(8,8,10,.55));
+    color: #f3f3f0; transition: background-color .25s ease, opacity .2s ease;
+  }
+  .playing .play { opacity: 0; pointer-events: none; }
+
+  .disc {
+    width: 62px; height: 62px; border: 1px solid rgba(243,243,240,.5); border-radius: 50%;
+    display: grid; place-items: center; transition: border-color .2s ease, background-color .2s ease, transform .2s ease;
+  }
+  .disc::after {
+    content: ""; width: 0; height: 0; margin-left: 4px;
+    border-left: 13px solid currentColor;
+    border-top: 8px solid transparent; border-bottom: 8px solid transparent;
+  }
+  .play:hover .disc, .play:focus-visible .disc { border-color: var(--pass-lit); color: var(--pass-lit); transform: scale(1.05); }
+  .lab { display: flex; gap: 10px; align-items: baseline; color: rgba(243,243,240,.82); }
+  .len { color: rgba(243,243,240,.45); }
+
+  figcaption { margin-top: var(--s-2); color: var(--mid); font-size: var(--t-small); max-width: 60ch; }
+
+  @media (prefers-reduced-motion: reduce) { .disc { transition: none; } }
+</style>

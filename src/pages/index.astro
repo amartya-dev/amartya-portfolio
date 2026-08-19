@@ -23,20 +23,6 @@ const FILTERS = [
 <Base>
   <Hero />
 
-  <section class="light film-sec">
-    <div class="wrap">
-      <figure class="film rv">
-        <video
-          src="/media/hunr-a-thousand-resumes.mp4"
-          poster="/media/hunr-a-thousand-resumes.jpg"
-          controls preload="none" playsinline
-          aria-label="A short film about hunr: a thousand résumés at six seconds each, and an agent passing a take-home test."
-        ></video>
-        <figcaption class="mono">A film for hunr, cut by the <a href="/blog/a-pipeline-that-cannot-invent-your-ui/">product-motion pipeline</a> I built — the screens in it are replicas of the real ones, not impressions of them.</figcaption>
-      </figure>
-    </div>
-  </section>
-
   <section id="what" class="light sec">
     <div class="wrap">
       <p class="mono eyebrow rv">What I do</p>
@@ -188,15 +174,6 @@ const FILTERS = [
 </Base>
 
 <style>
-  .film-sec { padding-block: 0 var(--s-6); }
-  .film { margin: 0; }
-  .film video {
-    width: 100%; display: block; background: var(--void);
-    border: 1px solid var(--ink); aspect-ratio: 16 / 9;
-  }
-  .film figcaption { margin-top: var(--s-2); color: var(--mid); max-width: 62ch; line-height: 1.7; }
-  .film figcaption a { color: var(--fail); }
-
   #what .lede { max-width: 44ch; }
   .pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--s-3) 44px; margin-top: var(--s-5); border-top: 1px solid var(--rule); padding-top: var(--s-3); }
   .pillars dt { color: var(--fail); text-transform: uppercase; letter-spacing: .14em; font-size: var(--t-micro); margin-bottom: var(--s-1); }
