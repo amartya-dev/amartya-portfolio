@@ -10,7 +10,8 @@
     "serve": "npm run build && wrangler pages dev",
     "deploy": "npm run build && wrangler pages deploy --branch=main",
     "check": "node scripts/check-html.mjs",
-    "test": "node scripts/test-ask-guards.mjs"
+    "test": "node scripts/test-ask-guards.mjs",
+    "ci": "npm test && npm run build"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.7",

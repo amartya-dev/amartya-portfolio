@@ -4,11 +4,32 @@
 //
 // Rendered in a real browser against the real webfonts, then written to
 // public/og/. Run: node scripts/og.mjs
-import { chromium } from '/Users/amartya/repos/neta-resume/web/node_modules/playwright-core/index.mjs';
+//
+// Needs playwright-core and a Chromium. It is not a dependency of this project
+// because it runs by hand, a few times a year, when the card design changes:
+//
+//   npm i -D playwright-core && npx playwright install chromium
+//
+// Override either with an environment variable if you have them somewhere else:
+//   PLAYWRIGHT_CORE=/path/to/playwright-core/index.mjs
+//   PLAYWRIGHT_CHROMIUM=/path/to/chrome-headless-shell
+//
+// This used to import both from absolute paths inside one particular laptop,
+// which worked on exactly that laptop.
 import { readFileSync, readdirSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const EXE = '/Users/amartya/Library/Caches/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-mac-arm64/chrome-headless-shell';
+const { chromium } = await import(process.env.PLAYWRIGHT_CORE || 'playwright-core').catch(() => {
+  console.error(
+    'og: playwright-core not found.\n' +
+    '    npm i -D playwright-core && npx playwright install chromium\n' +
+    '    or set PLAYWRIGHT_CORE to an existing install.'
+  );
+  process.exit(1);
+});
+
+// Undefined lets playwright find its own managed browser, which is the normal case.
+const EXE = process.env.PLAYWRIGHT_CHROMIUM || undefined;
 const ROOT = new URL('..', import.meta.url).pathname;
 const BLOG = join(ROOT, 'src/content/blog');
 const OUT = join(ROOT, 'public/og');
@@ -123,7 +144,7 @@ const posts = readdirSync(BLOG).filter((f) => f.endsWith('.mdx')).map((f) => {
   return { id: f.replace(/\.mdx$/, ''), ...d };
 });
 
-const b = await chromium.launch({ executablePath: EXE });
+const b = await chromium.launch(EXE ? { executablePath: EXE } : {});
 const page = await b.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
 
 const shoot = async (html, name) => {
