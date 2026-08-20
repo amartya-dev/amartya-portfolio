@@ -18,7 +18,7 @@ const CELLS = Array.from({ length: 739 }, (_, i) => ({
   </div>
 
   <div class="wrap hero-in">
-    <p class="mono eyebrow rv">Amartya Gaur · AI systems engineer</p>
+    <p class="mono eyebrow rv">Amartya Gaur, AI systems engineer</p>
 
     <h1 class="d rv">I build the<br />machinery behind<br /><em>AI assistants</em></h1>
 
@@ -35,11 +35,10 @@ const CELLS = Array.from({ length: 739 }, (_, i) => ({
         <li><a href="mailto:amartya@hunr.ai" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.6" y="4.8" width="18.8" height="14.4" rx="1.8"/><path d="m3.4 6.6 8.6 6 8.6-6"/></svg></a></li>
       </ul>
 
-      <p class="mono where">Founder of hunr.ai · Bengaluru</p>
+      <p class="where">Founder of <a href="https://hunr.ai" rel="noopener">hunr.ai</a>. Bengaluru.</p>
     </div>
   </div>
 
-  <p class="mono caption" aria-hidden="true">739 regression cases · 30 of them red on a bad day</p>
 </section>
 
 <style>
@@ -62,7 +61,10 @@ const CELLS = Array.from({ length: 739 }, (_, i) => ({
   .eyebrow { color: var(--bone-dim); margin-bottom: var(--s-4); }
 
   h1 { font-size: clamp(2.6rem, 7.4vw, 6.4rem); margin-bottom: var(--s-4); }
-  h1 em { font-style: normal; color: var(--pass-lit); }
+  /* Emphasis is weight and width. A second colour on one phrase of a headline
+     is decoration standing in for typography. */
+  h1 { font-weight: 500; font-stretch: 102%; }
+  h1 em { font-style: normal; font-weight: 900; font-stretch: 120%; }
 
   .sub { max-width: 36ch; font-size: var(--t-lede); line-height: 1.42; color: #c4c4cc; }
 
@@ -73,20 +75,14 @@ const CELLS = Array.from({ length: 739 }, (_, i) => ({
   .quick { display: flex; flex-wrap: wrap; gap: var(--s-1); }
   .quick a {
     display: grid; place-items: center; width: 42px; height: 42px;
-    color: var(--bone-dim); border: 1px solid #2a2a34;
+    color: var(--bone); border: 1px solid #34343f;
     transition: color .18s ease, background-color .18s ease, border-color .18s ease;
   }
   .quick a:hover, .quick a:focus-visible { color: var(--void); background: var(--pass-lit); border-color: var(--pass-lit); }
-  .where { color: var(--bone-dim); }
-
-  .caption {
-    position: absolute; right: var(--gut); bottom: 30px; z-index: 2;
-    color: #7e7e8a; font-size: var(--t-micro);
-  }
+  .where { color: #b4b4bd; font-size: var(--t-body); }
 
   @media (max-width: 900px) {
     .matrix { inset: 0 -20% -10% 8%; opacity: .7; }
-    .caption { display: none; }
   }
   @media (max-width: 660px) { .hero-in { padding-block: 118px 64px; } }
 </style>

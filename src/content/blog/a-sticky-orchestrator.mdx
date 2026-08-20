@@ -47,11 +47,11 @@ workflow itself requests, with a reason attached.
 
 Concretely:
 
-- **A workflow registry.** Each workflow declares the states it owns, the tools it can call, and the
+- A workflow registry: each workflow declares the states it owns, the tools it can call, and the
   transitions it will accept. Adding a product area is a registry entry, not a prompt edit.
-- **Sticky assignment.** The workflow is written to conversation state at intake and read back on
+- Sticky assignment: the workflow is written to conversation state at intake and read back on
   every turn. Re-classification is not part of the turn loop.
-- **Explicit hand-off.** A workflow that decides it is the wrong owner emits a hand-off with a
+- Explicit hand-off: a workflow that decides it is the wrong owner emits a hand-off with a
   target and a reason. That is a state transition, it lands in the trace, and it is countable.
 
 That last one is what turned a mystery into a metric. Before, drift was invisible: nobody logs the

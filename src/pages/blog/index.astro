@@ -39,7 +39,7 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long'
   .date { color: var(--mid); padding-top: 6px; }
   .body { display: grid; gap: 12px; max-width: 62ch; }
   .title { transition: color .2s ease; }
-  .list a:hover .title { color: var(--fail-ink); }
+  .list a:hover .title { color: var(--fail-ink); text-decoration: underline; text-underline-offset: .16em; }
   .blurb { color: var(--ink-2); }
   .tags { color: var(--mid); }
   @media (max-width: 760px) { .list a { grid-template-columns: 1fr; gap: 14px; } }

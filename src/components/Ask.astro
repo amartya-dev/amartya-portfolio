@@ -17,9 +17,7 @@ const PLOTS = buildPlots(posts);
 const OPENERS = [
   'How long has he been doing this?',
   'What has he actually shipped?',
-  'Has he done anything with payments?',
   'How does he test an agent?',
-  'What does he do away from a keyboard?',
   'What salary does he want?'
 ];
 ---
@@ -27,40 +25,41 @@ const OPENERS = [
   <div class="wrap">
     <p class="mono eyebrow rv">Ask</p>
     <h2 class="d d-2 rv">Ask it. It has to cite.</h2>
-    <p class="lede rv">A model with five tools and no other way to reach you. It picks what to say,
-      what to look up and what to draw. It does not get to pick the numbers.</p>
+    <p class="lede rv">It will not tell you anything this page cannot back up.</p>
 
     <div class="box rv" data-ask>
+      <div class="head">
+        <span class="live" aria-hidden="true"></span>
+        <span class="who">Amartya&rsquo;s site</span>
+        <span class="idx">{INDEX.length} passages indexed</span>
+      </div>
+
       <div class="log" data-log>
         <div class="turn bot">
-          <p class="cb">Ask me anything about Amartya. I read an index compiled from this site, {INDEX.length} passages
-            of it, and I will show you which ones I open. If the answer is not in there I will say so
-            rather than improvise, which is most of the reason this box is on the page.</p>
-          <div class="follows" data-openers>
-            {OPENERS.map((c, i) => <button type="button" class:list={['chip', { hard: i === OPENERS.length - 1 }]}>{c}</button>)}
-          </div>
+          <p class="cb">Ask me about Amartya. I answer from an index of this site and link every
+            source I use. If it is not in there, I will say so.</p>
         </div>
+      </div>
+
+      <div class="suggest" data-openers>
+        {OPENERS.map((c, i) => <button type="button" class:list={['chip', { hard: i === OPENERS.length - 1 }]}>{c}</button>)}
       </div>
 
       <form class="bar" data-form>
         <label class="sr" for="ask-q">Ask a question about Amartya</label>
-        <input id="ask-q" type="text" autocomplete="off" maxlength="400"
-          placeholder="Ask a follow-up, or something new" data-q />
-        <button type="submit" class="mono" data-go>Ask</button>
-        <button type="button" class="mono reset" data-reset hidden>Start over</button>
+        <input id="ask-q" type="text" autocomplete="off" maxlength="400" placeholder="Ask something" data-q />
+        <button type="button" class="reset" data-reset hidden>Clear</button>
+        <button type="submit" class="go" data-go aria-label="Send">
+          <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h13M12.5 6l6 6-6 6" />
+          </svg>
+        </button>
       </form>
     </div>
 
-    <div class="how rv">
-      <p><b>Why you can trust what it says.</b> Your question is scored against the index in your
-      browser and the best few passages are opened for it. From there the model works: it can open
-      more from the catalogue when what it was handed does not fit, and you will see which. Prose
-      comes back through a tool that demands the ids it rested on, and an answer citing a passage it
-      never opened is rejected and asked again, which you will also see. Charts are either a series
-      this page counts for itself or points that each name their passage, and the ones that cannot
-      are dropped before the chart is drawn. Declining is one of the five tools, not a failure,
-      which is why the last suggestion up there is worth a click.</p>
-    </div>
+    <p class="foot-line rv">Answers name the passages they rest on, and declining is one of the five
+      tools it has. That is what the last suggestion is for.</p>
   </div>
 
   <script type="application/json" data-index set:html={JSON.stringify(INDEX)}></script>
@@ -192,7 +191,7 @@ const OPENERS = [
       busy = v;
       go.disabled = v;
       input.disabled = v;
-      go.textContent = v ? 'Working' : 'Ask';
+      root.classList.toggle('busy', v);
     }
 
     async function ask(q) {
@@ -200,6 +199,7 @@ const OPENERS = [
       if (!q || busy) return;
       setBusy(true);
       log.querySelectorAll('.follows').forEach((f) => (f.hidden = true));
+      openers.hidden = true;
       log.appendChild(el('turn you', `<p>${esc(q)}</p>`));
       toBottom(true);
       turns.push({ role: 'user', content: q });
@@ -215,8 +215,7 @@ const OPENERS = [
       const hits = search(q);
       const seed = hits.map((h) => h.d.id);
       trace.appendChild(el('', seed.length
-        ? `<p class="mono step">Opened ${seed.length} passage${seed.length === 1 ? '' : 's'}: ` +
-          seed.map((id) => esc(byId.get(id).t)).join(', ') + '</p>'
+        ? `<p class="mono step">Opened ${seed.length} passage${seed.length === 1 ? '' : 's'}</p>`
         : '<p class="mono step">Nothing scored above the floor</p>'));
 
       let answered = false;
@@ -268,8 +267,8 @@ const OPENERS = [
                     decline: 'Deciding it does not know'
                   }[ev.name] || ev.name);
                 } else if (ev.e === 'opened') {
-                  trace.appendChild(el('', `<p class="mono step">Opened ${ev.ids.length} more${ev.why ? ', ' + esc(ev.why) : ''}: ` +
-                    ev.ids.map((x) => esc(x.t)).join(', ') + '</p>'));
+                  trace.appendChild(el('', `<p class="mono step">Opened ${ev.ids.length} more` +
+                    (ev.why ? ', ' + esc(ev.why) : '') + '</p>'));
                   toBottom();
                 } else if (ev.e === 'reject') {
                   trace.appendChild(el('', `<p class="mono step bad">Rejected, ${esc(ev.why)}. Asked again.</p>`));
@@ -362,7 +361,7 @@ const OPENERS = [
       input.value = '';
       ask(v);
     });
-    log.addEventListener('click', (e) => {
+    root.addEventListener('click', (e) => {
       const c = e.target.closest('.chip');
       if (c && !busy) ask(c.textContent);
     });
@@ -381,7 +380,23 @@ const OPENERS = [
 <style>
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-  .box { margin-top: clamp(34px, 4vw, 54px); border: 1px solid var(--rule-dark); background: var(--void-2); }
+  .box {
+    margin-top: clamp(30px, 3.5vw, 44px); border: 1px solid #2b2b35; background: var(--void-2);
+    display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto;
+  }
+
+  /* A strip that tells you what you are talking to, the way any chat window does. */
+  .head {
+    display: flex; align-items: center; gap: 10px; padding: 13px 20px;
+    border-bottom: 1px solid #23232c; background: #0d0d12;
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .02em;
+  }
+  .live { width: 7px; height: 7px; border-radius: 50%; background: var(--pass-lit); flex: none; }
+  .who { color: var(--bone); }
+  .idx { margin-left: auto; color: #86868f; }
+
+  .suggest { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 16px; }
+  .suggest[hidden] { display: none; }
 
   .log { padding: 26px 24px; display: grid; align-content: start; gap: 26px; max-height: 620px; overflow-y: auto; scrollbar-width: thin; }
   /* Rows stretch so a chart gets the full width; the two things that must hug
@@ -402,7 +417,7 @@ const OPENERS = [
   @keyframes askcaret { 50% { opacity: 0; } }
 
   .log :global(.trace) { display: grid; gap: 5px; }
-  .log :global(.step) { color: #86868f; font-size: var(--t-micro); letter-spacing: .09em; text-transform: none; line-height: 1.65; margin: 0; }
+  .log :global(.step) { color: #86868f; font-size: .72rem; letter-spacing: .01em; text-transform: none; line-height: 1.6; margin: 0; }
   .log :global(.step)::before { content: '\00B7\00A0'; }
   .log :global(.step.bad) { color: var(--fail-lit); }
   .log :global(.status) { color: var(--pass-lit); font-size: var(--t-micro); letter-spacing: .12em; }
@@ -454,33 +469,43 @@ const OPENERS = [
   .log :global(.dropped) { color: var(--fail-lit); font-size: var(--t-micro); letter-spacing: .1em; text-transform: none; }
   @keyframes askgrow { from { transform: scaleX(0); } }
 
-  .bar { display: flex; border-top: 1px solid var(--rule-dark); }
+  .bar {
+    display: flex; align-items: center; gap: 10px; margin: 0 14px 14px; padding: 6px 6px 6px 16px;
+    border: 1px solid #2f2f3a; background: #101017;
+    transition: border-color .18s ease;
+  }
+  .bar:focus-within { border-color: var(--pass-lit); }
   .bar input {
     flex: 1; min-width: 0; background: none; border: 0; color: var(--bone);
-    font: inherit; font-size: 1.02rem; padding: 19px 24px;
+    font: inherit; font-size: 1.02rem; padding: 12px 0;
   }
   .bar input::placeholder { color: #7e7e8a; }
-  .bar input:focus { outline: none; background: rgba(53,224,138,.05); }
+  .bar input:focus { outline: none; }
   .bar input:disabled { opacity: .5; }
-  .bar button {
-    font: inherit; font-family: var(--mono); font-size: var(--t-label); letter-spacing: .09em; text-transform: uppercase;
-    background: var(--bone); color: var(--void); border: 0; padding: 0 30px; cursor: pointer; flex: none;
-    transition: background-color .18s ease;
-  }
-  .bar button:hover:not(:disabled) { background: var(--pass-lit); }
-  .bar button:disabled { opacity: .45; cursor: default; }
-  .bar .reset { background: none; color: #86868f; padding: 0 20px; border-left: 1px solid var(--rule-dark); }
-  .bar .reset:hover:not(:disabled) { background: none; color: var(--bone); }
 
-  .how { margin-top: var(--s-3); border-top: 1px solid var(--rule-dark); padding-top: var(--s-3); }
-  .how p { color: #9a9aa4; font-size: var(--t-small); max-width: 78ch; line-height: 1.75; }
-  .how b { color: var(--bone); font-weight: 500; }
+  .go {
+    display: grid; place-items: center; width: 40px; height: 40px; flex: none; cursor: pointer;
+    background: var(--bone); color: var(--void); border: 0;
+    transition: background-color .18s ease, opacity .18s ease;
+  }
+  .go:hover:not(:disabled) { background: var(--pass-lit); }
+  .go:disabled { opacity: .4; cursor: default; }
+  .busy .go svg { animation: askspin 1s linear infinite; }
+  @keyframes askspin { to { transform: rotate(360deg); } }
+
+  .reset {
+    font: inherit; font-family: var(--mono); font-size: .7rem; letter-spacing: .04em;
+    background: none; border: 0; color: #86868f; cursor: pointer; padding: 8px 4px; flex: none;
+  }
+  .reset:hover { color: var(--bone); }
+
+  .lede { max-width: 48ch; }
+  .foot-line { margin-top: var(--s-3); color: #9a9aa4; font-size: var(--t-small); max-width: 62ch; line-height: 1.7; }
 
   @media (max-width: 760px) {
-    .log { padding: 20px 18px; max-height: 560px; }
-    .bar { flex-wrap: wrap; }
-    .bar input { flex-basis: 100%; padding: 16px 18px; font-size: 1rem; }
-    .bar button { flex: 1; padding: 15px 0; }
+    .log { padding: 20px 18px; max-height: 520px; }
+    .head, .suggest { padding-inline: 16px; }
+    .bar { margin: 0 12px 12px; padding-left: 13px; }
     .log :global(.prow) { grid-template-columns: 104px minmax(0, 1fr) 56px; gap: 10px; }
     .log :global(.tl .prow) { grid-template-columns: 104px minmax(0, 1fr); }
     .log :global(.tl .pv) { display: none; }

@@ -86,7 +86,15 @@ img { max-width: 100%; display: block; }
 /* Headings own the space beneath them. Nothing downstream adds its own margin-top. */
 .lede { margin-top: 0; }
 
-a { color: inherit; }
+/* A link that does not look like a link is a link that does not work. Text
+   links are underlined everywhere; the only exceptions are the nav and things
+   that are already obviously a control. */
+a { color: inherit; text-underline-offset: .18em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+.light a { text-decoration-color: color-mix(in oklab, var(--fail-ink) 55%, transparent); }
+.light a:hover { color: var(--fail-ink); text-decoration-color: currentColor; }
+.chamber a { text-decoration-color: color-mix(in oklab, var(--pass-lit) 50%, transparent); }
+.chamber a:hover { color: var(--pass-lit); text-decoration-color: currentColor; }
 
 .skip { position: absolute; left: -9999px; top: 0; z-index: 99; background: var(--ink); color: var(--bone); padding: 12px 18px; }
 .skip:focus { left: 0; }
@@ -109,8 +117,9 @@ a { color: inherit; }
 .light ::selection { background: var(--ink); color: var(--paper); }
 
 .sec { padding-block: var(--s-6); }
-.eyebrow { color: var(--mid); margin-bottom: var(--s-3); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: var(--t-micro); }
-.eyebrow::before { content: ""; width: 28px; height: 1px; background: currentColor; flex: none; }
+/* Section labels used to be 10px uppercase mono. That is a size you look at,
+   not a size you read. They are sentences now. */
+.eyebrow { color: var(--mid); margin-bottom: var(--s-2); font-family: var(--body); font-size: var(--t-small); letter-spacing: 0; text-transform: none; }
 .chamber .eyebrow { color: var(--bone-dim); }
 
 .lede { font-size: var(--t-lede); line-height: 1.42; max-width: 38ch; color: var(--ink-2); }
@@ -154,7 +163,6 @@ a { color: inherit; }
 @media (max-width: 720px) {
   body { font-size: 18px; }
   .top .nav { gap: 15px; font-size: 0.69rem; }
-  .eyebrow::before { display: none; }
 }
 /* Five destinations and a wordmark do not fit a phone. The wordmark gives way,
    because you can already see whose site this is. */

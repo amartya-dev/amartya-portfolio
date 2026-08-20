@@ -23,11 +23,11 @@ assertion, it is a vibe.
 
 So the suite is built out of things that are deterministic given a fixed model and seed:
 
-- **Routing.** Did this conversation land in the workflow it should have? A label match, not a
+- Routing: did this conversation land in the workflow it should have? A label match, not a
   judgment call.
-- **Tool-call correctness.** Was the tool invoked, with arguments in the right shape, in the right
+- Tool-call correctness: was the tool invoked, with arguments in the right shape, in the right
   order, and not invoked when it should not have been?
-- **Handoff quality.** When a workflow gave up, did it hand off with a reason, to a target that
+- Handoff quality: when a workflow gave up, did it hand off with a reason, to a target that
   exists?
 
 Roughly 250 scoring metrics across 739 regression cases and about 2,700 assertions. The ones that

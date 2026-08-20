@@ -258,7 +258,7 @@ const FILTERS = [
   .posts a { display: grid; grid-template-columns: 130px minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: baseline; padding: 24px 0; text-decoration: none; }
   .p-date { color: var(--bone-dim); }
   .p-title { font-family: var(--display); font-weight: 700; font-stretch: 112%; text-transform: uppercase; letter-spacing: -.015em; font-size: 1.3rem; line-height: 1.08; color: var(--bone); transition: color .2s ease; }
-  .posts a:hover .p-title { color: var(--pass-lit); }
+  .posts a:hover .p-title { color: var(--pass-lit); text-decoration: underline; text-underline-offset: .16em; }
   .p-blurb { color: var(--bone-dim); font-size: var(--t-small); }
   @media (max-width: 860px) { .posts a { grid-template-columns: 1fr; gap: 10px; } }
   .cta { display: inline-flex; gap: 10px; align-items: center; margin-top: 26px; text-decoration: none; color: var(--bone-dim); border-bottom: 1px solid currentColor; padding-bottom: 5px; }
@@ -269,8 +269,7 @@ const FILTERS = [
   .bigmail { display: inline-block; margin-top: clamp(28px, 4vw, 44px); font-size: clamp(1.4rem, 4.8vw, 3.4rem); text-decoration: none; color: var(--ink); word-break: break-word; border-bottom: 3px solid var(--rule); }
   .bigmail:hover { color: var(--fail); border-color: var(--fail); }
   .links { display: flex; flex-wrap: wrap; gap: 12px 28px; margin-top: 34px; color: var(--mid); }
-  .links a { text-decoration: none; }
-  .links a:hover { color: var(--ink); }
+  .links a:hover { color: var(--fail-ink); }
 
   @media (max-width: 900px) {
     .axis { margin-left: 0; }
