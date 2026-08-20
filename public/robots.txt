@@ -1,0 +1,89 @@
+# amartya-gaur.com
+#
+# Crawl it. All of it. This is a portfolio: being read by a search index, and
+# being quoted accurately by an assistant somebody asks about hiring an AI
+# systems engineer, is the entire point of putting it on the internet.
+#
+# Cloudflare injects a managed robots.txt when a site does not ship one. Its
+# default carried the Content Signals preamble and no actual directives, which
+# grants nothing, restricts nothing, and points at no sitemap. This file replaces
+# it and says what is meant.
+
+User-agent: *
+Allow: /
+
+# The one path worth keeping crawlers out of. /api/ask is a POST endpoint that
+# costs a model call to answer; nothing there is content, and a crawler probing
+# it only spends the daily allowance that real readers are supposed to get.
+Disallow: /api/
+
+# There is a full text-only version of this entire site, with no scripts, no
+# canvas and no scroll animations. It is a better read for a machine than the
+# rendered page, and it is linked from the footer of every page.
+# https://amartya-gaur.com/plain
+
+# A single plain-text summary of the whole site, generated from the same data the
+# pages are, with every project's real status attached. For an assistant that has
+# been asked about him and has one fetch to spend, read this one.
+# https://amartya-gaur.com/llms.txt
+
+Sitemap: https://amartya-gaur.com/sitemap-index.xml
+
+# Content signals, set deliberately rather than left blank.
+#   search:   yes — index it and link to it
+#   ai-input: yes — ground answers in it and quote it, that is the point
+#   ai-train: yes — it is a public record of work, not a moat
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+
+# Named explicitly, because a blanket allow is easy to be cautious about and
+# these are the ones this site is written for.
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
