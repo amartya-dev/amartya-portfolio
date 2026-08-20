@@ -10,6 +10,7 @@ import Head from './Head.astro';
 // the box still answers from the index alone, and says that is what it is doing.
 import { getCollection } from 'astro:content';
 import { buildIndex, buildPlots } from '../data/ask.js';
+const { bare = false } = Astro.props;
 
 const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const INDEX = buildIndex(posts);
@@ -22,10 +23,12 @@ const OPENERS = [
   'What salary does he want?'
 ];
 ---
-<section id="ask" class="chamber sec">
-  <div class="wrap">
-    <Head title="Ask it. It has to cite." fig="Fig. 02">It will not tell you anything this
-      page cannot back up.</Head>
+<section id="ask" class={bare ? 'embed' : 'chamber sec'}>
+  <div class={bare ? '' : 'wrap'}>
+    {!bare && (
+      <Head title="Ask it. It has to cite." fig="Fig. 02">It will not tell you anything this
+        page cannot back up.</Head>
+    )}
     <div class="figured box rv" data-ask>
       <div class="head">
         <span class="live" aria-hidden="true"></span>
@@ -57,8 +60,10 @@ const OPENERS = [
       </form>
     </div>
 
-    <p class="foot-line rv">Answers name the passages they rest on, and declining is one of the five
-      tools it has. That is what the last suggestion is for.</p>
+    {!bare && (
+      <p class="foot-line rv">Answers name the passages they rest on, and declining is one of the five
+        tools it has. That is what the last suggestion is for.</p>
+    )}
   </div>
 
   <script type="application/json" data-index set:html={JSON.stringify(INDEX)}></script>
@@ -412,7 +417,7 @@ const OPENERS = [
   .log :global(.quoted) { color: var(--bone-dim); font-size: .94rem; border-left: 1px solid var(--rule-dark); padding-left: 15px; }
   .log :global(.stream::after) {
     content: ''; display: inline-block; width: .5em; height: 1.05em; margin-left: 3px; vertical-align: -.16em;
-    background: var(--pass-lit); animation: askcaret 1s steps(1) infinite;
+    background: var(--bone); animation: askcaret 1s steps(1) infinite;
   }
   @keyframes askcaret { 50% { opacity: 0; } }
 
@@ -478,7 +483,7 @@ const OPENERS = [
     border: 1px solid var(--rule-dark-2); background: var(--void-2); border-radius: var(--r);
     transition: border-color .18s ease;
   }
-  .bar:focus-within { border-color: var(--pass-lit); }
+  .bar:focus-within { border-color: var(--bone-3); }
   .bar input {
     flex: 1; min-width: 0; background: none; border: 0; color: var(--bone);
     font: inherit; font-size: var(--t-body); padding: 12px 0;
@@ -489,10 +494,10 @@ const OPENERS = [
 
   .go {
     display: grid; place-items: center; width: 40px; height: 40px; flex: none; cursor: pointer;
-    background: var(--pass-lit); color: var(--void); border: 0; border-radius: var(--r-sm);
+    background: var(--bone); color: var(--void); border: 0; border-radius: var(--r-sm);
     transition: filter .18s ease, opacity .18s ease;
   }
-  .go:hover:not(:disabled) { filter: brightness(1.12); }
+  .go:hover:not(:disabled) { background: var(--fail-lit); }
   .go:disabled { opacity: .4; cursor: default; }
   .busy .go svg { animation: askspin 1s linear infinite; }
   @keyframes askspin { to { transform: rotate(360deg); } }

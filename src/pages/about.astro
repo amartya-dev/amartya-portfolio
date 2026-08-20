@@ -25,13 +25,17 @@ const hasMedia = photos.length > 0 || videos.length > 0;
 <Base title="Off the clock · Amartya Gaur" description="The parts of Amartya Gaur that are not infrastructure: music, martial arts, and talking to rooms full of people about WordPress." theme="light">
   <article class="light sec about">
     <div class="wrap">
+      <div class="flowline" aria-hidden="true"></div>
+      <div class="spread">
+      <div class="rail" aria-hidden="true"><span class="railhead"><span class="no">V</span><span class="lbl">Off the clock</span></span></div>
+      <div class="col">
       <h1 class="d d-2">The rest of it</h1>
       <p class="lede">Everywhere else on this site I am an engineer. Here I am a person who owns
         several instruments and is competent on some of them.</p>
 
       <div class="cols">
         <section>
-          <h2 class="mono sub">Music</h2>
+          <h2 class="sub">Music</h2>
           <p>I sing, and I play harmonium, tabla and guitar. The harmonium and the tabla came first and are the ones
             I would put money on; the guitar is the one I actually pick up, which tells you something about how
             practice works.</p>
@@ -42,7 +46,7 @@ const hasMedia = photos.length > 0 || videos.length > 0;
         </section>
 
         <section>
-          <h2 class="mono sub">Rooms full of people</h2>
+          <h2 class="sub">Rooms full of people</h2>
           <p>Four WordCamps, in Mumbai, Ahmedabad, Delhi and Kolkata, mostly the same talk about building Gutenberg
             blocks, given three times, improving slightly each time. Speaking is the fastest way I know to find out
             whether you actually understand something. An audience finds the hole in your explanation in about
@@ -50,10 +54,10 @@ const hasMedia = photos.length > 0 || videos.length > 0;
         </section>
 
         <section>
-          <h2 class="mono sub">Elsewhere</h2>
+          <h2 class="sub">Elsewhere</h2>
           <p>I built the site for the Jeet Kune Do Federation of India for nothing, which is the sort of thing you
             do when the cause is close to you.</p>
-          <p>I make AI video, which is how <a href="https://github.com/calesthio/OpenMontage/pull/372" rel="noopener">product-motion</a>
+          <p>I make AI video, which is how <a href="https://github.com/calesthio/OpenMontage/pull/372" rel="noopener">product-motion</a>{' '}
             happened. I wanted a tool that could cut a product film from the product&rsquo;s own source code, without
             inventing screens that do not exist, and it was easier to build it than to keep being disappointed.</p>
           <p>Bengaluru, mostly. An Arctic Code Vault contributor, which means only that I was committing to the
@@ -71,25 +75,39 @@ const hasMedia = photos.length > 0 || videos.length > 0;
           {photos.map((f) => (
             <figure class="shot">
               <img src={`/media/personal/${f}`} alt={label(f)} loading="lazy" decoding="async" />
-              <figcaption class="mono">{label(f)}</figcaption>
+              <figcaption>{label(f)}</figcaption>
             </figure>
           ))}
         </div>
       ) : (
-        <p class="empty mono">Pictures of any of this to follow, once I find some that I like.</p>
+        <p class="empty">Pictures of any of this to follow, once I find some that I like.</p>
       )}
 
-      <p class="back mono"><a href="/">← back to the infrastructure</a></p>
+      <p class="back"><a href="/">← Back to the infrastructure</a></p>
+      </div>
+      </div>
     </div>
   </article>
 </Base>
 
 <style>
-  .about { padding-top: clamp(120px, 14vw, 190px); }
+  .about { padding-top: clamp(118px, 13vw, 178px); }
   .about .lede { max-width: 42ch; }
-  .cols { display: grid; gap: clamp(34px, 4vw, 56px); margin-top: clamp(48px, 6vw, 80px); border-top: 1px solid var(--rule); padding-top: 36px; }
-  @media (min-width: 900px) { .cols { grid-template-columns: repeat(3, 1fr); } }
-  .sub { color: var(--fail-ink); margin-bottom: 16px; }
+  /* Three fixed columns inside the content measure gave each subject about
+     twenty-four characters a line, which is a newspaper classified, not a
+     column of prose. They now take as many columns as will hold a readable
+     measure and no more. */
+  .cols {
+    display: grid; gap: clamp(34px, 4vw, 56px);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+    margin-top: clamp(48px, 6vw, 80px); border-top: 1px solid var(--rule); padding-top: 36px;
+  }
+  /* Named in small letter-spaced caps, the way a book sets a sub-section — not
+     in mono, which on this site means "this is a figure you can check". */
+  .sub {
+    font-size: var(--t-micro); font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--fail-ink); margin-bottom: 16px;
+  }
   .cols p { color: var(--ink-2); font-size: var(--t-body); }
   .cols p + p { margin-top: 1em; }
   .cols a { color: var(--fail-ink); }
@@ -99,9 +117,13 @@ const hasMedia = photos.length > 0 || videos.length > 0;
   .shot.wide { grid-column: span 2; }
   @media (max-width: 620px) { .shot.wide { grid-column: span 1; } }
   .shot img, .shot video { width: 100%; height: auto; display: block; background: var(--paper-2); border: 1px solid var(--rule); }
-  .shot figcaption { margin-top: 9px; color: var(--mid); }
-  .empty { margin-top: clamp(44px, 5vw, 68px); color: var(--mid); border-top: 1px solid var(--rule); padding-top: 26px; }
-  .back { margin-top: clamp(50px, 6vw, 80px); color: var(--mid); }
+  .shot figcaption { margin-top: 9px; color: var(--mid); font-size: var(--t-label); }
+  .empty {
+    margin-top: clamp(44px, 5vw, 68px); color: var(--mid); font-style: italic;
+    font-family: var(--display); font-size: 1.0625rem;
+    border-top: 1px solid var(--rule); padding-top: 26px;
+  }
+  .back { margin-top: clamp(50px, 6vw, 80px); color: var(--mid); font-size: var(--t-small); font-weight: 500; }
   .back a { text-decoration: none; }
   .back a:hover { color: var(--ink); }
 </style>

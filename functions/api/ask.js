@@ -14,6 +14,8 @@
 // Environment (Pages project settings, or .dev.vars locally):
 //   ANTHROPIC_API_KEY   required. Without it this returns 501 and the page falls
 //                       back to plain retrieval and says so.
+//   ANTHROPIC_BASE_URL  optional. Points the call at a gateway or proxy instead of
+//                       api.anthropic.com. With or without a trailing /v1.
 //   ASK_MODEL           optional, defaults to claude-haiku-4-5-20251001
 //   ASK_KV              a KV namespace. Bind it. Without it there is no rate limit
 //                       and a bored visitor can spend real money on your behalf.
@@ -219,6 +221,21 @@ async function limited(env, ip) {
   return null;
 }
 
+// api.anthropic.com, or whatever gateway is configured, resolved to the exact
+// messages endpoint. Anything that is not a usable absolute URL falls back to the
+// real API rather than failing the request on a config typo.
+function messagesURL(base) {
+  const DEFAULT = 'https://api.anthropic.com/v1/messages';
+  if (!base || typeof base !== 'string') return DEFAULT;
+  let root = base.trim().replace(/\/+$/, '');
+  if (!root) return DEFAULT;
+  if (!/^https?:\/\//i.test(root)) return DEFAULT;
+  if (/\/v1$/i.test(root)) root = root.slice(0, -3).replace(/\/+$/, '');
+  const url = `${root}/v1/messages`;
+  try { new URL(url); } catch { return DEFAULT; }
+  return url;
+}
+
 export async function onRequestPost({ request, env }) {
   if (!env.ANTHROPIC_API_KEY) return json({ error: 'no model configured' }, 501);
 
@@ -267,6 +284,10 @@ export async function onRequestPost({ request, env }) {
   });
 
   const model = env.ASK_MODEL || 'claude-haiku-4-5-20251001';
+  // A gateway in front of the API is set by base URL, so honour one if it is
+  // configured. Accepts it with or without the /v1, and with or without a
+  // trailing slash, because every place that asks for this spells it differently.
+  const endpoint = messagesURL(env.ANTHROPIC_BASE_URL);
   // Tools and system are identical for every question and are most of the input,
   // so one cache breakpoint on the system block covers both. A follow-up asked
   // within five minutes reads them at a tenth of the price.
@@ -281,7 +302,7 @@ export async function onRequestPost({ request, env }) {
         for (let round = 0; round < MAX_ROUNDS; round++) {
           send({ e: 'status', t: round === 0 ? 'thinking' : 'thinking again' });
 
-          const res = await fetch('https://api.anthropic.com/v1/messages', {
+          const res = await fetch(endpoint, {
             method: 'POST',
             headers: {
               'content-type': 'application/json',
@@ -292,7 +313,18 @@ export async function onRequestPost({ request, env }) {
           });
 
           if (!res.ok) {
-            send({ e: 'error', t: 'The model did not answer. Try again in a moment.' });
+            // "The model did not answer" is true of a bad key, a spent balance and a
+            // 500 alike, which makes it useless to whoever has to fix it. The status
+            // goes to the worker log with the upstream body; the visitor gets the one
+            // sentence that is actually true for their case.
+            const detail = await res.text().catch(() => '');
+            console.error(`ask: anthropic ${res.status} ${res.statusText} ${detail.slice(0, 400)}`);
+            const t = res.status === 401 || res.status === 403
+              ? 'The model is not configured on this deployment.'
+              : res.status === 429
+                ? 'Too many questions at once. Try again in a moment.'
+                : 'The model did not answer. Try again in a moment.';
+            send({ e: 'error', t });
             break;
           }
 

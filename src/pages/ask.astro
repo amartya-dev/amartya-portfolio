@@ -1,0 +1,49 @@
+---
+// The one interactive thing that is not evidence for a project — it is evidence
+// about the site itself — so it gets its own page rather than a slot on the
+// contents page. It sits in ink, because this is the machine running.
+import Base from '../layouts/Base.astro';
+import Ask from '../components/Ask.astro';
+---
+<Base
+  title="Ask this site · Amartya Gaur"
+  description="An agent with five tools and an index of everything on this site. It cites every passage it uses, and declines when the answer is not in there."
+  theme="chamber">
+  <section class="chamber ask-page">
+    <div class="wrap spread">
+      <div class="rail" aria-hidden="true"><span class="railhead"><span class="no">?</span><span class="lbl">Ask</span></span></div>
+      <div class="col">
+        <a class="back" href="/">← Contents</a>
+        <h1 class="d d-2">Ask it. It has to cite.</h1>
+        <p class="lede">It will not tell you anything this page cannot back up.</p>
+
+        <div class="rig"><Ask bare /></div>
+
+        <div class="notes">
+          <p>Five tools, an index of every passage on this site, and no other way to reach you. Prose it
+            cannot source is rejected and asked again in front of you. Numbers in a chart come from series
+            this page counts, not from the model.</p>
+          <p>Declining is one of the five tools, which is what the last suggested question is there to
+            demonstrate. It is the same argument as{' '}
+            <a href="/work/data-layer-that-refuses/">the data layer that refuses</a>, turned on me.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .ask-page { padding-top: clamp(118px, 13vw, 178px); padding-bottom: var(--s-6); }
+  .back {
+    display: inline-block; margin-bottom: var(--s-4);
+    font-size: var(--t-small); font-weight: 500; color: var(--bone-3); text-decoration: none;
+  }
+  .back:hover { color: var(--bone); }
+  h1 { color: var(--bone); margin-bottom: var(--s-3); }
+  .lede { max-width: 34ch; }
+  .rig { margin-top: clamp(40px, 5vw, 60px); }
+  .notes { margin-top: var(--s-5); max-width: 62ch; padding-top: var(--s-3); border-top: 1px solid var(--rule-dark); }
+  .notes p { color: var(--bone-dim); font-size: var(--t-small); line-height: 1.75; }
+  .notes p + p { margin-top: 1em; }
+  .notes a { color: var(--bone-2); }
+</style>

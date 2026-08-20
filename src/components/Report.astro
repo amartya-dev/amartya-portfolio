@@ -5,6 +5,7 @@
 // in it that were mine. Drawn rather than described: a claim about judgement is
 // worth less than the artefact that shows it being exercised.
 import Head from './Head.astro';
+const { bare = false } = Astro.props;
 
 const PINS = [
   { x: '7.2%',  y: '33.9%', len: '9%',    side: 'l',
@@ -15,13 +16,15 @@ const PINS = [
     t: 'The weakest competency stays amber on the page. Nothing is rounded up into the headline number.' }
 ];
 ---
-<section id="now" class="light sec now">
+<section id="now" class={bare ? 'embed now' : 'light sec now'}>
   <div class="graticule" aria-hidden="true"></div>
 
-  <div class="wrap">
-    <Head title="What it returns" fig="Fig. 04">I have written <a href="https://hunr.ai" rel="noopener">hunr</a> on my own since August 2026.
-      It sets an engineer a real task, lets them use whatever agent they like, then makes them defend the code
-      afterwards. This is what it hands back.</Head>
+  <div class={bare ? '' : 'wrap'}>
+    {!bare && (
+      <Head title="What it returns" fig="Fig. 04">I have written <a href="https://hunr.ai" rel="noopener">hunr</a> on my own since August 2026.
+        It sets an engineer a real task, lets them use whatever agent they like, then makes them defend the code
+        afterwards. This is what it hands back.</Head>
+    )}
 
     <figure class="anno rv">
       <div class="scroller">

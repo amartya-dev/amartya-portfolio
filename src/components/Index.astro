@@ -1,0 +1,163 @@
+---
+// The index. This is the page now, so it had better be set properly.
+//
+// It used to be a five-column table with twenty-two rows: name, hook, client,
+// year, status, each in its own tracked column, all at roughly the same weight.
+// That is a spreadsheet. A reader scanning it has to run their eye across five
+// alignments per row and gets no help deciding which rows matter.
+//
+// A catalogue entry is the right model instead. Number, name, and the sentence
+// that says what the thing is, all on one reading line — because that is the
+// line you actually read — with the provenance dropped underneath in small type
+// where it can be checked but does not compete. Everything is one hairline apart
+// and the whole column shares a single left edge, so twenty-two entries scan as
+// fast as five.
+import { WORK, GROUPS } from '../data/work.js';
+
+const FILTERS = [
+  { k: 'all', l: 'Everything' },
+  { k: 'agents', l: 'Agent systems' },
+  { k: 'infra', l: 'Infrastructure' },
+  { k: 'merged', l: 'Merged upstream' }
+];
+const num = (i) => String(i + 1).padStart(2, '0');
+---
+<div class="filters rv" role="group" aria-label="Filter the index">
+  {FILTERS.map((f, i) => (
+    <button type="button" class="chip" data-filter={f.k} aria-pressed={i === 0 ? 'true' : 'false'}>{f.l}</button>
+  ))}
+</div>
+
+<ol class="index rv">
+  {WORK.map((p, i) => (
+    <li class="entry" data-group={p.g}
+      data-first={WORK.findIndex((q) => q.g === p.g) === i ? GROUPS[p.g] : undefined}>
+      <a href={`/work/${p.slug}/`}>
+        <span class="n" aria-hidden="true">{num(i)}</span>
+        <span class="body">
+          <span class="line">
+            <b class="name">{p.n}</b><span class="dash" aria-hidden="true"> — </span><span class="hook">{p.h}</span>
+          </span>
+          <span class="meta">{p.w}<span class="sep" aria-hidden="true">·</span>{p.y}</span>
+        </span>
+        <span class="side">
+          {p.demo && <span class="demo" title="This one has a working demo on its page">demo</span>}
+          <span class="status" data-s={p.s}>{p.s}</span>
+        </span>
+      </a>
+    </li>
+  ))}
+</ol>
+
+<p class="early rv">Earlier: American Express, Bruce Clay, a B.Tech from VIT, and four WordCamp talks I am
+  contractually obliged to mention.</p>
+
+<script>
+  const chips = [...document.querySelectorAll('.chip')];
+  const entries = [...document.querySelectorAll('.entry')];
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const key = chip.dataset.filter;
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+      entries.forEach((p) => { p.hidden = !(key === 'all' || p.dataset.group === key); });
+    });
+  });
+</script>
+
+<style>
+  /* Filters are words, not pills. A pill is a UI kit; a word with a rule under
+     it is what a printed contents page does when it offers you a choice. */
+  .filters { display: flex; flex-wrap: wrap; gap: 6px 26px; margin-bottom: var(--s-4); }
+  .chip {
+    font: inherit; font-size: var(--t-small); font-weight: 500; cursor: pointer;
+    background: none; border: 0; padding: 4px 0; color: var(--mid);
+    border-bottom: 1px solid transparent; transition: color .16s ease, border-color .16s ease;
+  }
+  .chip:hover { color: var(--ink); }
+  .chip[aria-pressed='true'] { color: var(--ink); border-bottom-color: var(--fail-ink); }
+
+  .index { border-top: 1px solid var(--ink); }
+  .entry { border-bottom: 1px solid var(--rule); }
+  .entry[hidden] { display: none; }
+
+  /* A group opens with its name in the number column's gutter, so the three
+     groups read as three lists without three separate headings. */
+  .entry[data-first]::before {
+    display: block; content: attr(data-first);
+    font-family: var(--mono); font-size: var(--t-micro); letter-spacing: .1em; text-transform: uppercase;
+    color: var(--mid); padding: var(--s-4) 0 12px;
+  }
+  .entry[data-first]:first-child::before { padding-top: var(--s-3); }
+  .entry[data-first][hidden]::before { display: none; }
+
+  a {
+    display: grid; grid-template-columns: 2.9rem minmax(0, 1fr) auto;
+    gap: 4px 16px; align-items: baseline;
+    padding: 17px 12px 17px 0; margin-left: -12px; padding-left: 12px;
+    text-decoration: none; border-radius: var(--r-sm);
+    transition: background-color .16s ease;
+  }
+  a:hover { background: var(--paper-3); color: inherit; }
+
+  .n {
+    font-family: var(--display); font-style: italic; font-weight: 400;
+    font-size: 1rem; color: var(--mid); font-variant-numeric: tabular-nums;
+  }
+  a:hover .n { color: var(--fail-ink); }
+
+  .body { display: block; min-width: 0; }
+  /* Name and hook share one reading line. This is the whole idea: the sentence
+     that tells you what the thing is should be on the line your eye is already
+     on, not in a column beside it. */
+  .line { display: block; font-size: 1.0625rem; line-height: 1.5; letter-spacing: -.008em; }
+  .name { font-weight: 600; color: var(--ink); transition: color .16s ease; }
+  a:hover .name { color: var(--fail-ink); }
+  .dash { color: var(--mid); }
+  .hook { color: var(--ink-2); font-weight: 400; }
+
+  .meta {
+    display: block; margin-top: 3px; font-size: var(--t-label);
+    color: var(--mid); line-height: 1.5;
+  }
+  /* The separator is spaced in CSS. Spelling it " · " inside a text node leaves
+     the browser free to collapse the leading space against the run before it,
+     which is exactly what it was doing. */
+  .sep { padding: 0 .45em; }
+
+  .side { display: flex; align-items: baseline; gap: 12px; justify-self: end; white-space: nowrap; }
+
+  /* A row that has something you can operate says so. Four demos in twenty-two
+     rows is a small enough number that marking them is useful rather than noise. */
+  .demo {
+    font-family: var(--mono); font-size: var(--t-micro); letter-spacing: .06em;
+    color: var(--fail-ink); border-bottom: 1px solid color-mix(in oklab, var(--fail-ink) 40%, transparent);
+  }
+
+  /* Status is set as a word, not a badge. Colour carries the only distinction
+     that matters — running somewhere, or not yet. */
+  .status {
+    font-family: var(--mono); font-size: var(--t-micro); letter-spacing: .04em;
+    color: var(--mid); line-height: 1.5;
+  }
+  .status[data-s^='Live'], .status[data-s^='In production'], .status[data-s^='Shipped'],
+  .status[data-s^='Open'], .status[data-s^='Published'], .status[data-s^='Merged'] { color: var(--pass); }
+  .status[data-s^='Unpublished'], .status[data-s^='Private'], .status[data-s^='Unproven'],
+  .status[data-s^='Not yet'] { font-style: italic; }
+
+  .early {
+    margin-top: var(--s-4); color: var(--mid); max-width: 68ch;
+    font-size: var(--t-small); line-height: 1.7;
+  }
+
+  @media (max-width: 760px) {
+    a {
+      grid-template-columns: 2.4rem minmax(0, 1fr);
+      grid-template-areas: 'n body' '. side';
+      row-gap: 8px;
+    }
+    .n { grid-area: n; }
+    .body { grid-area: body; }
+    .side { grid-area: side; justify-self: start; }
+    .entry[data-first]::before { padding-top: var(--s-3); }
+  }
+</style>

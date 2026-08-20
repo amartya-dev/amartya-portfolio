@@ -50,44 +50,43 @@ function figure(f) {
 }
 
 const CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,300..600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300..700&family=Instrument+Sans:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap');
   * { box-sizing: border-box; margin: 0; }
-  body { width: 1200px; height: 630px; background: #f3f3f0; color: #0a0a0b;
+  body { width: 1200px; height: 630px; background: #FBF9F5; color: #16130F;
     font-family: Newsreader, Georgia, serif; overflow: hidden; position: relative; }
   .grat { position: absolute; inset: 0;
-    background-image: linear-gradient(to right, rgba(10,10,11,.055) 1px, transparent 1px),
-                      linear-gradient(to bottom, rgba(10,10,11,.055) 1px, transparent 1px);
-    background-size: 26px 26px;
-    -webkit-mask-image: radial-gradient(85% 80% at 30% 45%, #000 10%, transparent 80%); }
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    mix-blend-mode: multiply; opacity: .5; }
   .in { position: relative; height: 100%; padding: 54px 64px; display: grid;
         grid-template-rows: auto 1fr auto; }
-  .mono { font-family: 'IBM Plex Mono', monospace; font-size: 15px; letter-spacing: .14em;
-          text-transform: uppercase; color: #6a6a64; }
-  .rule { border-top: 1px solid #0a0a0b; margin-top: 14px; }
+  .mono { font-family: 'IBM Plex Mono', monospace; font-size: 14px; letter-spacing: .12em;
+          text-transform: uppercase; color: #857C6E; }
+  .rule { border-top: 1px solid #16130F; margin-top: 14px; }
   .mid { display: grid; grid-template-columns: minmax(0,1fr) 268px; gap: 56px; align-items: center; }
   .mid.solo { grid-template-columns: minmax(0,1fr); }
-  h1 { font-family: Archivo, sans-serif; font-weight: 800; font-stretch: 118%; text-transform: uppercase;
-       letter-spacing: -.02em; line-height: .9; }
-  .sub { margin-top: 22px; color: #26262a; font-size: 21px; line-height: 1.45; max-width: 46ch; }
+  h1 { font-family: Newsreader, Georgia, serif; font-weight: 400; font-optical-sizing: auto;
+       letter-spacing: -.022em; line-height: 1.02; }
+  .sub { margin-top: 22px; color: #4E473E; font-size: 21px; line-height: 1.45; max-width: 44ch;
+         font-style: italic; }
   .foot { display: flex; justify-content: space-between; align-items: end; }
-  .name { font-family: Archivo, sans-serif; font-weight: 700; font-stretch: 106%; font-size: 21px;
-          text-transform: uppercase; letter-spacing: -.01em; }
+  .name { font-family: Newsreader, Georgia, serif; font-weight: 450; font-size: 22px;
+          letter-spacing: -.016em; }
   /* figures */
   .fig { display: grid; gap: 9px; }
-  .r { height: 15px; background: #e9e9e4; position: relative; }
+  .r { height: 15px; background: #F1ECE1; position: relative; }
   .fig > .r + .r, .sg .r + .r { margin-top: 6px; }
-  .r i { position: absolute; inset-block: 0; left: 0; background: #0b7a46; display: block; }
-  .r i.bad { background: #cf3a20; }
-  .sg .r::after { content:""; position: absolute; left: 50%; inset-block: -1px; width: 1px; background: #d4d4cd; }
+  .r i { position: absolute; inset-block: 0; left: 0; background: #3D6B4A; display: block; }
+  .r i.bad { background: #8A2B20; }
+  .sg .r::after { content:""; position: absolute; left: 50%; inset-block: -1px; width: 1px; background: #E2DBCC; }
   .pr { display: flex; gap: 7px; }
   .pr + .pr { margin-top: 7px; }
-  .pr b { width: 21px; height: 21px; border: 1px solid #d4d4cd; background: #e9e9e4; }
-  .pr b.on { background: #0b7a46; border-color: #0b7a46; }
-  .pr b.bad { background: #cf3a20; border-color: #cf3a20; }
-  .still { width: 100%; display: block; border: 1px solid #d4d4cd; }
-  .cap { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #6a6a64; line-height: 1.4; }
+  .pr b { width: 21px; height: 21px; border: 1px solid #E2DBCC; background: #F1ECE1; }
+  .pr b.on { background: #3D6B4A; border-color: #3D6B4A; }
+  .pr b.bad { background: #8A2B20; border-color: #8A2B20; }
+  .still { width: 100%; display: block; border: 1px solid #E2DBCC; }
+  .cap { font-family: 'Instrument Sans', sans-serif; font-size: 14px; color: #857C6E; line-height: 1.45; }
   /* registration marks, the site's own */
-  .c { position: absolute; width: 20px; height: 20px; border: 0 solid #6a6a64; }
+  .c { position: absolute; width: 20px; height: 20px; border: 0 solid #C3BAA6; }
   .c1 { top: 24px; left: 24px; border-width: 1px 0 0 1px; }
   .c2 { top: 24px; right: 24px; border-width: 1px 1px 0 0; }
   .c3 { bottom: 24px; left: 24px; border-width: 0 0 1px 1px; }

@@ -10,9 +10,9 @@ Everything else here is static and would run anywhere.
 
 ## 1. The domain
 
-`astro.config.mjs` currently says `https://amartyagaur.com`. Canonical tags, the
-sitemap and the RSS feed all derive from it, so set it to whatever you actually buy
-before the first deploy.
+`astro.config.mjs` is set to `https://amartya-gaur.com`, which is the domain on the
+account. Canonical tags, the sitemap, the RSS feed and the absolute OG image URLs all
+derive from it, so it has to match the domain the site is actually served on.
 
 | Registrar | .com, first year | .com, renewal | Notes |
 |---|---|---|---|
@@ -30,8 +30,8 @@ Two things worth knowing:
 carries that cost and a second one for a personal site does not earn it back. `.in` is cheap if you
 want a second domain pointing at the same site, usually ₹500 to ₹800 a year.
 
-`amartyagaur.com` is the obvious one. If it is taken, `amartya.dev` and
-`amartyagaur.in` are the next two that read as a person rather than a startup.
+`amartya-gaur.com` is the one in use. `amartya.dev` and `amartyagaur.in` are the
+next two that read as a person rather than a startup, if a second is ever wanted.
 
 ## 2. Cloudflare Pages
 
@@ -63,16 +63,21 @@ What the free plan gives you, and none of it is close to being a constraint here
 
 ## 3. The ask box
 
-Three environment variables, set under **Settings → Environment variables** on the
-Pages project. Set them for Production and Preview both, or the preview builds answer
-from retrieval alone.
+Environment variables go under **Settings → Environment variables** on the Pages
+project. Set them for Production and Preview both, or the preview builds answer from
+retrieval alone.
 
 | Variable | Required | What it is |
 |---|---|---|
 | `ANTHROPIC_API_KEY` | yes | An **encrypted** variable. Without it the endpoint returns 501 and the box falls back to plain retrieval and says so on the page. |
+| `ANTHROPIC_BASE_URL` | no | A gateway or proxy in front of the API. Accepted with or without the trailing `/v1`. Anything that is not an absolute http(s) URL is ignored and the real API is used, so a typo here degrades to normal rather than taking the box down. |
 | `ASK_MODEL` | no | Defaults to `claude-haiku-4-5-20251001`. |
 | `ASK_DAILY_PER_IP` | no | Defaults to 12. |
 | `ASK_DAILY_TOTAL` | no | Defaults to 400. |
+
+If the model call fails, the visitor sees one of three sentences depending on the
+status — not configured (401/403), too many questions (429), or did not answer — and
+the upstream status and body go to the worker log, which is where you look first.
 
 **Bind a KV namespace called `ASK_KV`.** Settings → Functions → KV namespace
 bindings. The rate limiter is the only thing standing between a bored visitor and

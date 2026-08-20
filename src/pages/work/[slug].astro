@@ -1,0 +1,201 @@
+---
+// One entry from the index, given its own page.
+//
+// Every row in the index lands here, including the twelve that have nothing to
+// operate — a catalogue where only the exciting entries have a page is a
+// catalogue you cannot trust. The ones that do have something to operate get it
+// in an ink chamber partway down: paper is the record about the work, ink is the
+// work running. That is the only rule governing which bands are dark, and it is
+// why there are never two dark bands in a row.
+import Base from '../../layouts/Base.astro';
+import Band from '../../components/Band.astro';
+import Figure from '../../components/Figure.astro';
+import { WORK, GROUPS } from '../../data/work.js';
+import { PREVIEW } from '../../data/previews.js';
+import { getCollection } from 'astro:content';
+
+import Report from '../../components/Report.astro';
+import Router from '../../components/Router.astro';
+import Gate from '../../components/Gate.astro';
+import Refuse from '../../components/Refuse.astro';
+import Units from '../../components/Units.astro';
+import Film from '../../components/Film.astro';
+
+export async function getStaticPaths() {
+  return WORK.map((p, i) => ({
+    params: { slug: p.slug },
+    props: { p, prev: WORK[i - 1] || null, next: WORK[i + 1] || null, i }
+  }));
+}
+
+// Each demo carries its own framing, because the sentence that makes a demo
+// worth touching is different from the sentence that describes the project.
+const DEMOS = {
+  report: { c: Report, dark: false, fig: 'Fig. 1', title: 'What it hands back',
+    lede: 'A real finished report, with leaders struck to the three decisions in it that were mine.',
+    note: 'The numbers on it are the ones the product printed, not an illustration of them.' },
+  router: { c: Router, dark: true, fig: 'Fig. 1', title: 'The support bot that forgets',
+    lede: 'Say something vague, then the second one, then still failing, and then genuinely change the subject. Watch what each one does with both.',
+    note: 'Sticky on its own would just be stuck. The safety is the second question — can whoever has this actually handle it? — asked of one team about one message.' },
+  gate: { c: Gate, dark: true, fig: 'Fig. 1', title: 'Can the marking tell them apart?',
+    lede: 'Two people hand in the same task. One understood it; one wrote something that looks right. If the marking cannot separate them, the marking is worthless.',
+    note: 'Nearly every take-home test ever set is the second version. It looks rigorous and it cannot separate anybody.' },
+  refuse: { c: Refuse, dark: false, fig: 'Fig. 1', title: 'Ask it the obvious question',
+    lede: 'Six platforms, six different definitions of a “view”. It argues with you instead of answering.',
+    note: 'Real counting rules and real drift dates; the numbers are simulated. Built for a private assessment, so this is the idea rather than the code.' },
+  units: { c: Units, dark: false, fig: 'Fig. 1', title: 'Twenty-nine lines, doing their job',
+    lede: 'Flip the flag and watch the divisor change under the reading.',
+    note: 'The smallest thing in this index, and by a wide margin the most installed.' }
+};
+
+const { p, prev, next, i } = Astro.props;
+const demo = p.demo ? DEMOS[p.demo] : null;
+const Demo = demo ? demo.c : null;
+
+const all = await getCollection('blog');
+const related = (p.posts || []).map((id) => all.find((x) => x.id === id)).filter(Boolean);
+const fmt = (d) => d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+
+const roman = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+const facts = [
+  ['Made for', p.w],
+  ['Years', p.y],
+  ['Status', p.s],
+  p.href ? ['Source', p.href.replace(/^https:\/\//, '')] : null
+].filter(Boolean);
+---
+<Base title={`${p.n} · Amartya Gaur`} description={p.h} theme="light">
+  <article>
+    <header class="sec entry-head">
+      <div class="wrap spread">
+        <div class="rail">
+          <span class="railhead">
+            <span class="no">{String(i + 1).padStart(2, '0')}</span>
+            <span class="lbl">{GROUPS[p.g]}</span>
+          </span>
+        </div>
+        <div class="col">
+          <a class="back" href="/#index">← The index</a>
+          <h1 class="d d-2">{p.n}</h1>
+          <p class="lede">{p.h}</p>
+
+          <dl class="facts">
+            {facts.map(([k, v]) => (
+              <div class="fact">
+                <dt class="mono">{k}</dt>
+                <dd>{k === 'Source' ? <a href={p.href} rel="noopener">{v}</a> : v}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <div class="prose"><p>{p.d}</p></div>
+        </div>
+      </div>
+    </header>
+
+    {p.film && (
+      <Band no={roman[0]} label="Frontispiece" title="A film cut from the product’s own source">
+        <Fragment slot="lede">Every screen in it was lifted out of the repository, so the film cannot invent a
+          UI that does not exist.</Fragment>
+        <Film src="/media/hunr-a-thousand-resumes.mp4" poster="/media/hunr-a-thousand-resumes.jpg" length="1:05" />
+      </Band>
+    )}
+
+    {Demo && (
+      <Band theme={demo.dark ? 'chamber' : 'light'} no={p.film ? roman[1] : roman[0]}
+        label="Working demo" title={demo.title} fig={demo.fig} id="demo">
+        <Fragment slot="lede">{demo.lede}</Fragment>
+        {demo.note && <Fragment slot="note">{demo.note}</Fragment>}
+        <Demo bare />
+      </Band>
+    )}
+
+    {related.length > 0 && (
+      <Band no={roman[(p.film ? 1 : 0) + (Demo ? 1 : 0)]} label="Written up" title="What I wrote about it">
+        <ol class="notes">
+          {related.map((r) => (
+            <li>
+              <a href={`/blog/${r.id}/`}>
+                <span class="nbody">
+                  <span class="ndate mono">{fmt(r.data.date)}</span>
+                  <span class="ntitle d">{r.data.title}</span>
+                  <span class="nblurb">{r.data.description}</span>
+                </span>
+                <Figure f={PREVIEW[r.id]} />
+              </a>
+            </li>
+          ))}
+        </ol>
+      </Band>
+    )}
+
+    <nav class="pager wrap" aria-label="Adjacent entries">
+      <div class="pg">
+        {prev && <a href={`/work/${prev.slug}/`}><span class="mono dir">← Previous</span><span class="pn">{prev.n}</span></a>}
+      </div>
+      <div class="pg r">
+        {next && <a href={`/work/${next.slug}/`}><span class="mono dir">Next →</span><span class="pn">{next.n}</span></a>}
+      </div>
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .entry-head { padding-top: clamp(118px, 13vw, 178px); padding-bottom: var(--s-5); }
+  .back {
+    display: inline-block; margin-bottom: var(--s-4);
+    font-size: var(--t-small); font-weight: 500; color: var(--mid); text-decoration: none;
+  }
+  .back:hover { color: var(--fail-ink); }
+  h1 { margin-bottom: var(--s-3); }
+  .lede { max-width: 40ch; }
+
+  /* The provenance, set as a table of facts rather than a row of coloured
+     badges. Anyone who is going to check these is reading them one at a time. */
+  .facts {
+    margin-top: clamp(36px, 4.4vw, 52px);
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+    gap: var(--s-3) var(--s-4);
+    padding-block: var(--s-3); border-block: 1px solid var(--rule);
+  }
+  .fact dt {
+    font-size: var(--t-micro); letter-spacing: .1em; text-transform: uppercase;
+    color: var(--mid); margin-bottom: 6px;
+  }
+  .fact dd { margin: 0; font-size: var(--t-small); line-height: 1.55; color: var(--ink); overflow-wrap: anywhere; }
+
+  /* The description is prose, so it is set as prose: the reading serif, a real
+     measure, and a size you settle into. */
+  .prose { margin-top: var(--s-4); max-width: 64ch; }
+  .prose p {
+    font-family: var(--display); font-optical-sizing: auto;
+    font-size: 1.1875rem; line-height: 1.68; letter-spacing: -.003em; color: var(--ink-2);
+  }
+
+  .notes { border-top: 1px solid var(--ink); }
+  .notes li { border-bottom: 1px solid var(--rule); }
+  .notes a {
+    display: grid; grid-template-columns: minmax(0, 1fr) 190px; gap: 40px;
+    align-items: center; padding: 24px 0; text-decoration: none;
+  }
+  .nbody { display: grid; gap: 8px; max-width: 56ch; }
+  .ndate { color: var(--mid); letter-spacing: .06em; text-transform: uppercase; font-size: var(--t-micro); }
+  .ntitle { font-size: 1.4rem; font-weight: 400; letter-spacing: -.016em; line-height: 1.18; transition: color .16s ease; }
+  .notes a:hover .ntitle { color: var(--fail-ink); }
+  .nblurb { color: var(--ink-2); font-size: var(--t-small); line-height: 1.6; }
+
+  .pager {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+    padding-block: var(--s-5) var(--s-6); border-top: 1px solid var(--rule);
+  }
+  .pg.r { text-align: right; }
+  .pager a { display: grid; gap: 7px; text-decoration: none; }
+  .dir { color: var(--mid); font-size: var(--t-micro); letter-spacing: .07em; text-transform: uppercase; }
+  .pn { font-family: var(--display); font-size: 1.3rem; letter-spacing: -.014em; line-height: 1.2; }
+  .pager a:hover .pn { color: var(--fail-ink); }
+
+  @media (max-width: 860px) {
+    .notes a { grid-template-columns: 1fr; gap: 16px; }
+    .notes a :global(.fig) { max-width: 210px; }
+  }
+</style>

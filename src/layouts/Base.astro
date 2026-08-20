@@ -2,8 +2,8 @@
 import '../styles/global.css';
 const {
   title = 'Amartya Gaur · AI systems engineer',
-  description = 'Amartya Gaur builds the layer agents run on: orchestration that survives a failed tool call, evals that can fail a deploy, and the infrastructure under both. Founder of hunr.ai; five years in Newfold Digital\u2019s AI Center of Excellence.',
-  theme = 'chamber',
+  description = 'Amartya Gaur builds the layer agents run on: orchestration that survives a failed tool call, evals that can fail a deploy, and the infrastructure under both. Founder of hunr.ai; five years in Newfold Digital’s AI Center of Excellence.',
+  theme = 'light',
   // Each post has a card drawn from its own figure, by scripts/og.mjs. Anything
   // without one falls back to the site card rather than to nothing, because a
   // shared link with no image is the version most people will see.
@@ -11,6 +11,14 @@ const {
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const image = new URL(`/og/${og}.png`, Astro.site);
+const path = Astro.url.pathname;
+const NAV = [
+  { href: '/#index', label: 'Work', on: (p) => p === '/' || p.startsWith('/work') },
+  { href: '/blog', label: 'Writing', on: (p) => p.startsWith('/blog') },
+  { href: '/ask', label: 'Ask', on: (p) => p.startsWith('/ask') },
+  { href: '/about', label: 'About', on: (p) => p.startsWith('/about') },
+  { href: '/#contact', label: 'Contact', on: () => false }
+];
 ---
 <!doctype html>
 <html lang="en">
@@ -31,25 +39,26 @@ const image = new URL(`/og/${og}.png`, Astro.site);
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content={image} />
 <meta name="twitter:image:alt" content={title} />
-<meta name="color-scheme" content="dark light" />
+<meta name="theme-color" content="#FBF9F5" />
+<meta name="color-scheme" content="light" />
 <link rel="alternate" type="application/rss+xml" title="Amartya Gaur" href="/rss.xml" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2308080A'/%3E%3Crect x='6' y='6' width='8' height='8' fill='%2335E08A'/%3E%3Crect x='18' y='6' width='8' height='8' fill='%2335E08A'/%3E%3Crect x='6' y='18' width='8' height='8' fill='%2335E08A'/%3E%3Crect x='18' y='18' width='8' height='8' fill='%23FF6244'/%3E%3C/svg%3E" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FBF9F5'/%3E%3Crect x='5' y='6' width='22' height='2' fill='%2316130F'/%3E%3Crect x='5' y='12' width='22' height='2' fill='%2316130F'/%3E%3Crect x='5' y='18' width='22' height='2' fill='%2316130F'/%3E%3Crect x='5' y='24' width='13' height='2' fill='%238A2B20'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<!-- Newsreader says things, Instrument Sans labels them, Plex Mono holds data.
+     Three faces, three jobs, and no face doing a job another one already has. -->
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
 </head>
-<body class={theme === 'light' ? 'light' : ''}>
+<body class={theme === 'chamber' ? '' : 'light'}>
 <a class="skip" href="#main">Skip to content</a>
 
-<header class="top" id="top-bar" data-over="dark">
-  <div class="wrap top-in mono">
+<header class="top" id="top-bar" data-over={theme === 'chamber' ? 'dark' : 'light'}>
+  <div class="wrap top-in">
     <a class="brand" href="/"><span class="full">Amartya Gaur</span><span class="short" aria-hidden="true">AG</span></a>
     <nav class="nav" aria-label="Sections">
-      <a href="/#ask">Ask</a>
-      <a href="/#work">Work</a>
-      <a href="/blog">Writing</a>
-      <a href="/about">About</a>
-      <a href="/#contact">Contact</a>
+      {NAV.map((n) => (
+        <a href={n.href} aria-current={n.on(path) ? 'page' : undefined}>{n.label}</a>
+      ))}
     </nav>
   </div>
 </header>
@@ -57,7 +66,7 @@ const image = new URL(`/og/${og}.png`, Astro.site);
 <main id="main"><slot /></main>
 
 <footer class="foot chamber">
-  <div class="wrap foot-in mono">
+  <div class="wrap foot-in">
     <span>Amartya Gaur · Bengaluru, UTC+5:30</span>
     <span><a href="/plain">plain version</a> · <a href="https://hunr.ai" rel="noopener">hunr.ai</a> · <a href="https://github.com/amartya-dev" rel="me noopener">github</a> · <a href="https://linkedin.com/in/amartya-gaur" rel="me noopener">linkedin</a> · <a href="/rss.xml">rss</a></span>
   </div>
@@ -66,30 +75,31 @@ const image = new URL(`/og/${og}.png`, Astro.site);
 <script>
   document.documentElement.classList.add('js');
 
-  // Nav: knows whether it is over a light or dark section, hides going down,
-  // returns coming up. A 6px deadzone so a trackpad twitch does not flap it.
+  // The running head knows whether paper or ink is under it, hides going down,
+  // and returns coming up. A 6px deadzone so a trackpad twitch does not flap it.
   const bar = document.getElementById('top-bar');
   if (bar) {
     let lastY = window.scrollY;
     let ticking = false;
+    const fallback = bar.dataset.over || 'light';
     const sections = [...document.querySelectorAll('main > section, main > article')];
 
     const themeAt = (y) => {
       for (const s of sections) {
         const top = s.offsetTop;
-        if (y >= top - 63 && y < top + s.offsetHeight - 63) {
-          return s.classList.contains('light') ? 'light' : 'dark';
+        if (y >= top - 66 && y < top + s.offsetHeight - 66) {
+          return s.classList.contains('chamber') ? 'dark' : 'light';
         }
       }
-      return 'dark';
+      return fallback;
     };
 
     const update = () => {
       const y = window.scrollY;
       bar.dataset.over = themeAt(y);
       if (y > 8) bar.setAttribute('data-stuck', ''); else bar.removeAttribute('data-stuck');
-      if (y > 220 && y > lastY + 6) bar.setAttribute('data-hidden', '');
-      else if (y < lastY - 6 || y < 220) bar.removeAttribute('data-hidden');
+      if (y > 240 && y > lastY + 6) bar.setAttribute('data-hidden', '');
+      else if (y < lastY - 6 || y < 240) bar.removeAttribute('data-hidden');
       lastY = y;
       ticking = false;
     };
@@ -100,15 +110,16 @@ const image = new URL(`/og/${og}.png`, Astro.site);
     }, { passive: true });
     addEventListener('resize', update, { passive: true });
   }
+
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
       if (!e.isIntersecting) return;
       e.target.classList.add('in');
       io.unobserve(e.target);
     });
-  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+  }, { rootMargin: '0px 0px -6% 0px', threshold: 0.1 });
   document.querySelectorAll('.rv').forEach((el, i) => {
-    el.style.transitionDelay = (Math.min(i % 4, 3) * 70) + 'ms';
+    el.style.transitionDelay = (Math.min(i % 4, 3) * 60) + 'ms';
     io.observe(el);
   });
 </script>

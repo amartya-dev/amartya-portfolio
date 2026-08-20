@@ -8,6 +8,9 @@
 
 ANTHROPIC_API_KEY=sk-ant-...
 
+# Optional. A gateway in front of the API, with or without the trailing /v1.
+# ANTHROPIC_BASE_URL=https://api.anthropic.com
+
 # Optional. Defaults to claude-haiku-4-5-20251001.
 # ASK_MODEL=claude-haiku-4-5-20251001
 

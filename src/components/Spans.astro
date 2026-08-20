@@ -1,0 +1,80 @@
+---
+// Five overlapping spans against one axis.
+//
+// This is here rather than in the index because it answers a question the index
+// cannot: which of these were running at the same time. A list of job titles
+// with date ranges hides that, and hiding it is how six years of work reads as
+// six years of one job.
+const SPANS = [
+  { n: 'hunr.ai', r: 'Founder & engineer', s: .857, e: .947, d: 'Since 2026', k: 'now' },
+  { n: 'Newfold Digital', r: 'Senior Software Developer, AI Center of Excellence', s: .1786, e: .947, d: '5y 5mo', k: 'main' },
+  { n: 'PayCrunch', r: 'Founding consultant, part-time', s: .2857, e: .7143, d: '2022 – 2025', k: 'side' },
+  { n: 'Magicweave', r: 'Consulting on a friend’s product', s: .857, e: .947, d: '2026', k: 'side' },
+  { n: 'Ohuru Tech', r: 'Freelance and client work', s: .107, e: .881, d: '2020 – 2026', k: 'side' }
+];
+const YEARS = [
+  ['2020', 0], ['2021', .1429], ['2022', .2857], ['2023', .4286],
+  ['2024', .5714], ['2025', .7143], ['2026', .857]
+];
+---
+<figure class="chart rv">
+  <div class="panel">
+    <div class="axis" aria-hidden="true">
+      {YEARS.map(([y, t]) => <span class="mono" style={`--t:${t}`}>{y}</span>)}
+    </div>
+    <ol class="spans">
+      {SPANS.map((s) => (
+        <li class:list={['span', s.k]} style={`--s:${s.s};--e:${s.e}`}>
+          <span class="sl">
+            <b>{s.n}</b>
+            <i>{s.r}</i>
+          </span>
+          <span class="plot" aria-hidden="true"><span class="bar"></span></span>
+          <span class="dur mono">{s.d}</span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</figure>
+
+<style>
+  .chart { margin: 0; }
+  .panel { border: 1px solid var(--rule); border-radius: var(--r); background: var(--paper-2); overflow: hidden; }
+
+  .axis { position: relative; height: 30px; margin-left: 17rem; border-bottom: 1px solid var(--rule); }
+  .axis span {
+    position: absolute; left: calc(var(--t) * 100%); top: 9px; padding-left: 8px;
+    border-left: 1px solid var(--rule); height: 21px; line-height: 1;
+    font-size: var(--t-micro); color: var(--mid); letter-spacing: .04em;
+  }
+
+  .span { display: grid; grid-template-columns: 17rem 1fr auto; gap: 16px; align-items: center; padding: 17px 22px 17px 0; }
+  .span + .span { border-top: 1px solid var(--rule-2); }
+  .sl { display: flex; flex-direction: column; gap: 3px; padding-left: 22px; }
+  .sl b { font-weight: 600; font-size: 1.0625rem; line-height: 1.25; letter-spacing: -.012em; }
+  .sl i { font-style: normal; color: var(--mid); font-size: var(--t-label); line-height: 1.45; }
+
+  .plot { position: relative; height: 10px; }
+  .bar {
+    position: absolute; inset-block: 0;
+    left: calc(var(--s) * 100%); width: calc((var(--e) - var(--s)) * 100%);
+    background: var(--ink); border-radius: 1px;
+  }
+  /* Hollow means it ran alongside something else. The distinction is drawn, not
+     annotated, which is why the caption is one sentence long. */
+  .side .bar { background: none; border: 1px solid var(--ink); }
+  /* The current one takes the accent, because "what is he doing now" is the
+     first thing anyone reading this actually wants. */
+  .now .bar { background: var(--fail); }
+
+  .dur { color: var(--mid); font-size: var(--t-micro); letter-spacing: .03em; }
+
+  @media (max-width: 900px) {
+    .axis { margin-left: 0; }
+    .axis span:nth-child(even) { display: none; }
+    .span { grid-template-columns: 1fr auto; row-gap: 12px; padding: 17px 22px; align-items: start; }
+    .sl { padding-left: 0; grid-row: 1; }
+    .dur { grid-row: 1; }
+    .plot { grid-column: 1 / -1; }
+  }
+</style>

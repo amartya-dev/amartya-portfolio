@@ -1,293 +1,142 @@
 ---
+// Index-first.
+//
+// The old home page was six interactive demos stacked in identical frames, in
+// alternating black and white bands, with the actual list of work buried at
+// position four. It asked for about nine minutes before it told you what the
+// person had built.
+//
+// This is a contents page. Title, the spans, the index, the writing, an address.
+// Every demo still exists — each one is now on the page of the thing it is
+// evidence for, which is where somebody who cares about that thing will find it,
+// and where it is not competing with three other demos for the same attention.
 import Base from '../layouts/Base.astro';
-import Hero from '../components/Hero.astro';
-import Ask from '../components/Ask.astro';
-import Router from '../components/Router.astro';
-import Report from '../components/Report.astro';
-import Head from '../components/Head.astro';
-import Refuse from '../components/Refuse.astro';
-import Gate from '../components/Gate.astro';
-import Units from '../components/Units.astro';
+import Band from '../components/Band.astro';
+import Masthead from '../components/Masthead.astro';
+import Spans from '../components/Spans.astro';
+import Index from '../components/Index.astro';
+import { WORK } from '../data/work.js';
+const demos = WORK.filter((w) => w.demo).length;
 import Figure from '../components/Figure.astro';
 import { PREVIEW } from '../data/previews.js';
 import { getCollection } from 'astro:content';
-import { P } from '../data/projects.js';
 
 const posts = (await getCollection('blog'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
-const fmt = (d) => d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
-
-const FILTERS = [
-  { k: 'all', l: 'All' },
-  { k: 'agents', l: 'Agents' },
-  { k: 'infra', l: 'Infrastructure' },
-  { k: 'merged', l: 'Merged upstream' }
-];
+const fmt = (d) => d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+const WORDS = ['no', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'];
 ---
 <Base>
-  <Hero />
+  <Masthead />
 
-  <Ask />
-  <Router />
-  <Report />
+  <Band no="I" label="The record" id="record" title="Six years, five spans">
+    <Fragment slot="lede">Two companies, a consultancy and two products — and for most of those six
+      years, more than one of them was running at once.</Fragment>
+    <Fragment slot="note">Solid bars were the main thing at the time. Hollow ones ran alongside it.</Fragment>
+    <Spans />
+  </Band>
 
-  <section id="work" class="light sec">
-    <div class="graticule" aria-hidden="true"></div>
+  <Band no="II" label="Index" id="index" title={`${WORK.length} things, and what became of each`}>
+    <Fragment slot="lede">From a thousand support conversations an hour down to twenty-nine lines in
+      somebody else&rsquo;s repository. Every entry says what state it is actually in &mdash; in production,
+      a prototype, or a notebook &mdash; because the reader who bothers to check is the one worth keeping.</Fragment>
+    <Fragment slot="note">{WORDS[demos]} entries have something you can operate on their page.
+      Those are marked <em>demo</em>.</Fragment>
+    <Index />
+  </Band>
+
+  <Band no="III" label="Writing" id="writing" title="Working notes">
+    <Fragment slot="lede">Longer pieces on the things in the index: how they were built, what they
+      cost, and the seven experiments that came back negative.</Fragment>
+    <Fragment slot="note">Each figure is drawn from that post&rsquo;s own numbers, so no two are
+      alike.</Fragment>
+
+    <ol class="posts rv">
+      {posts.map((p) => (
+        <li>
+          <a href={`/blog/${p.id}/`}>
+            <span class="pbody">
+              <span class="pdate mono">{fmt(p.data.date)}</span>
+              <span class="ptitle d">{p.data.title}</span>
+              <span class="pblurb">{p.data.description}</span>
+            </span>
+            <Figure f={PREVIEW[p.id]} />
+          </a>
+        </li>
+      ))}
+    </ol>
+    <a class="more" href="/blog">All of it <span aria-hidden="true">→</span></a>
+  </Band>
+
+  <section id="contact" class="chamber sec close">
     <div class="wrap">
-      <Head title="Six years, five spans" fig="Fig. 05">Five overlapping spans, plotted against the same axis,
-        because a list of job titles hides which of them were running at once.</Head>
-      <div class="figured panel rv">
-        <div class="axis mono" aria-hidden="true">
-          <span style="--t:0">2020</span><span style="--t:.1429">2021</span><span style="--t:.2857">2022</span
-          ><span style="--t:.4286">2023</span><span style="--t:.5714">2024</span><span style="--t:.7143">2025</span
-          ><span style="--t:.857">2026</span>
-        </div>
-        <ol class="spans">
-          <li class="span live" style="--s:.857;--e:.947">
-            <div class="span-row">
-              <span class="sl"><b>hunr.ai</b><i>Founder &amp; engineer</i></span>
-              <span class="plot"><span class="bar"></span></span>
-              <span class="mono dur">Since 2026</span>
-            </div>
-          </li>
-          <li class="span" style="--s:.1786;--e:.947">
-            <div class="span-row">
-              <span class="sl"><b>Newfold Digital</b><i>Senior Software Developer, AI Center of Excellence</i></span>
-              <span class="plot"><span class="bar"></span></span>
-              <span class="mono dur">5y 5mo</span>
-            </div>
-          </li>
-          <li class="span side" style="--s:.2857;--e:.7143">
-            <div class="span-row">
-              <span class="sl"><b>PayCrunch</b><i>Founding consultant, part-time</i></span>
-              <span class="plot"><span class="bar"></span></span>
-              <span class="mono dur">2022 – 2025</span>
-            </div>
-          </li>
-          <li class="span side" style="--s:.857;--e:.947">
-            <div class="span-row">
-              <span class="sl"><b>Magicweave</b><i>Consulting on a friend&rsquo;s product</i></span>
-              <span class="plot"><span class="bar"></span></span>
-              <span class="mono dur">2026</span>
-            </div>
-          </li>
-          <li class="span side" style="--s:.107;--e:.881">
-            <div class="span-row">
-              <span class="sl"><b>Ohuru Tech</b><i>Freelance and client work</i></span>
-              <span class="plot"><span class="bar"></span></span>
-              <span class="mono dur">2020 – 2026</span>
-            </div>
-          </li>
-        </ol>
-        <p class="legend mono">Solid bars were the main thing at the time. Hollow ones ran alongside.</p>
+      <div class="flowline" aria-hidden="true"></div>
+      <div class="spread">
+      <div class="rail" aria-hidden="true"><span class="railhead"><span class="no">IV</span><span class="lbl">Address</span></span></div>
+      <div class="col">
+        <h2 class="d d-sec">What&rsquo;s breaking?</h2>
+        <p class="lede">Agents, evals, or the platform underneath. Any of those three, and I will have
+          seen the failure mode before.</p>
+        <a class="bigmail d" href="mailto:amartya@hunr.ai">amartya@hunr.ai</a>
+        <ul class="addr">
+          <li><a href="https://hunr.ai" rel="noopener">hunr.ai</a></li>
+          <li><a href="https://github.com/amartya-dev" rel="me noopener">GitHub</a></li>
+          <li><a href="https://linkedin.com/in/amartya-gaur" rel="me noopener">LinkedIn</a></li>
+          <li><a href="/rss.xml">RSS</a></li>
+        </ul>
       </div>
-
-      <div class="filters mono rv" role="group" aria-label="Filter">
-        {FILTERS.map((f, i) => (
-          <button type="button" class="chip" data-filter={f.k} aria-pressed={i === 0 ? 'true' : 'false'}>{f.l}</button>
-        ))}
       </div>
-
-      <ol class="projects">
-        {P.map((p, i) => (
-          <li class="proj rv" data-group={p.g} data-first={P.findIndex((q) => q.g === p.g) === i ? p.g : undefined}>
-            <details>
-              <summary>
-                <span class="d d-3 p-name">{p.n}</span>
-                <span class="p-hook">{p.h}</span>
-                <span class="mono p-meta">{p.w}</span>
-                <span class="mono p-year">{p.y}</span>
-                <span class="mono p-status" data-s={p.s}>{p.s}</span>
-              </summary>
-              <div class="p-detail">
-                <p>{p.d}</p>
-                {p.href && <p class="mono p-link"><a href={p.href} rel="noopener">{p.href.replace('https://', '')}</a></p>}
-                {p.widget === 'units' && <div class="p-widget"><Units /></div>}
-              </div>
-            </details>
-          </li>
-        ))}
-      </ol>
-      <p class="mono early rv">Earlier: American Express, Bruce Clay, a B.Tech from VIT, and four WordCamp talks I am
-        contractually obliged to mention.</p>
     </div>
   </section>
-
-  <Gate />
-  <Refuse />
-
-  <section id="writing" class="chamber sec">
-    <div class="wrap">
-      <Head title="Working notes">What I learned building the things above, including the parts that did not
-        work.</Head>
-      <ul class="posts rv">
-        {posts.map((p) => (
-          <li>
-            <a href={`/blog/${p.id}/`}>
-              <span class="p-body">
-                <span class="mono p-date">{fmt(p.data.date)}</span>
-                <span class="p-title">{p.data.title}</span>
-                <span class="p-blurb">{p.data.description}</span>
-              </span>
-              <Figure f={PREVIEW[p.id]} dark />
-            </a>
-          </li>
-        ))}
-      </ul>
-      <a class="cta mono rv" href="/blog">All of it<span aria-hidden="true">→</span></a>
-    </div>
-  </section>
-
-  <section id="contact" class="light sec section-end">
-    <div class="wrap">
-      <Head title="What&rsquo;s breaking?">Agents, evals, or the platform underneath. Any of those.</Head>
-      <a class="d bigmail rv" href="mailto:amartya@hunr.ai">amartya@hunr.ai</a>
-      <ul class="links mono rv">
-        <li><a href="https://hunr.ai" rel="noopener">hunr.ai</a></li>
-        <li><a href="https://github.com/amartya-dev" rel="me noopener">github</a></li>
-        <li><a href="https://linkedin.com/in/amartya-gaur" rel="me noopener">linkedin</a></li>
-        <li><a href="/rss.xml">rss</a></li>
-      </ul>
-    </div>
-  </section>
-
-  <script>
-    const chips = [...document.querySelectorAll('.chip')];
-    const projects = [...document.querySelectorAll('.proj')];
-    chips.forEach((chip) => {
-      chip.addEventListener('click', () => {
-        const key = chip.dataset.filter;
-        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
-        projects.forEach((p) => { p.hidden = !(key === 'all' || p.dataset.group === key); });
-      });
-    });
-  </script>
 </Base>
 
 <style>
-  /* The dark bands have carried a plotting grid from the start. The paper ones
-     did not, so the two halves of the page were not speaking with equal force. */
-  #work { position: relative; overflow: hidden; }
-  #work > * { position: relative; z-index: 1; }
-  #work > .graticule {
-    -webkit-mask-image: radial-gradient(90% 55% at 50% 22%, #000 5%, transparent 76%);
-    mask-image: radial-gradient(90% 55% at 50% 22%, #000 5%, transparent 76%);
+  /* Three posts, set as a contents list with each post's own figure beside it.
+     The figures are drawn from each post's real numbers, so no two are alike —
+     which is what keeps this from being a grid of identical cards. */
+  .posts { border-top: 1px solid var(--ink); }
+  .posts li { border-bottom: 1px solid var(--rule); }
+  .posts a {
+    display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 44px;
+    align-items: center; padding: 26px 0; text-decoration: none;
   }
-
-  .panel { margin-top: var(--s-4); border: 1px solid var(--rule); border-radius: var(--r); overflow: hidden; background: var(--paper-2); }
-  .axis { position: relative; height: 28px; margin-left: 280px; border-bottom: 1px solid var(--rule); color: var(--mid); }
-  .axis span { position: absolute; left: calc(var(--t) * 100%); top: 8px; padding-left: 8px; border-left: 1px solid var(--rule); height: 20px; line-height: 1; font-size: var(--t-micro); }
-  .span + .span { border-top: 1px solid var(--rule); }
-  .span-row { display: grid; grid-template-columns: 280px 1fr auto; gap: 16px; align-items: center; padding: 16px 20px 16px 0; }
-  .sl { display: flex; flex-direction: column; gap: 3px; padding-left: 20px; }
-  .sl b { font-family: var(--display); font-weight: 640; font-size: 1.0625rem; line-height: 1.2; letter-spacing: -.018em; }
-  .sl i { font-style: normal; color: var(--mid); font-size: var(--t-small); line-height: 1.35; }
-  .plot { position: relative; height: 12px; }
-  .bar { position: absolute; inset-block: 0; left: calc(var(--s) * 100%); width: calc((var(--e) - var(--s)) * 100%); background: var(--ink); }
-  .side .bar { background: none; border: 1px solid var(--ink); }
-  .live .bar { background: var(--pass); }
-  .dur { color: var(--mid); font-size: var(--t-micro); }
-
-  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--s-5); }
-  .chip { font: inherit; cursor: pointer; background: var(--paper-2); color: var(--mid); border: 1px solid var(--rule); border-radius: 999px; padding: 8px 16px; transition: all .18s ease; }
-  .chip:hover { border-color: var(--ink); color: var(--ink); }
-  .chip[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
-
-  .projects { margin-top: var(--s-3); border-top: 1px solid var(--ink); }
-  /* A rule and a label where each group starts, so the list reads as three lists. */
-  .proj[data-first]::before {
-    display: block; content: attr(data-first);
-    font-size: var(--t-label); font-weight: 550; letter-spacing: -.005em;
-    color: var(--mid); padding: 34px 0 12px;
+  .pbody { display: grid; gap: 8px; max-width: 56ch; }
+  .pdate { color: var(--mid); letter-spacing: .06em; text-transform: uppercase; font-size: var(--t-micro); }
+  .ptitle {
+    font-size: clamp(1.35rem, 2.2vw, 1.75rem); font-weight: 400;
+    letter-spacing: -.016em; line-height: 1.15; transition: color .16s ease;
   }
-  .proj[data-first='agents']::before { content: 'Agent systems'; }
-  .proj[data-first='infra']::before { content: 'Infrastructure'; }
-  .proj[data-first='merged']::before { content: 'Merged into other repositories'; }
-  .proj[data-first][hidden]::before { display: none; }
-  .proj { border-bottom: 1px solid var(--rule); }
-  .proj[hidden] { display: none; }
-  .proj details { display: block; }
-  /* Five columns and a sign, so the status chip sits on the row it belongs to
-     and the row admits it opens. */
-  .proj summary {
-    display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 10.5rem 5.6rem 9.2rem 1.2rem;
-    gap: var(--s-1) 20px; align-items: baseline; padding: 18px 0; cursor: pointer; list-style: none;
-    transition: background .15s ease;
-  }
-  .proj summary::-webkit-details-marker { display: none; }
-  .proj summary::after {
-    content: "+"; font-family: var(--mono); font-size: var(--t-small); line-height: 1;
-    color: var(--mid); justify-self: end; transition: color .15s ease;
-  }
-  .proj[open] summary::after { content: "\2212"; color: var(--fail); }
-  .proj summary:hover::after { color: var(--fail); }
-  .proj summary:hover { background: var(--paper-2); }
-  .proj summary:hover .p-name { color: var(--fail); }
-  .proj[open] summary { padding-bottom: 8px; }
-  .p-name { font-size: 1.0625rem; line-height: 1.08; transition: color .15s ease; }
-  .p-hook { color: var(--ink-2); font-size: var(--t-body); }
-  .p-meta { color: var(--mid); font-size: var(--t-micro); }
-  .p-year { color: var(--mid); font-size: var(--t-micro); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .p-detail { padding: 2px 0 var(--s-3); max-width: 68ch; }
-  .p-detail p { color: var(--ink-2); font-size: var(--t-small); }
-  .p-link { margin-top: 12px; }
-  .p-link a { color: var(--fail-ink); }
-  .p-name { display: inline-flex; gap: .3em; align-items: baseline; text-decoration: none; }
-  a.p-name:hover { color: var(--fail); }
-  .ext { font-size: .5em; opacity: .55; }
-  .p-status {
-    justify-self: start; padding: 3px 9px; font-size: var(--t-micro); white-space: nowrap; border-radius: var(--r-sm);
-    border: 1px solid var(--rule); background: var(--paper-2); color: var(--mid); line-height: 1.5;
-  }
-  .p-status[data-s^='Live'], .p-status[data-s^='In production'], .p-status[data-s^='Shipped'] { border-color: var(--pass); color: var(--pass); }
-  .p-status[data-s^='Merged'] { border-color: var(--ink); color: var(--ink); }
-  .p-status[data-s^='Unpublished'], .p-status[data-s^='Private'] { border-style: dashed; }
-  .p-body p { color: var(--ink-2); font-size: var(--t-body); max-width: 68ch; }
-  .p-widget { margin-top: 20px; max-width: 560px; }
-  .early { margin-top: var(--s-4); color: var(--mid); text-transform: none; letter-spacing: -.005em; max-width: 70ch; line-height: 1.75; font-size: var(--t-small); }
+  .posts a:hover .ptitle { color: var(--fail-ink); }
+  .pblurb { color: var(--ink-2); font-size: var(--t-small); line-height: 1.65; }
 
-  .posts { border-top: 1px solid var(--rule-dark); margin-top: clamp(30px, 4vw, 48px); }
-  .posts li { border-bottom: 1px solid var(--rule-dark); }
-  .posts a { display: grid; grid-template-columns: minmax(0, 1fr) 190px; gap: 40px; align-items: center; padding: 26px 0; text-decoration: none; }
-  .p-body { display: grid; gap: 9px; max-width: 58ch; }
-  .p-date { color: var(--bone-dim); font-size: var(--t-label); letter-spacing: -.005em; text-transform: none; }
-  .p-title { font-family: var(--display); font-weight: 700; font-stretch: 112%; text-transform: uppercase; letter-spacing: -.015em; font-size: 1.3rem; line-height: 1.08; color: var(--bone); transition: color .2s ease; }
-  .posts a:hover .p-title { color: var(--pass-lit); text-decoration: underline; text-underline-offset: .16em; }
-  .p-blurb { color: var(--bone-dim); font-size: var(--t-small); }
-  @media (max-width: 860px) { .posts a { grid-template-columns: 1fr; gap: 16px; } .posts a :global(.fig) { max-width: 210px; } }
-  .cta { display: inline-flex; gap: 10px; align-items: center; margin-top: 26px; text-decoration: none; color: var(--bone-dim); border-bottom: 1px solid currentColor; padding-bottom: 5px; }
-  .cta:hover { color: var(--bone); }
-  .cta span { transition: transform .25s ease; }
-  .cta:hover span { transform: translateX(5px); }
-
-  .bigmail { display: inline-block; margin-top: clamp(28px, 4vw, 44px); font-size: clamp(1.4rem, 4.8vw, 3.4rem); text-decoration: none; color: var(--ink); word-break: break-word; border-bottom: 3px solid var(--rule); }
-  .bigmail:hover { color: var(--fail); border-color: var(--fail); }
-  .links { display: flex; flex-wrap: wrap; gap: 12px 28px; margin-top: 34px; color: var(--mid); }
-  .links a:hover { color: var(--fail-ink); }
-
-  @media (max-width: 900px) {
-    .axis { margin-left: 0; }
-    .axis span:nth-child(even) { display: none; }
-    .span-row { grid-template-columns: 1fr auto; row-gap: 10px; padding: 16px 20px; align-items: start; }
-    .sl { padding-left: 0; grid-row: 1; }
-    .dur { grid-row: 1; }
-    .plot { grid-column: 1 / -1; }
+  .more {
+    display: inline-block; margin-top: var(--s-3); font-size: var(--t-small); font-weight: 500;
+    color: var(--mid); text-decoration: none; border-bottom: 1px solid var(--rule);
+    padding-bottom: 4px;
   }
+  .more:hover { color: var(--fail-ink); border-color: var(--fail-ink); }
+  .more span { display: inline-block; transition: transform .22s ease; }
+  .more:hover span { transform: translateX(4px); }
 
-  /* Under 1080 the five columns stop fitting, so the row becomes a stack:
-     name and sign, hook, who and when, then the status chip. */
-  @media (max-width: 1080px) {
-    .proj summary {
-      grid-template-columns: minmax(0, 1fr) 1.2rem;
-      grid-template-areas: 'name sign' 'hook hook' 'meta year' 'stat stat';
-      gap: 10px 20px; align-items: start;
-    }
-    .p-name { grid-area: name; }
-    .p-hook { grid-area: hook; }
-    .p-meta { grid-area: meta; }
-    .p-year { grid-area: year; text-align: right; }
-    .p-status { grid-area: stat; margin-top: 4px; }
-    .proj summary::after { grid-area: sign; }
+  /* The document closes in ink, the way it opened. */
+  .close .lede { color: var(--bone-2); }
+  .close h2 { color: var(--bone); }
+  .bigmail {
+    display: inline-block; margin-top: clamp(34px, 4.6vw, 56px);
+    font-size: clamp(1.6rem, 5.4vw, 3.6rem); font-weight: 380; letter-spacing: -.024em;
+    color: var(--bone); text-decoration: none; word-break: break-word;
+    border-bottom: 1px solid var(--rule-dark-2); padding-bottom: 6px;
+  }
+  .bigmail:hover { color: var(--fail-lit); border-color: var(--fail-lit); }
+  .addr {
+    display: flex; flex-wrap: wrap; gap: 10px 28px;
+    margin-top: clamp(34px, 4vw, 48px); font-size: var(--t-small); color: var(--bone-dim);
+  }
+  .addr a { color: var(--bone-2); }
+
+  @media (max-width: 860px) {
+    .posts a { grid-template-columns: 1fr; gap: 18px; }
+    .posts a :global(.fig) { max-width: 220px; }
   }
 </style>

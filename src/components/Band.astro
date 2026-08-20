@@ -1,0 +1,57 @@
+---
+// A band of the document: a flowline across the top, a margin rail on the left,
+// and the content beside it.
+//
+// The rail is the spine of the whole site. It carries a section number set in
+// italic serif, a short label, and — where a figure needs one — a note in the
+// margin. It sticks while its band scrolls, so at any point on the page you can
+// look left and see which part of the document you are in. That is a book
+// affordance, and it does the job the old page gave to flipping the background
+// from white to black every eight hundred pixels.
+//
+// The `note` slot exists because sentences like "solid bars were the main thing
+// at the time" are instructions for reading a figure, not arguments. Put one in
+// the main column as a standfirst and it reads as an implementation note. Put it
+// in the margin, small, beside the figure it describes, and it reads as what it
+// is. The standfirst is then free to do its actual job, which is to say what the
+// section is about.
+import Head from './Head.astro';
+
+const {
+  no,               // 'I', 'II' — set in the rail, italic serif
+  label,            // a two or three word name for the band
+  title,            // optional: renders the standard band head
+  fig,              // optional figure number, passed through to the head
+  id,
+  theme = 'light',
+  wide = false      // content spans the rail too, for full-measure figures
+} = Astro.props;
+const hasNote = Astro.slots.has('note');
+---
+<section id={id} class:list={[theme === 'chamber' ? 'chamber' : 'light', 'sec']}>
+  <div class="wrap">
+    <div class="flowline" aria-hidden="true"></div>
+    <div class="spread">
+      <div class="rail">
+        <span class="railhead">
+          <span class="no" aria-hidden="true">{no}</span>
+          {label && <span class="lbl" aria-hidden="true">{label}</span>}
+        </span>
+        {hasNote && <span class="note"><slot name="note" /></span>}
+      </div>
+      <div class:list={[wide ? 'col-full' : 'col']}>
+        {title && (
+          <Head title={title} fig={fig}><slot name="lede" /></Head>
+        )}
+        <slot />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lbl { display: block; }
+  @media (max-width: 900px) {
+    .lbl { display: inline; }
+  }
+</style>

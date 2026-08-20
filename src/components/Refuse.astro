@@ -1,5 +1,6 @@
 ---
 import Head from './Head.astro';
+const { bare = false } = Astro.props;
 const PLATFORMS = [
   { n: 'TikTok',         views: 1240000, reach: 402000, rule: 'the video starts' },
   { n: 'Instagram',      views: 412000,  reach: 180000, rule: 'a play, any length' },
@@ -11,8 +12,8 @@ const PLATFORMS = [
 const total = PLATFORMS.reduce((s, p) => s + p.views, 0);
 const maxReach = Math.max(...PLATFORMS.map((p) => p.reach));
 ---
-<section id="refuse" class="light sec">
-  <div class="wrap">
+<section id="refuse" class={bare ? 'embed' : 'light sec'}>
+  <div class={bare ? '' : 'wrap'}>
     <Head title="A number is not a fact" fig="Fig. 07">Six platforms, six different
       definitions of a &ldquo;view&rdquo;. Ask this one the obvious question and it argues with you instead of
       answering.</Head>
