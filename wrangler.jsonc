@@ -1,0 +1,29 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+
+  // Pages project configuration, kept in the repository rather than in the
+  // dashboard. `wrangler pages dev` and `wrangler pages deploy` both read this,
+  // so what runs locally and what runs in production are the same declaration
+  // instead of two things somebody has to remember to keep in step.
+  "name": "amartya-portfolio",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-08-01",
+
+  // The rate limiter behind functions/api/ask.js. Without this binding the
+  // limiter is a no-op and the only thing between a bored visitor and a real
+  // bill is the daily cap it can no longer enforce, so it belongs in version
+  // control where its absence would be visible in a diff.
+  //
+  // Preview and production deliberately share one namespace: the cap is a
+  // spending control, and two independent budgets is two ways to be surprised.
+  "kv_namespaces": [
+    {
+      "binding": "ASK_KV",
+      "id": "2a64302963724a8c96222c80c2e5841b"
+    }
+  ]
+
+  // ANTHROPIC_API_KEY is NOT here, and must never be. This file is committed.
+  // It is a Pages secret (Settings -> Variables and Secrets, encrypted) in
+  // production, and .dev.vars locally.
+}

@@ -5,10 +5,11 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/check-html.mjs",
     "preview": "astro preview",
-    "serve": "npm run build && wrangler pages dev dist --compatibility-date=2026-08-01",
-    "deploy": "npm run build && wrangler pages deploy dist"
+    "serve": "npm run build && wrangler pages dev",
+    "deploy": "npm run build && wrangler pages deploy --branch=main",
+    "check": "node scripts/check-html.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.7",

@@ -35,22 +35,44 @@ next two that read as a person rather than a startup, if a second is ever wanted
 
 ## 2. Cloudflare Pages
 
+Project configuration lives in `wrangler.jsonc`, not in the dashboard: the project
+name, the build output directory, the compatibility date and the `ASK_KV` binding
+are all declared there, so `wrangler pages dev` and `wrangler pages deploy` run the
+same configuration and a missing binding shows up in a diff.
+
 ```bash
 npm install
 npx wrangler login
-npm run deploy          # builds, then wrangler pages deploy dist
+npm run deploy          # build, gate, then wrangler pages deploy
 ```
 
-Or connect the GitHub repository in the Cloudflare dashboard, which is better because
-it redeploys on push:
+The `functions/` directory at the repository root is picked up automatically.
 
-- Framework preset: **Astro**
-- Build command: `npm run build`
-- Output directory: `dist`
-- Node version: 20 or newer
+### CI/CD
 
-The `functions/` directory at the repository root is picked up automatically. Nothing
-in it needs configuring.
+`.github/workflows/deploy.yml` builds, runs the HTML gate, and deploys. A push to
+`main` goes to production; a pull request gets its own preview deployment on a
+branch alias. Two repository secrets are required:
+
+| Secret | Where it comes from |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → Create Token. Permissions: **Account · Cloudflare Pages · Edit**. Nothing else. |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → Workers & Pages → the account ID in the right-hand sidebar. |
+
+Without them the workflow still builds and gates, and says so, so a fork's pull
+request is checked rather than failed.
+
+The alternative is the dashboard's Git integration, which redeploys on push with no
+token in GitHub at all. It is fine, and the reason this repository does not use it is
+that the build then happens somewhere the gate's exit code is harder to see.
+
+### The gate
+
+`npm run build` is `astro build` followed by `scripts/check-html.mjs`, which fails on
+defects that exist only in the rendered output: a word fused to an inline link, an
+HTML entity printed rather than rendered, an absolute URL pointing at a domain this
+site is not served on, a page with no title. Every one of those has shipped here at
+least once, and none of them are visible in a diff.
 
 What the free plan gives you, and none of it is close to being a constraint here:
 
@@ -69,7 +91,7 @@ retrieval alone.
 
 | Variable | Required | What it is |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | yes | An **encrypted** variable. Without it the endpoint returns 501 and the box falls back to plain retrieval and says so on the page. |
+| `ANTHROPIC_API_KEY` | yes | An **encrypted** variable. Without it the endpoint returns 501 and the box falls back to plain retrieval and says so on the page. Never put this in `wrangler.jsonc` — that file is committed. |
 | `ANTHROPIC_BASE_URL` | no | A gateway or proxy in front of the API. Accepted with or without the trailing `/v1`. Anything that is not an absolute http(s) URL is ignored and the real API is used, so a typo here degrades to normal rather than taking the box down. |
 | `ASK_MODEL` | no | Defaults to `claude-haiku-4-5-20251001`. |
 | `ASK_DAILY_PER_IP` | no | Defaults to 12. |
@@ -79,9 +101,11 @@ If the model call fails, the visitor sees one of three sentences depending on th
 status — not configured (401/403), too many questions (429), or did not answer — and
 the upstream status and body go to the worker log, which is where you look first.
 
-**Bind a KV namespace called `ASK_KV`.** Settings → Functions → KV namespace
-bindings. The rate limiter is the only thing standing between a bored visitor and
-your card, and it is a no-op without this binding.
+**The `ASK_KV` binding is already declared** in `wrangler.jsonc`, pointing at the
+namespace `amartya-portfolio-ask-kv` (`2a64302963724a8c96222c80c2e5841b`). Nothing to
+click. The rate limiter is the only thing standing between a bored visitor and your
+card, and it is a no-op without that binding, which is why it lives in the repository
+where its absence would be visible.
 
 Free KV allows 1,000 writes a day. Each question costs two, so the 400-question
 default cap runs into its own ceiling before KV's, which is the right way round.
@@ -104,6 +128,10 @@ site is a couple of dollars. If it ever starts mattering, drop `ASK_DAILY_TOTAL`
 cp .dev.vars.example .dev.vars     # put a real key in it; .dev.vars is gitignored
 npm run serve                      # http://localhost:8788
 ```
+
+`npm run serve` needs wrangler 4.124 or newer — the compatibility date in
+`wrangler.jsonc` is ahead of what older workerd binaries will start on, and the error
+when it is not is about the runtime rather than about the date.
 
 `npm run dev` is the Astro dev server and does **not** run Pages Functions, so the
 box answers from the index there and reports that it is doing so. That is the same
