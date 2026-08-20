@@ -1,0 +1,61 @@
+---
+// The post previews, drawn small. Shared by /blog and the home page so the two
+// lists speak the same visual language.
+const { f, dark = false } = Astro.props;
+const max = f && f.v ? Math.max(...f.v.map(Math.abs)) : 1;
+---
+{f && (
+  <span class:list={['fig', { dark }]} aria-hidden="true">
+    {f.kind === 'bars' && (
+      <span class="mini">
+        {f.v.map((x, k) => (
+          <span class="r"><i class={f.bad && f.bad.includes(k) ? 'bad' : ''}
+            style={`width:${Math.max((Math.abs(x) / max) * 100, 2)}%`}></i></span>
+        ))}
+      </span>
+    )}
+    {f.kind === 'signed' && (
+      <span class="mini signed">
+        {f.v.map((x) => (
+          <span class="r"><i class={x < 0 ? 'bad' : ''}
+            style={`left:${x < 0 ? 50 - (Math.abs(x) / max) * 50 : 50}%;width:${Math.max((Math.abs(x) / max) * 50, 1.5)}%`}></i></span>
+        ))}
+      </span>
+    )}
+    {f.kind === 'still' && <img class="still" src={f.src} alt="" loading="lazy" decoding="async" />}
+    {f.kind === 'pips' && (
+      <span class="pips">
+        <span class="prow">{Array.from({ length: f.n }, (_, k) => <b class={k < f.a ? 'on' : 'bad'}></b>)}</span>
+        <span class="prow">{Array.from({ length: f.n }, (_, k) => <b class={k < f.b ? 'on' : 'bad'}></b>)}</span>
+      </span>
+    )}
+    <span class="cap">{f.label}</span>
+  </span>
+)}
+
+<style>
+  .fig { display: grid; gap: 9px; align-content: center; }
+  .still { width: 100%; display: block; background: var(--paper-2); }
+  .mini { display: grid; gap: 3px; }
+  .r { display: block; height: 7px; background: var(--paper-2); position: relative; }
+  .r i { position: absolute; inset-block: 0; left: 0; background: var(--pass); display: block; }
+  .r i.bad { background: var(--fail); }
+  .signed .r::after { content: ""; position: absolute; left: 50%; inset-block: -1px; width: 1px; background: var(--rule); }
+
+  .pips { display: grid; gap: 5px; }
+  .prow { display: flex; gap: 4px; }
+  .prow b { width: 11px; height: 11px; border: 1px solid var(--rule); background: var(--paper-2); }
+  .prow b.on { background: var(--pass); border-color: var(--pass); }
+  .prow b.bad { background: var(--fail); border-color: var(--fail); }
+
+  .cap { color: var(--mid); font-family: var(--mono); font-size: .68rem; letter-spacing: .02em; line-height: 1.45; }
+
+  /* Same figures on the black bands, where the lit pair reads and the dull one does not. */
+  .dark .r, .dark .prow b, .dark .still { background: #1c1c25; border-color: #2c2c36; }
+  .dark .r i { background: var(--pass-lit); }
+  .dark .r i.bad { background: var(--fail-lit); }
+  .dark .prow b.on { background: var(--pass-lit); border-color: var(--pass-lit); }
+  .dark .prow b.bad { background: var(--fail-lit); border-color: var(--fail-lit); }
+  .dark .signed .r::after { background: #3a3a46; }
+  .dark .cap { color: #86868f; }
+</style>
