@@ -186,17 +186,17 @@ const SEEDS = [
   .ask { display: flex; gap: 10px; }
   .ask input {
     flex: 1; min-width: 0; background: var(--void); border: 1px solid var(--rule-dark); color: var(--bone);
-    font-family: var(--mono); font-size: .84rem; padding: 13px 15px;
+    font-family: var(--mono); font-size: var(--t-label); padding: 13px 15px;
   }
   .ask input:focus { outline: none; border-color: var(--pass-lit); }
   .ask input::placeholder { color: var(--bone-dim); }
   .send {
     background: var(--bone); color: var(--void); border: 0; padding: 13px 22px; cursor: pointer;
-    font-family: var(--mono); letter-spacing: .12em; text-transform: uppercase; font-size: .7rem;
+    font-family: var(--mono); letter-spacing: -.005em; text-transform: uppercase; font-size: .7rem;
   }
   .send:hover { background: var(--pass-lit); }
 
-  .seeds { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; color: var(--bone-dim); text-transform: none; letter-spacing: .03em; }
+  .seeds { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; color: var(--bone-dim); text-transform: none; letter-spacing: -.005em; }
   .seed {
     font: inherit; cursor: pointer; background: none; border: 1px dashed var(--rule-dark);
     color: var(--bone-dim); padding: 6px 11px;
@@ -211,7 +211,7 @@ const SEEDS = [
   @media (max-width: 859px) { .lane + .lane { border-left: 0; border-top: 1px solid var(--rule-dark); } }
   .lane header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-bottom: 16px; color: var(--bone-dim); }
   .lane header b { color: var(--bone); font-weight: 500; }
-  .lane header span { text-transform: none; letter-spacing: .03em; color: var(--bone-dim); }
+  .lane header span { text-transform: none; letter-spacing: -.005em; color: var(--bone-dim); }
   .tally { margin-left: auto; font-style: normal; color: var(--bone-dim); }
   .tally.ok { color: var(--pass-lit); }
   .tally.no { color: var(--fail-lit); }
@@ -223,17 +223,17 @@ const SEEDS = [
   }
   .lane :global(.said.in), .lane :global(.turn.in) { opacity: 1; transform: none; }
   .lane :global(.said) {
-    font-size: .92rem; color: var(--bone-2); background: var(--void-3); padding: 9px 13px;
+    font-size: var(--t-small); color: var(--bone-2); background: var(--void-3); padding: 9px 13px;
     margin-top: 9px; border-left: 2px solid var(--rule-dark-2);
   }
   .lane :global(.turn) { display: flex; gap: 12px; align-items: baseline; padding-left: 13px; }
-  .lane :global(.wf) { font-family: var(--mono); font-size: .74rem; letter-spacing: .06em; color: var(--bone-dim); }
+  .lane :global(.wf) { font-family: var(--mono); font-size: var(--t-label); letter-spacing: -.005em; color: var(--bone-dim); }
   .lane :global(.turn.good .wf) { color: var(--pass-lit); }
   .lane :global(.turn.bad .wf) { color: var(--fail-lit); }
   .lane :global(.turn.hand .wf) { color: var(--bone); }
   .lane :global(.turn.hand .note) { color: var(--bone-dim); }
-  .lane :global(.note) { font-family: var(--mono); font-size: .72rem; color: var(--bone-dim); letter-spacing: .03em; }
-  .empty { color: var(--bone-dim); text-transform: none; letter-spacing: .03em; }
+  .lane :global(.note) { font-family: var(--mono); font-size: var(--t-label); color: var(--bone-dim); letter-spacing: -.005em; }
+  .empty { color: var(--bone-dim); text-transform: none; letter-spacing: -.005em; }
 
   .foot-note { margin-top: 26px; color: var(--bone-dim); max-width: 60ch; line-height: 1.6; font-size: 1rem; }
   .foot-note em { color: var(--bone); font-style: italic; }

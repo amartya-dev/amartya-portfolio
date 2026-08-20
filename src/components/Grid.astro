@@ -28,10 +28,10 @@ const marked = new Set(hit > 0 ? Array.from({ length: hit }, (_, i) => Math.floo
   .field { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: 2px; }
   .field i { display: block; aspect-ratio: 1; background: var(--paper-2); border: 1px solid var(--rule); }
   .field i.on { background: var(--fail); border-color: var(--fail); }
-  .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 14px; color: var(--mid); font-size: .7rem; letter-spacing: .04em; text-transform: none; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 14px; color: var(--mid); font-size: .7rem; letter-spacing: -.005em; text-transform: none; }
   .k { display: inline-flex; align-items: center; gap: 8px; }
   .sw { width: 9px; height: 9px; background: var(--paper-2); border: 1px solid var(--rule); display: inline-block; }
   .sw.on { background: var(--fail); border-color: var(--fail); }
-  .note { margin-top: 14px; color: var(--mid); font-size: .86rem; line-height: 1.7; max-width: 62ch; }
+  .note { margin-top: 14px; color: var(--mid); font-size: var(--t-label); line-height: 1.7; max-width: 62ch; }
   @media (max-width: 620px) { .field { --cols: 30 !important; } }
 </style>

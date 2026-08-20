@@ -76,7 +76,7 @@
   .units { border: 1px solid var(--rule); background: var(--paper); }
   .term {
     display: flex; align-items: center; gap: 14px; padding: 18px 20px;
-    font-family: var(--mono); font-size: .82rem; color: var(--ink);
+    font-family: var(--mono); font-size: var(--t-label); color: var(--ink);
   }
   .spin { color: var(--pass); width: 1ch; }
   .label { color: var(--mid); }
@@ -88,8 +88,8 @@
   .ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 13px 20px; border-top: 1px solid var(--rule); background: var(--paper-2); }
   .tog { font: inherit; cursor: pointer; background: var(--paper); border: 1px solid var(--rule); padding: 9px 14px; color: var(--ink-2); }
   .tog:hover { border-color: var(--ink); }
-  .tog code { font-family: var(--mono); font-size: .72rem; }
+  .tog code { font-family: var(--mono); font-size: var(--t-label); }
   .tog b { color: var(--pass); font-weight: 500; }
   .tog[aria-pressed='false'] b { color: var(--fail-ink); }
-  .div { color: var(--mid); text-transform: none; letter-spacing: .04em; }
+  .div { color: var(--mid); text-transform: none; letter-spacing: -.005em; }
 </style>

@@ -99,7 +99,7 @@ const LINKS = [
     color: var(--bone); margin-bottom: var(--s-3);
   }
 
-  .say p { font-size: 1.04rem; line-height: 1.62; color: var(--bone-2); }
+  .say p { font-size: var(--t-body); line-height: 1.62; color: var(--bone-2); }
   .say p + p { margin-top: .9em; }
   .quiet { color: var(--bone-dim) !important; }
   .say a { color: var(--bone); }
@@ -123,7 +123,7 @@ const LINKS = [
   /* The rule runs off the right edge with the film, and past the last label,
      because 2026 is not the end of the scale. */
   .scale .tickrule { width: auto; margin-right: calc(50% - 50vw); }
-  .years { display: flex; justify-content: space-between; margin-top: 7px; color: var(--bone-dim); font-size: .69rem; letter-spacing: .06em; }
+  .years { display: flex; justify-content: space-between; margin-top: 7px; color: var(--bone-dim); font-size: var(--t-micro); letter-spacing: -.005em; }
 
   @media (max-width: 1000px) {
     .hero-in { grid-template-columns: 1fr; gap: var(--s-4); padding-block: 108px 46px; }

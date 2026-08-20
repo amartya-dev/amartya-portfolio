@@ -388,7 +388,7 @@ const OPENERS = [
   .head {
     display: flex; align-items: center; gap: 10px; padding: 13px 20px;
     border-bottom: 1px solid var(--rule-dark); background: var(--void-2);
-    font-family: var(--mono); font-size: .72rem; letter-spacing: .02em;
+    font-family: var(--mono); font-size: var(--t-label); letter-spacing: -.005em;
   }
   .live { width: 7px; height: 7px; border-radius: 50%; background: var(--pass-lit); flex: none; }
   .who { color: var(--bone); }
@@ -404,11 +404,11 @@ const OPENERS = [
   .log :global(.turn.you) {
     justify-self: end; max-width: 46ch; background: var(--void-3); color: var(--bone);
     border: 1px solid var(--rule-dark-2); border-radius: var(--r); border-bottom-right-radius: var(--r-sm);
-    padding: 12px 17px; font-family: var(--mono); font-size: .76rem; letter-spacing: .02em; line-height: 1.5;
+    padding: 12px 17px; font-family: var(--mono); font-size: var(--t-label); letter-spacing: -.005em; line-height: 1.5;
   }
   .log :global(.turn.you p) { margin: 0; }
 
-  .log :global(.cb) { color: var(--bone-2); font-size: 1.04rem; line-height: 1.62; max-width: 70ch; margin: 0; }
+  .log :global(.cb) { color: var(--bone-2); font-size: var(--t-body); line-height: 1.62; max-width: 70ch; margin: 0; }
   .log :global(.quoted) { color: var(--bone-dim); font-size: .94rem; border-left: 1px solid var(--rule-dark); padding-left: 15px; }
   .log :global(.stream::after) {
     content: ''; display: inline-block; width: .5em; height: 1.05em; margin-left: 3px; vertical-align: -.16em;
@@ -417,10 +417,10 @@ const OPENERS = [
   @keyframes askcaret { 50% { opacity: 0; } }
 
   .log :global(.trace) { display: grid; gap: 5px; }
-  .log :global(.step) { color: var(--bone-dim); font-size: .72rem; letter-spacing: .01em; text-transform: none; line-height: 1.6; margin: 0; }
+  .log :global(.step) { color: var(--bone-dim); font-size: var(--t-label); letter-spacing: .01em; text-transform: none; line-height: 1.6; margin: 0; }
   .log :global(.step)::before { content: '\00B7\00A0'; }
   .log :global(.step.bad) { color: var(--fail-lit); }
-  .log :global(.status) { color: var(--pass-lit); font-size: var(--t-micro); letter-spacing: .12em; }
+  .log :global(.status) { color: var(--pass-lit); font-size: var(--t-micro); letter-spacing: -.005em; }
   .log :global(.dots i) { animation: askblink 1.1s infinite; opacity: .25; font-style: normal; }
   .log :global(.dots i:nth-child(2)) { animation-delay: .18s; }
   .log :global(.dots i:nth-child(3)) { animation-delay: .36s; }
@@ -429,13 +429,13 @@ const OPENERS = [
   .log :global(.said) { display: grid; gap: 13px; justify-items: start; }
   .log :global(.said) :global(.cb) { justify-self: stretch; }
   .log :global(.said.no) { border-left: 2px solid var(--fail-lit); padding-left: 16px; }
-  .log :global(.verdict) { color: var(--pass-lit); text-transform: none; letter-spacing: .05em; font-size: .72rem; }
+  .log :global(.verdict) { color: var(--pass-lit); text-transform: none; letter-spacing: -.005em; font-size: var(--t-label); }
   .log :global(.verdict.no) { color: var(--fail-lit); }
 
   .log :global(.cites) { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .log :global(.clab) { color: var(--bone-dim); font-size: var(--t-micro); letter-spacing: .16em; margin-right: 4px; }
+  .log :global(.clab) { color: var(--bone-dim); font-size: var(--t-micro); letter-spacing: -.005em; margin-right: 4px; }
   .log :global(.cite) {
-    font-family: var(--mono); font-size: 0.69rem; letter-spacing: .04em; text-transform: none;
+    font-family: var(--mono); font-size: var(--t-micro); letter-spacing: -.005em; text-transform: none;
     color: var(--bone-2); text-decoration: none; border: 1px solid var(--rule-dark-2); padding: 6px 11px;
     transition: color .16s ease, border-color .16s ease;
   }
@@ -446,7 +446,7 @@ const OPENERS = [
   .log :global(.follows) { display: flex; flex-wrap: wrap; gap: 8px; }
   .log :global(.follows[hidden]) { display: none; }
   .suggest :global(.chip), .log :global(.chip) {
-    font: inherit; font-family: var(--mono); font-size: 0.69rem; letter-spacing: .04em; cursor: pointer;
+    font: inherit; font-family: var(--mono); font-size: var(--t-micro); letter-spacing: -.005em; cursor: pointer;
     background: none; border: 1px solid var(--rule-dark-2); border-radius: 999px;
     color: var(--bone-dim); padding: 8px 14px; text-align: left;
     transition: border-color .18s ease, color .18s ease, background-color .18s ease;
@@ -459,17 +459,17 @@ const OPENERS = [
   .log :global(.chip.hard:hover) { border-color: var(--fail-lit); color: var(--fail-lit); }
 
   .log :global(.fig) { margin: 0; display: grid; gap: 14px; padding: 16px 18px; width: 100%; background: var(--void-3); border: 1px solid var(--rule-dark-2); border-radius: var(--r-sm); }
-  .log :global(.figc) { color: var(--bone); font-family: var(--body); font-size: .98rem; letter-spacing: 0; text-transform: none; }
+  .log :global(.figc) { color: var(--bone); font-family: var(--body); font-size: var(--t-body); letter-spacing: 0; text-transform: none; }
   .log :global(.plot) { display: grid; gap: 8px; }
   .log :global(.prow) { display: grid; grid-template-columns: 152px minmax(0, 1fr) 200px; gap: 16px; align-items: center; }
-  .log :global(.pn) { color: var(--bone); font-size: .73rem; letter-spacing: .02em; text-transform: none; }
+  .log :global(.pn) { color: var(--bone); font-size: var(--t-label); letter-spacing: -.005em; text-transform: none; }
   .log :global(.pt) { height: 12px; background: var(--void-3); display: block; position: relative; }
   .log :global(.pt i) { display: block; height: 100%; width: var(--w); background: var(--c, var(--bone)); animation: askgrow .6s cubic-bezier(.2,.8,.2,1); transform-origin: left; }
-  .log :global(.pv) { color: var(--bone-dim); font-size: .72rem; letter-spacing: .02em; text-transform: none; }
+  .log :global(.pv) { color: var(--bone-dim); font-size: var(--t-label); letter-spacing: -.005em; text-transform: none; }
   .log :global(.tl .pt i) { position: absolute; left: var(--s); width: var(--w); min-width: 7px; background: var(--bone); animation: none; }
   .log :global(.tl .pt i.side) { background: none; border: 1px solid var(--bone-3); }
   .log :global(.tl .pt i.now) { background: var(--pass-lit); border: 0; }
-  .log :global(.pax) { display: flex; justify-content: space-between; color: var(--bone-dim); font-size: .69rem; letter-spacing: .04em; text-transform: none; margin: 2px 0 0; padding: 0 200px 0 168px; }
+  .log :global(.pax) { display: flex; justify-content: space-between; color: var(--bone-dim); font-size: var(--t-micro); letter-spacing: -.005em; text-transform: none; margin: 2px 0 0; padding: 0 200px 0 168px; }
   .log :global(.dropped) { color: var(--fail-lit); font-size: var(--t-micro); letter-spacing: .1em; text-transform: none; }
   @keyframes askgrow { from { transform: scaleX(0); } }
 
@@ -481,7 +481,7 @@ const OPENERS = [
   .bar:focus-within { border-color: var(--pass-lit); }
   .bar input {
     flex: 1; min-width: 0; background: none; border: 0; color: var(--bone);
-    font: inherit; font-size: 1.02rem; padding: 12px 0;
+    font: inherit; font-size: var(--t-body); padding: 12px 0;
   }
   .bar input::placeholder { color: var(--bone-3); }
   .bar input:focus { outline: none; }
@@ -498,7 +498,7 @@ const OPENERS = [
   @keyframes askspin { to { transform: rotate(360deg); } }
 
   .reset {
-    font: inherit; font-family: var(--mono); font-size: .7rem; letter-spacing: .04em;
+    font: inherit; font-family: var(--mono); font-size: .7rem; letter-spacing: -.005em;
     background: none; border: 0; color: var(--bone-dim); cursor: pointer; padding: 8px 4px; flex: none;
   }
   .reset:hover { color: var(--bone); }

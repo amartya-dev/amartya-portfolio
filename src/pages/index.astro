@@ -177,17 +177,17 @@ const FILTERS = [
 
   .panel { margin-top: var(--s-4); border: 1px solid var(--rule); border-radius: var(--r); overflow: hidden; background: var(--paper-2); }
   .axis { position: relative; height: 28px; margin-left: 280px; border-bottom: 1px solid var(--rule); color: var(--mid); }
-  .axis span { position: absolute; left: calc(var(--t) * 100%); top: 8px; padding-left: 8px; border-left: 1px solid var(--rule); height: 20px; line-height: 1; font-size: 0.69rem; }
+  .axis span { position: absolute; left: calc(var(--t) * 100%); top: 8px; padding-left: 8px; border-left: 1px solid var(--rule); height: 20px; line-height: 1; font-size: var(--t-micro); }
   .span + .span { border-top: 1px solid var(--rule); }
   .span-row { display: grid; grid-template-columns: 280px 1fr auto; gap: 16px; align-items: center; padding: 16px 20px 16px 0; }
   .sl { display: flex; flex-direction: column; gap: 3px; padding-left: 20px; }
-  .sl b { font-family: var(--display); font-weight: 640; font-size: 1.08rem; line-height: 1.2; letter-spacing: -.018em; }
+  .sl b { font-family: var(--display); font-weight: 640; font-size: 1.0625rem; line-height: 1.2; letter-spacing: -.018em; }
   .sl i { font-style: normal; color: var(--mid); font-size: var(--t-small); line-height: 1.35; }
   .plot { position: relative; height: 12px; }
   .bar { position: absolute; inset-block: 0; left: calc(var(--s) * 100%); width: calc((var(--e) - var(--s)) * 100%); background: var(--ink); }
   .side .bar { background: none; border: 1px solid var(--ink); }
   .live .bar { background: var(--pass); }
-  .dur { color: var(--mid); font-size: 0.69rem; }
+  .dur { color: var(--mid); font-size: var(--t-micro); }
 
   .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--s-5); }
   .chip { font: inherit; cursor: pointer; background: var(--paper-2); color: var(--mid); border: 1px solid var(--rule); border-radius: 999px; padding: 8px 16px; transition: all .18s ease; }
@@ -198,8 +198,8 @@ const FILTERS = [
   /* A rule and a label where each group starts, so the list reads as three lists. */
   .proj[data-first]::before {
     display: block; content: attr(data-first);
-    font-family: var(--mono); font-size: 0.69rem; letter-spacing: .16em; text-transform: uppercase;
-    color: var(--fail-ink); padding: 30px 0 12px;
+    font-size: var(--t-label); font-weight: 550; letter-spacing: -.005em;
+    color: var(--mid); padding: 34px 0 12px;
   }
   .proj[data-first='agents']::before { content: 'Agent systems'; }
   .proj[data-first='infra']::before { content: 'Infrastructure'; }
@@ -217,7 +217,7 @@ const FILTERS = [
   }
   .proj summary::-webkit-details-marker { display: none; }
   .proj summary::after {
-    content: "+"; font-family: var(--mono); font-size: .95rem; line-height: 1;
+    content: "+"; font-family: var(--mono); font-size: var(--t-small); line-height: 1;
     color: var(--mid); justify-self: end; transition: color .15s ease;
   }
   .proj[open] summary::after { content: "\2212"; color: var(--fail); }
@@ -225,7 +225,7 @@ const FILTERS = [
   .proj summary:hover { background: var(--paper-2); }
   .proj summary:hover .p-name { color: var(--fail); }
   .proj[open] summary { padding-bottom: 8px; }
-  .p-name { font-size: 1.24rem; line-height: 1.08; transition: color .15s ease; }
+  .p-name { font-size: 1.0625rem; line-height: 1.08; transition: color .15s ease; }
   .p-hook { color: var(--ink-2); font-size: var(--t-body); }
   .p-meta { color: var(--mid); font-size: var(--t-micro); }
   .p-year { color: var(--mid); font-size: var(--t-micro); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -237,21 +237,21 @@ const FILTERS = [
   a.p-name:hover { color: var(--fail); }
   .ext { font-size: .5em; opacity: .55; }
   .p-status {
-    justify-self: start; padding: 3px 9px; font-size: 0.69rem; white-space: nowrap; border-radius: var(--r-sm);
+    justify-self: start; padding: 3px 9px; font-size: var(--t-micro); white-space: nowrap; border-radius: var(--r-sm);
     border: 1px solid var(--rule); background: var(--paper-2); color: var(--mid); line-height: 1.5;
   }
   .p-status[data-s^='Live'], .p-status[data-s^='In production'], .p-status[data-s^='Shipped'] { border-color: var(--pass); color: var(--pass); }
   .p-status[data-s^='Merged'] { border-color: var(--ink); color: var(--ink); }
   .p-status[data-s^='Unpublished'], .p-status[data-s^='Private'] { border-style: dashed; }
-  .p-body p { color: var(--ink-2); font-size: .98rem; max-width: 68ch; }
+  .p-body p { color: var(--ink-2); font-size: var(--t-body); max-width: 68ch; }
   .p-widget { margin-top: 20px; max-width: 560px; }
-  .early { margin-top: var(--s-4); color: var(--mid); text-transform: none; letter-spacing: .03em; max-width: 70ch; line-height: 1.75; font-size: var(--t-small); }
+  .early { margin-top: var(--s-4); color: var(--mid); text-transform: none; letter-spacing: -.005em; max-width: 70ch; line-height: 1.75; font-size: var(--t-small); }
 
   .posts { border-top: 1px solid var(--rule-dark); margin-top: clamp(30px, 4vw, 48px); }
   .posts li { border-bottom: 1px solid var(--rule-dark); }
   .posts a { display: grid; grid-template-columns: minmax(0, 1fr) 190px; gap: 40px; align-items: center; padding: 26px 0; text-decoration: none; }
   .p-body { display: grid; gap: 9px; max-width: 58ch; }
-  .p-date { color: var(--bone-dim); font-size: .72rem; letter-spacing: .02em; text-transform: none; }
+  .p-date { color: var(--bone-dim); font-size: var(--t-label); letter-spacing: -.005em; text-transform: none; }
   .p-title { font-family: var(--display); font-weight: 700; font-stretch: 112%; text-transform: uppercase; letter-spacing: -.015em; font-size: 1.3rem; line-height: 1.08; color: var(--bone); transition: color .2s ease; }
   .posts a:hover .p-title { color: var(--pass-lit); text-decoration: underline; text-underline-offset: .16em; }
   .p-blurb { color: var(--bone-dim); font-size: var(--t-small); }

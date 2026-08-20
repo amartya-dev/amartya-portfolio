@@ -203,7 +203,7 @@ def take(key):
   .sol-h { color: var(--bone-dim); display: flex; gap: 10px; margin-bottom: 12px; }
   .sol-h b { color: var(--bone); font-weight: 500; }
   .code {
-    margin: 0; font-family: var(--mono); font-size: .74rem; line-height: 1.75;
+    margin: 0; font-family: var(--mono); font-size: var(--t-label); line-height: 1.75;
     color: var(--bone-dim); white-space: pre; overflow-x: auto;
   }
 
@@ -221,9 +221,9 @@ def take(key):
   .pip { width: 7px; height: 7px; background: var(--rule-dark-2); }
   .pip.sep { background: var(--pass-lit); }
   .pip.same, .pip.both { background: var(--rule-dark-2); }
-  .tname { font-size: .92rem; color: var(--bone-2); }
-  .tres { display: flex; gap: 12px; font-size: 0.69rem; }
-  .tres b { font-weight: 500; letter-spacing: .06em; color: var(--bone-dim); min-width: 32px; text-align: right; }
+  .tname { font-size: var(--t-small); color: var(--bone-2); }
+  .tres { display: flex; gap: 12px; font-size: var(--t-micro); }
+  .tres b { font-weight: 500; letter-spacing: -.005em; color: var(--bone-dim); min-width: 32px; text-align: right; }
   .tres .ok { color: var(--pass-lit); }
   .tres .no { color: var(--fail-lit); }
   .test[hidden] { display: none; }
@@ -231,7 +231,7 @@ def take(key):
   .verdict { margin-top: 22px; border-top: 1px solid var(--rule-dark); padding-top: 20px; }
   .verdict-word { font-size: clamp(2rem, 5vw, 3.2rem); color: var(--pass-lit); }
   .verdict[data-state='fail'] .verdict-word { color: var(--fail-lit); }
-  .verdict-why { color: var(--bone-dim); margin-top: 10px; text-transform: none; letter-spacing: .03em; }
+  .verdict-why { color: var(--bone-dim); margin-top: 10px; text-transform: none; letter-spacing: -.005em; }
 
   .rig-foot {
     display: flex; flex-wrap: wrap; align-items: center; gap: 16px 26px;
@@ -239,7 +239,7 @@ def take(key):
   }
   .run {
     position: relative; overflow: hidden; cursor: pointer;
-    font-family: var(--mono); font-size: .74rem; letter-spacing: .12em; text-transform: uppercase;
+    font-family: var(--mono); font-size: var(--t-label); letter-spacing: -.005em; text-transform: uppercase;
     background: var(--bone); color: var(--void); border: 0; padding: 13px 26px;
   }
   .run:hover { background: var(--pass-lit); }
@@ -247,7 +247,7 @@ def take(key):
   .rig.running .run-bar { width: 100%; transition: width 1.6s linear; }
   .rig.running .run { pointer-events: none; opacity: .7; }
 
-  .weaken { display: flex; align-items: center; gap: 10px; color: var(--bone-dim); cursor: pointer; text-transform: none; letter-spacing: .03em; }
+  .weaken { display: flex; align-items: center; gap: 10px; color: var(--bone-dim); cursor: pointer; text-transform: none; letter-spacing: -.005em; }
   .weaken input { accent-color: var(--fail-lit); width: 15px; height: 15px; }
 
   .gate-note { margin-top: 26px; color: var(--bone-dim); max-width: 58ch; line-height: 1.6; font-size: 1rem; }

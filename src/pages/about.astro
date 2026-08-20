@@ -90,7 +90,7 @@ const hasMedia = photos.length > 0 || videos.length > 0;
   .cols { display: grid; gap: clamp(34px, 4vw, 56px); margin-top: clamp(48px, 6vw, 80px); border-top: 1px solid var(--rule); padding-top: 36px; }
   @media (min-width: 900px) { .cols { grid-template-columns: repeat(3, 1fr); } }
   .sub { color: var(--fail-ink); margin-bottom: 16px; }
-  .cols p { color: var(--ink-2); font-size: .98rem; }
+  .cols p { color: var(--ink-2); font-size: var(--t-body); }
   .cols p + p { margin-top: 1em; }
   .cols a { color: var(--fail-ink); }
 

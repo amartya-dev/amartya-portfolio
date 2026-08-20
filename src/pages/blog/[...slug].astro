@@ -30,9 +30,9 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long'
 <style>
   .post { padding-top: clamp(110px, 13vw, 180px); }
   .wrap { max-width: 880px; }
-  .back { color: var(--mid); display: inline-block; font-size: .78rem; letter-spacing: .02em; text-transform: none; }
+  .back { color: var(--mid); display: inline-block; font-size: var(--t-label); letter-spacing: -.005em; text-transform: none; }
   .back:hover { color: var(--ink); }
-  .meta { color: var(--mid); margin: var(--s-4) 0 var(--s-2); font-size: .78rem; letter-spacing: .02em; text-transform: none; }
+  .meta { color: var(--mid); margin: var(--s-4) 0 var(--s-2); font-size: var(--t-label); letter-spacing: -.005em; text-transform: none; }
   .post :global(.d-2) { font-size: clamp(1.9rem, 4.6vw, 3.5rem); }
   .stand { font-size: var(--t-lede); line-height: 1.42; color: var(--ink-2); font-style: italic; }
   .prose { margin-top: var(--s-5); }
@@ -49,7 +49,7 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long'
   .prose :global(ol > li) { padding-left: 30px; counter-increment: step; }
   .prose :global(ol > li)::before {
     content: counter(step); width: auto; height: auto; background: none; top: 0;
-    font-family: var(--mono); font-size: .72rem; color: var(--fail-ink); font-variant-numeric: tabular-nums;
+    font-family: var(--mono); font-size: var(--t-label); color: var(--fail-ink); font-variant-numeric: tabular-nums;
   }
   .prose :global(blockquote) {
     margin: 1.9em 0; padding: 4px 0 4px 24px; border-left: 2px solid var(--ink);
@@ -60,13 +60,13 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long'
   .prose :global(hr) { border: 0; border-top: 1px solid var(--rule); margin: 2.6em 0; }
   .prose :global(h3) {
     font-family: var(--display); font-weight: 700; font-stretch: 112%; text-transform: uppercase;
-    font-size: 1.02rem; letter-spacing: -.005em; margin: 2em 0 .7em; line-height: 1.15;
+    font-size: var(--t-body); letter-spacing: -.005em; margin: 2em 0 .7em; line-height: 1.15;
   }
   .prose :global(img) { margin: 1.9em 0; border: 1px solid var(--rule); }
   .prose :global(strong) { font-weight: 600; }
   .prose :global(code) { font-family: var(--mono); font-size: .82em; background: var(--paper-2); padding: 2px 5px; }
   .prose :global(pre) {
-    font-family: var(--mono); font-size: .78rem; line-height: 1.8; background: var(--void); color: var(--bone);
+    font-family: var(--mono); font-size: var(--t-label); line-height: 1.8; background: var(--void); color: var(--bone);
     padding: 22px 24px; overflow-x: auto; margin: 1.8em 0;
   }
   .prose :global(pre code) { background: none; padding: 0; font-size: inherit; }

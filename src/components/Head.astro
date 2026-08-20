@@ -30,7 +30,7 @@ const { title, fig, id } = Astro.props;
   /* Both columns start on the same line. Bottom-aligning them left a dead
      quadrant above the heading the width of half the band. */
   .aside { padding-top: .12em; }
-  .aside .lede { max-width: none; }
+  .aside .lede { max-width: none; font-size: var(--t-body); }
   .fig-no { margin: 14px 0 0; }
   @media (max-width: 900px) {
     .bandhead { grid-template-columns: 1fr; gap: var(--s-3); }

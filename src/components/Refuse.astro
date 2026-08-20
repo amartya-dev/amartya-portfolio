@@ -133,18 +133,18 @@ const maxReach = Math.max(...PLATFORMS.map((p) => p.reach));
   .log :global(.msg.in) { opacity: 1; transform: none; }
   .log :global(.you) {
     justify-self: end; max-width: 34ch; background: var(--ink); color: var(--paper);
-    padding: 11px 16px; font-family: var(--mono); font-size: .76rem; letter-spacing: .03em;
+    padding: 11px 16px; font-family: var(--mono); font-size: var(--t-label); letter-spacing: -.005em;
   }
   .log :global(.bot) { max-width: 62ch; font-size: 1rem; color: var(--ink-2); line-height: 1.55; }
-  .log :global(.bot.mono) { font-family: var(--mono); font-size: .76rem; color: var(--mid); letter-spacing: .03em; }
+  .log :global(.bot.mono) { font-family: var(--mono); font-size: var(--t-label); color: var(--mid); letter-spacing: -.005em; }
   .log :global(.refuse) { border-left: 3px solid var(--fail); padding-left: 16px; }
   .log :global(.nudge) { border-left: 3px solid var(--pass); padding-left: 16px; }
   .log :global(.msg b) { color: var(--ink); font-weight: 600; }
-  .log :global(.hint) { color: var(--mid); font-size: .92rem; }
-  .log :global(.rules) { display: grid; gap: 5px; margin-top: 12px; font-family: var(--mono); font-size: .7rem; letter-spacing: .03em; color: var(--mid); }
+  .log :global(.hint) { color: var(--mid); font-size: var(--t-small); }
+  .log :global(.rules) { display: grid; gap: 5px; margin-top: 12px; font-family: var(--mono); font-size: .7rem; letter-spacing: -.005em; color: var(--mid); }
   .log :global(.rules b) { display: inline-block; min-width: 130px; font-weight: 500; color: var(--ink-2); }
   .log :global(.bars) { display: grid; gap: 7px; margin-top: 6px; }
-  .log :global(.bar-row) { display: grid; grid-template-columns: 130px 1fr 74px; gap: 12px; align-items: center; font-family: var(--mono); font-size: .7rem; letter-spacing: .03em; }
+  .log :global(.bar-row) { display: grid; grid-template-columns: 130px 1fr 74px; gap: 12px; align-items: center; font-family: var(--mono); font-size: .7rem; letter-spacing: -.005em; }
   .log :global(.bar-t) { height: 11px; background: var(--paper-2); display: block; }
   .log :global(.bar-t i) { display: block; height: 100%; width: var(--w); background: var(--ink); animation: grow .7s cubic-bezier(.2,.8,.2,1); transform-origin: left; }
   .log :global(.bar-v) { text-align: right; color: var(--mid); }
@@ -152,14 +152,14 @@ const maxReach = Math.max(...PLATFORMS.map((p) => p.reach));
 
   .asks { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 20px; border-top: 1px solid var(--rule); background: var(--paper-2); }
   .q {
-    font: inherit; font-family: var(--mono); font-size: .72rem; letter-spacing: .04em; cursor: pointer;
+    font: inherit; font-family: var(--mono); font-size: var(--t-label); letter-spacing: -.005em; cursor: pointer;
     background: var(--paper); border: 1px solid var(--rule); color: var(--ink-2); padding: 9px 14px;
     transition: all .18s ease;
   }
   .q:hover:not(:disabled) { border-color: var(--ink); }
   .q:disabled { opacity: .45; cursor: default; }
   .q.done { color: var(--mid); border-style: dashed; }
-  .src { margin-top: 18px; color: var(--mid); text-transform: none; letter-spacing: .03em; max-width: 62ch; line-height: 1.7; }
+  .src { margin-top: 18px; color: var(--mid); text-transform: none; letter-spacing: -.005em; max-width: 62ch; line-height: 1.7; }
 
   @media (max-width: 620px) {
     .log :global(.bar-row) { grid-template-columns: 96px 1fr 62px; gap: 8px; }

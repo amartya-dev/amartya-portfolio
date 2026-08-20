@@ -50,7 +50,7 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long'
     align-items: center; padding: 30px 0; text-decoration: none;
   }
   .body { display: grid; gap: 10px; max-width: 60ch; }
-  .date { color: var(--mid); font-family: var(--mono); font-size: .72rem; letter-spacing: .02em; }
+  .date { color: var(--mid); font-family: var(--mono); font-size: var(--t-label); letter-spacing: -.005em; }
   .title { transition: color .18s ease; }
   .list a:hover .title { color: var(--fail-ink); text-decoration: underline; text-underline-offset: .16em; }
   .blurb { color: var(--ink-2); font-size: var(--t-small); line-height: 1.6; }

@@ -15,7 +15,7 @@
   --paper-3: #DCE2E7;  /* wells, empty track */
   --ink: #11151A;
   --ink-2: #3A434D;
-  --mid: #67717C;
+  --mid: #59636E;
   --rule: #CFD6DC;
 
   /* dark bands, layered: base, surface, raised */
@@ -25,7 +25,7 @@
   --bone: #E9EBEE;
   --bone-dim: #9BA3AF;
   --bone-2: #CBD1D9;
-  --bone-3: #7A828E;
+  --bone-3: #868E9A;
   --rule-dark: #1F242D;
   --rule-dark-2: #2B323D;
 
@@ -45,8 +45,12 @@
   --amber: #E8A33D;
   --azure: #58A6FF;
 
-  --display: "Archivo", "Helvetica Neue", sans-serif;
-  --body: "Newsreader", Georgia, serif;
+  /* One family, several weights, the way the product sites this is measured
+     against do it. A serif body at 17px reads as an essay; the brief is a
+     product site, and every reference (Linear, Vercel, Resend) sets its body in
+     a neutral sans at 16px on a 24px line. */
+  --display: "Geist", "Inter", -apple-system, system-ui, sans-serif;
+  --body: "Geist", "Inter", -apple-system, system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
 
   --wrap: 1280px;
@@ -57,12 +61,15 @@
   --r: 10px;
   --r-sm: 6px;
 
-  /* type */
-  --t-body: 1.0625rem;
-  --t-small: .95rem;
-  --t-lede: clamp(1.2rem, 1.5vw, 1.42rem);
-  --t-label: .7rem;
-  --t-micro: .69rem;
+  /* Type, deliberately bimodal. One large display size, then a short ramp of
+     small ones. The old scale ran 17 / 19 / 23 / 26 / 34px, which is five sizes
+     close enough together to read as one size, and that is what "no hierarchy"
+     meant. */
+  --t-body: 1rem;        /* 16 / 24 */
+  --t-small: .875rem;    /* 14 */
+  --t-lede: 1.25rem;     /* 20 / 32 */
+  --t-label: .8125rem;   /* 13 */
+  --t-micro: .75rem;     /* 12 */
 
   /* vertical rhythm */
   --s-1: 8px;
@@ -83,7 +90,8 @@ body {
   color: var(--ink);
   font-family: var(--body);
   font-size: var(--t-body);
-  line-height: 1.6;
+  line-height: 1.5;
+  letter-spacing: -.006em;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
@@ -95,24 +103,20 @@ img { max-width: 100%; display: block; }
 .chamber :focus-visible { outline-color: var(--pass-lit); }
 
 .wrap { width: 100%; max-width: var(--wrap); margin-inline: auto; padding-inline: var(--gut); }
-.mono { font-family: var(--mono); font-size: var(--t-label); letter-spacing: .09em; text-transform: uppercase; }
+/* Mono is for data and code. It stopped being a costume: no capitals, no
+   wide tracking, at a size you read rather than decode. */
+.mono { font-family: var(--mono); font-size: var(--t-label); letter-spacing: -.01em; }
 .serif-i { font-style: italic; }
 
 /* Archivo carries every heading. Expanded width is the signature. */
 /* Archivo carries every heading, at a weight and width you can read rather than
    one you have to survive. It used to be 800 at 118% width in capitals, which is
    a poster treatment applied to every heading on the page at once. */
-.d {
-  font-family: var(--display);
-  font-weight: 620;
-  font-stretch: 100%;
-  letter-spacing: -.021em;
-  line-height: 1.04;
-}
-.d-1 { font-size: clamp(2.4rem, 6vw, 5rem); font-weight: 660; letter-spacing: -.028em; margin-bottom: var(--s-4); }
-.d-2 { font-size: clamp(1.95rem, 3.6vw, 3.1rem); font-weight: 650; letter-spacing: -.026em; margin-bottom: var(--s-3); }
-.d-sec { font-size: clamp(1.55rem, 2.3vw, 2.15rem); font-weight: 640; letter-spacing: -.024em; margin-bottom: var(--s-2); }
-.d-3 { font-size: clamp(1.14rem, 1.55vw, 1.32rem); font-weight: 620; letter-spacing: -.014em; line-height: 1.24; margin-bottom: var(--s-2); }
+.d { font-family: var(--display); font-weight: 560; letter-spacing: -.026em; line-height: 1.06; }
+.d-1 { font-size: clamp(2.5rem, 5.2vw, 4.25rem); letter-spacing: -.034em; line-height: 1.02; margin-bottom: var(--s-4); }
+.d-2 { font-size: clamp(1.75rem, 2.6vw, 2.25rem); letter-spacing: -.028em; line-height: 1.12; margin-bottom: var(--s-3); }
+.d-sec { font-size: clamp(1.6rem, 2.3vw, 2rem); letter-spacing: -.026em; line-height: 1.14; margin-bottom: var(--s-2); }
+.d-3 { font-size: 1.0625rem; font-weight: 550; letter-spacing: -.014em; line-height: 1.35; margin-bottom: var(--s-2); }
 /* Headings own the space beneath them. Nothing downstream adds its own margin-top. */
 .lede { margin-top: 0; }
 
@@ -131,15 +135,13 @@ a:hover { text-decoration-thickness: 2px; }
 
 /* chambers ---------------------------------------------------------------- */
 .chamber { background: var(--void); color: var(--bone); position: relative; }
-/* A faint plotting grid, so the dark bands read as a surface rather than a void. */
+/* A soft light source instead of graph paper. The grid read as a fax artefact
+   at this scale, and none of the references this is measured against use one. */
 .chamber::before {
   content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
-  background-image:
-    linear-gradient(to right, rgba(255,255,255,.028) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,.028) 1px, transparent 1px);
-  background-size: 26px 26px;
-  -webkit-mask-image: radial-gradient(120% 90% at 50% 40%, #000 30%, transparent 85%);
-  mask-image: radial-gradient(120% 90% at 50% 40%, #000 30%, transparent 85%);
+  background:
+    radial-gradient(70% 55% at 50% -10%, rgba(53, 224, 138, .045), transparent 62%),
+    radial-gradient(52% 44% at 88% 6%, rgba(88, 166, 255, .04), transparent 60%);
 }
 .chamber > * { position: relative; z-index: 1; }
 .chamber ::selection { background: var(--pass-lit); color: var(--void); }
@@ -149,10 +151,10 @@ a:hover { text-decoration-thickness: 2px; }
 .sec { padding-block: var(--s-6); }
 /* Section labels used to be 10px uppercase mono. That is a size you look at,
    not a size you read. They are sentences now. */
-.eyebrow { color: var(--mid); margin-bottom: var(--s-2); font-family: var(--body); font-size: var(--t-small); letter-spacing: 0; text-transform: none; }
+.eyebrow { color: var(--mid); margin-bottom: var(--s-2); font-size: var(--t-label); font-weight: 500; }
 .chamber .eyebrow { color: var(--bone-dim); }
 
-.lede { font-size: var(--t-lede); line-height: 1.42; max-width: 38ch; color: var(--ink-2); }
+.lede { font-size: var(--t-lede); line-height: 1.6; max-width: 42ch; color: var(--ink-2); }
 .chamber .lede { color: var(--bone-dim); }
 
 /* reveal ------------------------------------------------------------------ */
@@ -176,7 +178,7 @@ a:hover { text-decoration-thickness: 2px; }
 .top[data-stuck] { background: color-mix(in oklab, var(--void) 92%, transparent); border-bottom-color: var(--rule-dark); backdrop-filter: blur(10px); }
 .top[data-stuck][data-over='light'] { background: color-mix(in oklab, var(--paper) 92%, transparent); border-bottom-color: var(--rule); }
 .top[data-hidden] { transform: translateY(-100%); }
-.top-in { display: flex; align-items: center; justify-content: space-between; height: 62px; gap: 20px; }
+.top-in { display: flex; align-items: center; justify-content: space-between; height: 62px; gap: 20px; font-family: var(--body); font-size: var(--t-small); font-weight: 480; letter-spacing: -.008em; }
 .top a { text-decoration: none; }
 .top .nav { display: flex; gap: clamp(14px, 2.4vw, 30px); }
 .top .nav a { opacity: .68; transition: opacity .18s ease; }
@@ -186,7 +188,7 @@ a:hover { text-decoration-thickness: 2px; }
 
 /* footer ------------------------------------------------------------------ */
 .foot { border-top: 1px solid var(--rule-dark); }
-.foot-in { display: flex; flex-wrap: wrap; gap: 14px 32px; justify-content: space-between; padding-block: 26px; color: var(--bone-dim); }
+.foot-in { display: flex; flex-wrap: wrap; gap: 14px 32px; justify-content: space-between; padding-block: 26px; color: var(--bone-dim); font-family: var(--body); font-size: var(--t-small); }
 
 .top .brand .short { display: none; }
 
@@ -229,16 +231,12 @@ a:hover { text-decoration-thickness: 2px; }
 }
 .light .plate-cap { color: var(--mid); }
 
-/* A graticule. Behind a plate it reads as chart paper, which is what the things
-   drawn on top of it actually are. */
+/* Kept as a hook so sections can carry a soft wash; no longer a grid. */
 .graticule {
   position: absolute; inset: 0; pointer-events: none; z-index: 0;
-  background-image:
-    linear-gradient(to right, var(--grat, rgba(255,255,255,.032)) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grat, rgba(255,255,255,.032)) 1px, transparent 1px);
-  background-size: 26px 26px;
+  background: radial-gradient(60% 50% at 50% 0%, rgba(88, 166, 255, .05), transparent 65%);
 }
-.light .graticule { --grat: rgba(10,10,11,.055); }
+.light .graticule { background: radial-gradient(62% 52% at 50% 0%, rgba(17, 21, 26, .035), transparent 66%); }
 
 /* A graduated rule. Used where the page needs an edge that means something:
    a scale, a boundary, the end of a band. */
