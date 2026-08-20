@@ -3,6 +3,8 @@ import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import Ask from '../components/Ask.astro';
 import Router from '../components/Router.astro';
+import Report from '../components/Report.astro';
+import Head from '../components/Head.astro';
 import Refuse from '../components/Refuse.astro';
 import Gate from '../components/Gate.astro';
 import Units from '../components/Units.astro';
@@ -28,13 +30,13 @@ const FILTERS = [
 
   <Ask />
   <Router />
+  <Report />
 
   <section id="work" class="light sec">
+    <div class="graticule" aria-hidden="true"></div>
     <div class="wrap">
-      <p class="mono eyebrow rv">The record</p>
-      <h2 class="d d-2 rv">Six years, five spans</h2>
-
-      <p class="fig-no rv">Fig. 04</p>
+      <Head title="Six years, five spans" fig="Fig. 05">Five overlapping spans, plotted against the same axis,
+        because a list of job titles hides which of them were running at once.</Head>
       <div class="figured panel rv">
         <div class="axis mono" aria-hidden="true">
           <span style="--t:0">2020</span><span style="--t:.1429">2021</span><span style="--t:.2857">2022</span
@@ -117,8 +119,8 @@ const FILTERS = [
 
   <section id="writing" class="chamber sec">
     <div class="wrap">
-      <p class="mono eyebrow rv">Writing</p>
-      <h2 class="d d-2 rv">Working notes</h2>
+      <Head title="Working notes">What I learned building the things above, including the parts that did not
+        work.</Head>
       <ul class="posts rv">
         {posts.map((p) => (
           <li>
@@ -139,9 +141,7 @@ const FILTERS = [
 
   <section id="contact" class="light sec section-end">
     <div class="wrap">
-      <p class="mono eyebrow rv">Contact</p>
-      <h2 class="d d-2 rv">What&rsquo;s breaking?</h2>
-      <p class="lede rv">Agents, evals, or the platform underneath. Either of those.</p>
+      <Head title="What&rsquo;s breaking?">Agents, evals, or the platform underneath. Any of those.</Head>
       <a class="d bigmail rv" href="mailto:amartya@hunr.ai">amartya@hunr.ai</a>
       <ul class="links mono rv">
         <li><a href="https://hunr.ai" rel="noopener">hunr.ai</a></li>
@@ -166,13 +166,22 @@ const FILTERS = [
 </Base>
 
 <style>
-  .panel { margin-top: var(--s-4); border: 1px solid var(--ink); }
+  /* The dark bands have carried a plotting grid from the start. The paper ones
+     did not, so the two halves of the page were not speaking with equal force. */
+  #work { position: relative; overflow: hidden; }
+  #work > * { position: relative; z-index: 1; }
+  #work > .graticule {
+    -webkit-mask-image: radial-gradient(90% 55% at 50% 22%, #000 5%, transparent 76%);
+    mask-image: radial-gradient(90% 55% at 50% 22%, #000 5%, transparent 76%);
+  }
+
+  .panel { margin-top: var(--s-4); border: 1px solid var(--rule); border-radius: var(--r); overflow: hidden; background: var(--paper-2); }
   .axis { position: relative; height: 28px; margin-left: 280px; border-bottom: 1px solid var(--rule); color: var(--mid); }
   .axis span { position: absolute; left: calc(var(--t) * 100%); top: 8px; padding-left: 8px; border-left: 1px solid var(--rule); height: 20px; line-height: 1; font-size: 0.69rem; }
   .span + .span { border-top: 1px solid var(--rule); }
   .span-row { display: grid; grid-template-columns: 280px 1fr auto; gap: 16px; align-items: center; padding: 16px 20px 16px 0; }
   .sl { display: flex; flex-direction: column; gap: 3px; padding-left: 20px; }
-  .sl b { font-family: var(--display); font-weight: 700; font-stretch: 112%; font-size: 1.16rem; line-height: 1.1; text-transform: uppercase; letter-spacing: -.012em; }
+  .sl b { font-family: var(--display); font-weight: 640; font-size: 1.08rem; line-height: 1.2; letter-spacing: -.018em; }
   .sl i { font-style: normal; color: var(--mid); font-size: var(--t-small); line-height: 1.35; }
   .plot { position: relative; height: 12px; }
   .bar { position: absolute; inset-block: 0; left: calc(var(--s) * 100%); width: calc((var(--e) - var(--s)) * 100%); background: var(--ink); }
@@ -181,7 +190,7 @@ const FILTERS = [
   .dur { color: var(--mid); font-size: 0.69rem; }
 
   .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--s-5); }
-  .chip { font: inherit; cursor: pointer; background: none; color: var(--mid); border: 1px solid var(--rule); padding: 9px 16px; transition: all .18s ease; }
+  .chip { font: inherit; cursor: pointer; background: var(--paper-2); color: var(--mid); border: 1px solid var(--rule); border-radius: 999px; padding: 8px 16px; transition: all .18s ease; }
   .chip:hover { border-color: var(--ink); color: var(--ink); }
   .chip[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 
@@ -228,8 +237,8 @@ const FILTERS = [
   a.p-name:hover { color: var(--fail); }
   .ext { font-size: .5em; opacity: .55; }
   .p-status {
-    justify-self: start; padding: 3px 8px; font-size: 0.69rem; white-space: nowrap;
-    border: 1px solid var(--rule); color: var(--mid); line-height: 1.5;
+    justify-self: start; padding: 3px 9px; font-size: 0.69rem; white-space: nowrap; border-radius: var(--r-sm);
+    border: 1px solid var(--rule); background: var(--paper-2); color: var(--mid); line-height: 1.5;
   }
   .p-status[data-s^='Live'], .p-status[data-s^='In production'], .p-status[data-s^='Shipped'] { border-color: var(--pass); color: var(--pass); }
   .p-status[data-s^='Merged'] { border-color: var(--ink); color: var(--ink); }

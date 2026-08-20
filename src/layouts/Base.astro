@@ -3,9 +3,14 @@ import '../styles/global.css';
 const {
   title = 'Amartya Gaur · AI systems engineer',
   description = 'Amartya Gaur builds the layer agents run on: orchestration that survives a failed tool call, evals that can fail a deploy, and the infrastructure under both. Founder of hunr.ai; five years in Newfold Digital\u2019s AI Center of Excellence.',
-  theme = 'chamber'
+  theme = 'chamber',
+  // Each post has a card drawn from its own figure, by scripts/og.mjs. Anything
+  // without one falls back to the site card rather than to nothing, because a
+  // shared link with no image is the version most people will see.
+  og = 'default'
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const image = new URL(`/og/${og}.png`, Astro.site);
 ---
 <!doctype html>
 <html lang="en">
@@ -19,7 +24,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 <meta property="og:description" content={description} />
 <meta property="og:type" content="website" />
 <meta property="og:url" content={canonical} />
+<meta property="og:image" content={image} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="Amartya Gaur" />
 <meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content={image} />
+<meta name="twitter:image:alt" content={title} />
 <meta name="color-scheme" content="dark light" />
 <link rel="alternate" type="application/rss+xml" title="Amartya Gaur" href="/rss.xml" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2308080A'/%3E%3Crect x='6' y='6' width='8' height='8' fill='%2335E08A'/%3E%3Crect x='18' y='6' width='8' height='8' fill='%2335E08A'/%3E%3Crect x='6' y='18' width='8' height='8' fill='%2335E08A'/%3E%3Crect x='18' y='18' width='8' height='8' fill='%23FF6244'/%3E%3C/svg%3E" />

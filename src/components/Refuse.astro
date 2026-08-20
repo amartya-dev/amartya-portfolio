@@ -1,4 +1,5 @@
 ---
+import Head from './Head.astro';
 const PLATFORMS = [
   { n: 'TikTok',         views: 1240000, reach: 402000, rule: 'the video starts' },
   { n: 'Instagram',      views: 412000,  reach: 180000, rule: 'a play, any length' },
@@ -12,12 +13,9 @@ const maxReach = Math.max(...PLATFORMS.map((p) => p.reach));
 ---
 <section id="refuse" class="light sec">
   <div class="wrap">
-    <p class="mono eyebrow rv">Ask this one</p>
-    <h2 class="d d-2 rv">A number is not a fact</h2>
-    <p class="lede rv">Six platforms, six different definitions of a &ldquo;view&rdquo;. Ask this one the obvious
-      question and it argues with you instead of answering.</p>
-
-    <p class="fig-no rv">Fig. 06</p>
+    <Head title="A number is not a fact" fig="Fig. 07">Six platforms, six different
+      definitions of a &ldquo;view&rdquo;. Ask this one the obvious question and it argues with you instead of
+      answering.</Head>
     <div class="figured chat rv" data-chat>
       <div class="log" data-log>
         <p class="msg bot mono">Ask me about last month. I know three questions, because this is a portfolio and not
@@ -129,7 +127,7 @@ const maxReach = Math.max(...PLATFORMS.map((p) => p.reach));
 </script>
 
 <style>
-  .chat { margin-top: clamp(34px, 4vw, 54px); border: 1px solid var(--ink); background: var(--paper); }
+  .chat { margin-top: clamp(34px, 4vw, 54px); border: 1px solid var(--rule); background: var(--paper-2); border-radius: var(--r); }
   .log { padding: 22px 20px; display: grid; gap: 12px; max-height: 520px; overflow-y: auto; }
   .log :global(.msg) { opacity: 0; transform: translateY(8px); transition: opacity .35s ease, transform .35s ease; }
   .log :global(.msg.in) { opacity: 1; transform: none; }

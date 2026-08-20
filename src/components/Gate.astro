@@ -1,4 +1,5 @@
 ---
+import Head from './Head.astro';
 const { bare = false } = Astro.props;
 // The task: stop a runaway program from calling something ten thousand times.
 // The first four checks are the ones anybody thinks of. The rest are the job.
@@ -16,16 +17,10 @@ const TESTS = [
 <section id="gate" class={bare ? 'embed gate' : 'chamber sec gate'}>
   <div class={bare ? '' : 'wrap'}>
     {!bare && (
-      <Fragment>
-        <p class="mono eyebrow rv">Run this one</p>
-        <h2 class="d d-2 rv">Can the marking tell them apart?</h2>
-        <p class="lede rv">Two people hand in the same task. One understood it; one wrote something that looks right.
-          If the marking cannot tell them apart, the marking is worthless, so I check that first, before any candidate
-          sees it.</p>
-      </Fragment>
+      <Head title="Can the marking tell them apart?" fig="Fig. 06">Two people hand in the
+        same task. One understood it; one wrote something that looks right. If the marking cannot tell them apart,
+        the marking is worthless, so I check that first, before any candidate sees it.</Head>
     )}
-
-    <p class="fig-no rv">Fig. 05</p>
     <div class="figured rig rv">
       <header class="rig-bar mono">
         <span class="rig-dot" aria-hidden="true"></span>
@@ -181,11 +176,12 @@ def take(key):
 <style>
   .gate .lede { max-width: 46ch; }
   .embed { display: block; margin: 2.4em 0; }
-  .embed .rig { margin-top: 0; }
+  .embed .rig { margin-top: 0;  border-radius: var(--r); overflow: hidden; }
   .rig {
     margin-top: clamp(38px, 5vw, 64px);
-    border: 1px solid var(--rule-dark);
+    border: 1px solid var(--rule-dark-2);
     background: var(--void-2);
+    border-radius: var(--r); overflow: hidden;
   }
   .rig-bar {
     display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
@@ -195,7 +191,10 @@ def take(key):
   .rig.running .rig-dot { background: var(--pass-lit); }
   .rig-meta { margin-left: auto; }
 
+  /* Grid items refuse to shrink below their content unless told, which let the
+     code block push the whole page sideways on a phone. */
   .rig-body { display: grid; }
+  .rig-body > *, .sol { min-width: 0; }
   @media (min-width: 940px) { .rig-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); } }
 
   .sols { border-right: 1px solid var(--rule-dark); }
@@ -205,7 +204,7 @@ def take(key):
   .sol-h b { color: var(--bone); font-weight: 500; }
   .code {
     margin: 0; font-family: var(--mono); font-size: .74rem; line-height: 1.75;
-    color: #9aa4b0; white-space: pre; overflow-x: auto;
+    color: var(--bone-dim); white-space: pre; overflow-x: auto;
   }
 
   .suite { padding: 20px 18px; }
@@ -219,12 +218,12 @@ def take(key):
   .test.ran { opacity: 1; }
   .test.head { opacity: 1; color: var(--bone-dim); padding-bottom: 7px; }
   .test.head .tres b { color: var(--bone-dim); }
-  .pip { width: 7px; height: 7px; background: #2a2a33; }
+  .pip { width: 7px; height: 7px; background: var(--rule-dark-2); }
   .pip.sep { background: var(--pass-lit); }
-  .pip.same, .pip.both { background: #3a3a45; }
-  .tname { font-size: .92rem; color: #c3c3cb; }
+  .pip.same, .pip.both { background: var(--rule-dark-2); }
+  .tname { font-size: .92rem; color: var(--bone-2); }
   .tres { display: flex; gap: 12px; font-size: 0.69rem; }
-  .tres b { font-weight: 500; letter-spacing: .06em; color: #55555f; min-width: 32px; text-align: right; }
+  .tres b { font-weight: 500; letter-spacing: .06em; color: var(--bone-dim); min-width: 32px; text-align: right; }
   .tres .ok { color: var(--pass-lit); }
   .tres .no { color: var(--fail-lit); }
   .test[hidden] { display: none; }
@@ -251,7 +250,7 @@ def take(key):
   .weaken { display: flex; align-items: center; gap: 10px; color: var(--bone-dim); cursor: pointer; text-transform: none; letter-spacing: .03em; }
   .weaken input { accent-color: var(--fail-lit); width: 15px; height: 15px; }
 
-  .gate-note { margin-top: 26px; color: #a8a8b2; max-width: 58ch; line-height: 1.6; font-size: 1rem; }
+  .gate-note { margin-top: 26px; color: var(--bone-dim); max-width: 58ch; line-height: 1.6; font-size: 1rem; }
 
   @media (max-width: 939px) { .sols { border-right: 0; border-bottom: 1px solid var(--rule-dark); } }
 </style>

@@ -33,14 +33,14 @@ const { src, poster, length = '', caption = '' } = Astro.props;
 
 <style>
   .plate { margin: 0; }
-  .frame { position: relative; background: #0b0b0e; overflow: hidden; }
+  .frame { position: relative; background: var(--void); overflow: hidden; }
   .frame video { width: 100%; display: block; aspect-ratio: 16 / 9; object-fit: cover; }
 
   .play {
     position: absolute; inset: 0; width: 100%; border: 0; cursor: pointer;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
     background: linear-gradient(180deg, rgba(8,8,10,.28), rgba(8,8,10,.55));
-    color: #f3f3f0; transition: background-color .25s ease, opacity .2s ease;
+    color: var(--paper); transition: background-color .25s ease, opacity .2s ease;
   }
   .playing .play { opacity: 0; pointer-events: none; }
 

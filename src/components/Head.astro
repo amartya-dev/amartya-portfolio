@@ -1,0 +1,40 @@
+---
+// One band head, used by every section on the home page.
+//
+// Each section used to open with the same tower: a small label, then a headline
+// set nearly as large as the page title, then a lede, then a figure number on
+// its own line, then the widget. Four of those in a row is a template, and it
+// cost about 250px of empty band each time. This lays the same information out
+// as a single row and lets the figure number ride along with the lede.
+//
+// There is no label above the heading. A heading that needs a word above it
+// explaining what kind of heading it is has not been written yet.
+const { title, fig, id } = Astro.props;
+---
+<div class="bandhead rv">
+  <div>
+    <h2 class="d d-sec" id={id}>{title}</h2>
+  </div>
+  <div class="aside">
+    <p class="lede"><slot /></p>
+    {fig && <p class="fig-no">{fig}</p>}
+  </div>
+</div>
+
+<style>
+  .bandhead {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 46ch);
+    gap: clamp(24px, 4vw, 62px); align-items: start;
+    margin-bottom: clamp(24px, 3vw, 38px);
+  }
+  /* Both columns start on the same line. Bottom-aligning them left a dead
+     quadrant above the heading the width of half the band. */
+  .aside { padding-top: .12em; }
+  .aside .lede { max-width: none; }
+  .fig-no { margin: 14px 0 0; }
+  @media (max-width: 900px) {
+    .bandhead { grid-template-columns: 1fr; gap: var(--s-3); }
+    .aside { padding-top: 0; }
+    .fig-no { display: none; }
+  }
+</style>

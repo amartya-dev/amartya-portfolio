@@ -1,4 +1,5 @@
 ---
+import Head from './Head.astro';
 // Ask the page. An agent with five tools, a catalogue of everything this site
 // holds, and no other way to reach you: prose it cannot source is rejected and
 // asked again in front of you, and chart numbers come from series this page counts
@@ -23,11 +24,8 @@ const OPENERS = [
 ---
 <section id="ask" class="chamber sec">
   <div class="wrap">
-    <p class="mono eyebrow rv">Ask</p>
-    <h2 class="d d-2 rv">Ask it. It has to cite.</h2>
-    <p class="lede rv">It will not tell you anything this page cannot back up.</p>
-
-    <p class="fig-no rv">Fig. 02</p>
+    <Head title="Ask it. It has to cite." fig="Fig. 02">It will not tell you anything this
+      page cannot back up.</Head>
     <div class="figured box rv" data-ask>
       <div class="head">
         <span class="live" aria-hidden="true"></span>
@@ -382,19 +380,19 @@ const OPENERS = [
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
   .box {
-    margin-top: clamp(30px, 3.5vw, 44px); border: 1px solid #2b2b35; background: var(--void-2);
+    margin-top: clamp(30px, 3.5vw, 44px); border: 1px solid var(--rule-dark-2); background: var(--void-2); border-radius: var(--r);
     display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto;
   }
 
   /* A strip that tells you what you are talking to, the way any chat window does. */
   .head {
     display: flex; align-items: center; gap: 10px; padding: 13px 20px;
-    border-bottom: 1px solid #23232c; background: #0d0d12;
+    border-bottom: 1px solid var(--rule-dark); background: var(--void-2);
     font-family: var(--mono); font-size: .72rem; letter-spacing: .02em;
   }
   .live { width: 7px; height: 7px; border-radius: 50%; background: var(--pass-lit); flex: none; }
   .who { color: var(--bone); }
-  .idx { margin-left: auto; color: #86868f; }
+  .idx { margin-left: auto; color: var(--bone-dim); }
 
   .suggest { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 16px; }
   .suggest[hidden] { display: none; }
@@ -404,13 +402,14 @@ const OPENERS = [
      their content say so themselves. */
   .log :global(.turn) { display: grid; gap: 13px; }
   .log :global(.turn.you) {
-    justify-self: end; max-width: 46ch; background: var(--bone); color: var(--void);
+    justify-self: end; max-width: 46ch; background: var(--void-3); color: var(--bone);
+    border: 1px solid var(--rule-dark-2); border-radius: var(--r); border-bottom-right-radius: var(--r-sm);
     padding: 12px 17px; font-family: var(--mono); font-size: .76rem; letter-spacing: .02em; line-height: 1.5;
   }
   .log :global(.turn.you p) { margin: 0; }
 
-  .log :global(.cb) { color: #ccccd4; font-size: 1.04rem; line-height: 1.62; max-width: 70ch; margin: 0; }
-  .log :global(.quoted) { color: #a0a0aa; font-size: .94rem; border-left: 1px solid var(--rule-dark); padding-left: 15px; }
+  .log :global(.cb) { color: var(--bone-2); font-size: 1.04rem; line-height: 1.62; max-width: 70ch; margin: 0; }
+  .log :global(.quoted) { color: var(--bone-dim); font-size: .94rem; border-left: 1px solid var(--rule-dark); padding-left: 15px; }
   .log :global(.stream::after) {
     content: ''; display: inline-block; width: .5em; height: 1.05em; margin-left: 3px; vertical-align: -.16em;
     background: var(--pass-lit); animation: askcaret 1s steps(1) infinite;
@@ -418,7 +417,7 @@ const OPENERS = [
   @keyframes askcaret { 50% { opacity: 0; } }
 
   .log :global(.trace) { display: grid; gap: 5px; }
-  .log :global(.step) { color: #86868f; font-size: .72rem; letter-spacing: .01em; text-transform: none; line-height: 1.6; margin: 0; }
+  .log :global(.step) { color: var(--bone-dim); font-size: .72rem; letter-spacing: .01em; text-transform: none; line-height: 1.6; margin: 0; }
   .log :global(.step)::before { content: '\00B7\00A0'; }
   .log :global(.step.bad) { color: var(--fail-lit); }
   .log :global(.status) { color: var(--pass-lit); font-size: var(--t-micro); letter-spacing: .12em; }
@@ -434,45 +433,49 @@ const OPENERS = [
   .log :global(.verdict.no) { color: var(--fail-lit); }
 
   .log :global(.cites) { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .log :global(.clab) { color: #86868f; font-size: var(--t-micro); letter-spacing: .16em; margin-right: 4px; }
+  .log :global(.clab) { color: var(--bone-dim); font-size: var(--t-micro); letter-spacing: .16em; margin-right: 4px; }
   .log :global(.cite) {
     font-family: var(--mono); font-size: 0.69rem; letter-spacing: .04em; text-transform: none;
-    color: #c8c8d0; text-decoration: none; border: 1px solid #2e2e38; padding: 6px 11px;
+    color: var(--bone-2); text-decoration: none; border: 1px solid var(--rule-dark-2); padding: 6px 11px;
     transition: color .16s ease, border-color .16s ease;
   }
   .log :global(.cite:hover) { color: var(--pass-lit); border-color: var(--pass-lit); }
-  .log :global(.cite.solo) { border-color: #4b2b26; color: #cf9a90; }
+  .log :global(.cite.solo) { border-color: color-mix(in oklab, var(--fail-lit) 24%, var(--void-2)); color: color-mix(in oklab, var(--fail-lit) 60%, var(--bone)); }
   .log :global(.cite.solo:hover) { color: var(--fail-lit); border-color: var(--fail-lit); }
 
   .log :global(.follows) { display: flex; flex-wrap: wrap; gap: 8px; }
   .log :global(.follows[hidden]) { display: none; }
-  .log :global(.chip) {
+  .suggest :global(.chip), .log :global(.chip) {
     font: inherit; font-family: var(--mono); font-size: 0.69rem; letter-spacing: .04em; cursor: pointer;
-    background: none; border: 1px dashed #33333d; color: #a0a0aa; padding: 8px 13px; text-align: left;
-    transition: all .18s ease;
+    background: none; border: 1px solid var(--rule-dark-2); border-radius: 999px;
+    color: var(--bone-dim); padding: 8px 14px; text-align: left;
+    transition: border-color .18s ease, color .18s ease, background-color .18s ease;
   }
-  .log :global(.chip:hover) { border-style: solid; border-color: var(--bone); color: var(--bone); }
-  .log :global(.chip.hard) { border-color: #533029; color: #cf9a90; }
+  .suggest :global(.chip:hover), .log :global(.chip:hover) {
+    border-color: color-mix(in oklab, var(--pass-lit) 45%, var(--rule-dark-2));
+    color: var(--bone); background: var(--void-3);
+  }
+  .log :global(.chip.hard) { border-color: color-mix(in oklab, var(--fail-lit) 28%, var(--void-2)); color: color-mix(in oklab, var(--fail-lit) 60%, var(--bone)); }
   .log :global(.chip.hard:hover) { border-color: var(--fail-lit); color: var(--fail-lit); }
 
-  .log :global(.fig) { margin: 0; display: grid; gap: 14px; border-left: 2px solid var(--pass-lit); padding-left: 16px; width: 100%; }
+  .log :global(.fig) { margin: 0; display: grid; gap: 14px; padding: 16px 18px; width: 100%; background: var(--void-3); border: 1px solid var(--rule-dark-2); border-radius: var(--r-sm); }
   .log :global(.figc) { color: var(--bone); font-family: var(--body); font-size: .98rem; letter-spacing: 0; text-transform: none; }
   .log :global(.plot) { display: grid; gap: 8px; }
   .log :global(.prow) { display: grid; grid-template-columns: 152px minmax(0, 1fr) 200px; gap: 16px; align-items: center; }
   .log :global(.pn) { color: var(--bone); font-size: .73rem; letter-spacing: .02em; text-transform: none; }
-  .log :global(.pt) { height: 12px; background: #1c1c25; display: block; position: relative; }
+  .log :global(.pt) { height: 12px; background: var(--void-3); display: block; position: relative; }
   .log :global(.pt i) { display: block; height: 100%; width: var(--w); background: var(--c, var(--bone)); animation: askgrow .6s cubic-bezier(.2,.8,.2,1); transform-origin: left; }
-  .log :global(.pv) { color: #9a9aa4; font-size: .72rem; letter-spacing: .02em; text-transform: none; }
+  .log :global(.pv) { color: var(--bone-dim); font-size: .72rem; letter-spacing: .02em; text-transform: none; }
   .log :global(.tl .pt i) { position: absolute; left: var(--s); width: var(--w); min-width: 7px; background: var(--bone); animation: none; }
-  .log :global(.tl .pt i.side) { background: none; border: 1px solid #7e7e8a; }
+  .log :global(.tl .pt i.side) { background: none; border: 1px solid var(--bone-3); }
   .log :global(.tl .pt i.now) { background: var(--pass-lit); border: 0; }
-  .log :global(.pax) { display: flex; justify-content: space-between; color: #86868f; font-size: .69rem; letter-spacing: .04em; text-transform: none; margin: 2px 0 0; padding: 0 200px 0 168px; }
+  .log :global(.pax) { display: flex; justify-content: space-between; color: var(--bone-dim); font-size: .69rem; letter-spacing: .04em; text-transform: none; margin: 2px 0 0; padding: 0 200px 0 168px; }
   .log :global(.dropped) { color: var(--fail-lit); font-size: var(--t-micro); letter-spacing: .1em; text-transform: none; }
   @keyframes askgrow { from { transform: scaleX(0); } }
 
   .bar {
     display: flex; align-items: center; gap: 10px; margin: 0 14px 14px; padding: 6px 6px 6px 16px;
-    border: 1px solid #2f2f3a; background: #101017;
+    border: 1px solid var(--rule-dark-2); background: var(--void-2); border-radius: var(--r);
     transition: border-color .18s ease;
   }
   .bar:focus-within { border-color: var(--pass-lit); }
@@ -480,28 +483,28 @@ const OPENERS = [
     flex: 1; min-width: 0; background: none; border: 0; color: var(--bone);
     font: inherit; font-size: 1.02rem; padding: 12px 0;
   }
-  .bar input::placeholder { color: #7e7e8a; }
+  .bar input::placeholder { color: var(--bone-3); }
   .bar input:focus { outline: none; }
   .bar input:disabled { opacity: .5; }
 
   .go {
     display: grid; place-items: center; width: 40px; height: 40px; flex: none; cursor: pointer;
-    background: var(--bone); color: var(--void); border: 0;
-    transition: background-color .18s ease, opacity .18s ease;
+    background: var(--pass-lit); color: var(--void); border: 0; border-radius: var(--r-sm);
+    transition: filter .18s ease, opacity .18s ease;
   }
-  .go:hover:not(:disabled) { background: var(--pass-lit); }
+  .go:hover:not(:disabled) { filter: brightness(1.12); }
   .go:disabled { opacity: .4; cursor: default; }
   .busy .go svg { animation: askspin 1s linear infinite; }
   @keyframes askspin { to { transform: rotate(360deg); } }
 
   .reset {
     font: inherit; font-family: var(--mono); font-size: .7rem; letter-spacing: .04em;
-    background: none; border: 0; color: #86868f; cursor: pointer; padding: 8px 4px; flex: none;
+    background: none; border: 0; color: var(--bone-dim); cursor: pointer; padding: 8px 4px; flex: none;
   }
   .reset:hover { color: var(--bone); }
 
   .lede { max-width: 48ch; }
-  .foot-line { margin-top: var(--s-3); color: #9a9aa4; font-size: var(--t-small); max-width: 62ch; line-height: 1.7; }
+  .foot-line { margin-top: var(--s-3); color: var(--bone-dim); font-size: var(--t-small); max-width: 62ch; line-height: 1.7; }
 
   @media (max-width: 760px) {
     .log { padding: 20px 18px; max-height: 520px; }

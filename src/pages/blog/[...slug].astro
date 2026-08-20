@@ -11,7 +11,7 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
-<Base title={`${post.data.title} · Amartya Gaur`} description={post.data.description} theme="light">
+<Base title={`${post.data.title} · Amartya Gaur`} description={post.data.description} theme="light" og={post.id}>
   <article class="light sec post">
     <div class="wrap">
       <a class="mono back" href="/blog">← Writing</a>

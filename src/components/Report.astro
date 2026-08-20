@@ -1,0 +1,68 @@
+---
+// The most honest asset a founder's site can carry is the product's own output.
+// This is a real frame of what hunr returns when it has finished grading
+// somebody, lifted out of the film, with leaders struck to the three decisions
+// in it that were mine. Drawn rather than described: a claim about judgement is
+// worth less than the artefact that shows it being exercised.
+import Head from './Head.astro';
+
+const PINS = [
+  { x: '7.2%',  y: '33.9%', len: '9%',    side: 'l',
+    t: 'The arithmetic is printed. A fit of 87 is a code score of 82 scaled by 0.94, and the page shows you that line rather than asserting the 87.' },
+  { x: '13.7%', y: '84.6%', len: '15%',   side: 'l',
+    t: 'Every sentence names the file and line it was read from, so a hiring manager can check the claim instead of trusting it.' },
+  { x: '96.4%', y: '68.9%', len: '7.6%',  side: '',
+    t: 'The weakest competency stays amber on the page. Nothing is rounded up into the headline number.' }
+];
+---
+<section id="now" class="light sec now">
+  <div class="graticule" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <Head title="What it returns" fig="Fig. 04">I have written <a href="https://hunr.ai" rel="noopener">hunr</a> on my own since August 2026.
+      It sets an engineer a real task, lets them use whatever agent they like, then makes them defend the code
+      afterwards. This is what it hands back.</Head>
+
+    <figure class="anno rv">
+      <div class="scroller">
+      <div class="shot figured">
+        <img src="/media/hunr/report.png" width="844" height="700" loading="lazy" decoding="async"
+          alt="A finished hunr report. A fit score of 87 beside a code score of 82 and an ownership score of 94; an executive summary; a line showing the fit score is the code score scaled by ownership; lists of strengths and risks; and a competency breakdown for error handling, API design and testing, each citing specific files." />
+        {PINS.map((p, k) => (
+          <span class:list={['pin', p.side]} style={`--x:${p.x};--y:${p.y};--len:${p.len}`}>
+            <i aria-hidden="true"></i><s aria-hidden="true"></s><b aria-hidden="true">{k + 1}</b>
+          </span>
+        ))}
+      </div>
+      </div>
+
+      <ol class="key">
+        {PINS.map((p, k) => (
+          <li><span class="n" aria-hidden="true">{k + 1}</span><p>{p.t}</p></li>
+        ))}
+      </ol>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .now { position: relative; overflow: hidden; }
+  .now > * { position: relative; z-index: 1; }
+  .graticule {
+    -webkit-mask-image: radial-gradient(70% 75% at 50% 55%, #000 12%, transparent 80%);
+    mask-image: radial-gradient(70% 75% at 50% 55%, #000 12%, transparent 80%);
+  }
+
+  /* 844 is the frame's own width. Held there so the interface inside it is read
+     at the size it was drawn, rather than shrunk into an illegible texture. */
+  .anno { width: min(100%, 936px); margin: 0 auto; }
+
+  /* Shrunk to a phone the interface inside the frame stops being readable, which
+     defeats the point of showing it. Below that width it keeps its own size and
+     the reader scrolls it, rather than being handed an illegible texture. */
+  .scroller { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  @media (max-width: 760px) {
+    .scroller { margin-inline: -30px; padding-inline: 30px; }
+    .shot { min-width: 560px; }
+  }
+</style>

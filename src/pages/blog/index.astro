@@ -10,6 +10,7 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long'
 ---
 <Base title="Writing · Amartya Gaur" description="Notes on agent orchestration, evals, and technical hiring, by Amartya Gaur." theme="light">
   <section class="light sec index">
+    <div class="graticule" aria-hidden="true"></div>
     <div class="wrap">
       <h1 class="d d-2">Notes from the build</h1>
 
@@ -36,7 +37,12 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long'
 </Base>
 
 <style>
-  .index { padding-top: clamp(120px, 14vw, 190px); }
+  .index { padding-top: clamp(120px, 14vw, 190px); padding-bottom: var(--s-5); position: relative; overflow: hidden; }
+  .index > * { position: relative; z-index: 1; }
+  .index > .graticule {
+    -webkit-mask-image: radial-gradient(85% 45% at 50% 14%, #000 6%, transparent 78%);
+    mask-image: radial-gradient(85% 45% at 50% 14%, #000 6%, transparent 78%);
+  }
   .list { margin-top: clamp(34px, 4.5vw, 56px); border-top: 1px solid var(--ink); }
   .list li { border-bottom: 1px solid var(--rule); }
   .list a {

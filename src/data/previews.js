@@ -17,5 +17,10 @@ export const PREVIEW = {
   'proving-a-challenge-discriminates': {
     kind: 'pips', label: 'Reference passes 8, naive passes 5', a: 8, b: 5, n: 8
   },
-  'a-sticky-orchestrator': { kind: 'pips', label: 'Three hand-offs against one', a: 4, b: 1, n: 4 }
+  'a-sticky-orchestrator': { kind: 'pips', label: 'Three hand-offs against one', a: 4, b: 1, n: 4 },
+  'no-network-inside-a-cloud-run-job': {
+    // The post's own diagram would be the truest preview, but at this size its
+    // labels are unreadable, and an unreadable label is worse than no figure.
+    kind: 'bars', label: 'Loopback reachable. Nothing else is.', v: [1, 0], bad: [1]
+  }
 };

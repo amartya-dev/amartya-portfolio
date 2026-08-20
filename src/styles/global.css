@@ -1,35 +1,49 @@
-/* Amartya Gaur. A résumé is a claim, a proof is different.
-   Light sections carry the claims. Black chambers carry the proof.
-   The only two accents are the two verdicts a test can return. */
+/* Amartya Gaur. A resume is a claim, a proof is different.
+   Light sections carry the claims. Dark chambers carry the proof.
+
+   The palette is lifted from hunr's own interface, because the person who made
+   that product and the person whose site this is are the same person, and the
+   site looking harsher and cheaper than the product was the tell. Nothing here
+   is pure black or pure white: the dark bands are layered charcoals so a card
+   can sit on top of a surface and be seen to, and the light bands are a cool
+   off-white rather than paper stock. */
 
 :root {
-  --paper: #f3f3f0;
-  --paper-2: #e9e9e4;
-  --ink: #0a0a0b;
-  --ink-2: #26262a;
-  --mid: #6a6a64;
-  --rule: #d4d4cd;
+  /* light bands */
+  --paper: #E9ECEF;    /* the ground */
+  --paper-2: #F7F9FA;  /* anything raised off it */
+  --paper-3: #DCE2E7;  /* wells, empty track */
+  --ink: #11151A;
+  --ink-2: #3A434D;
+  --mid: #67717C;
+  --rule: #CFD6DC;
 
-  --void: #08080a;
-  --void-2: #101014;
-  --bone: #f3f3f0;
-  --bone-dim: #8b8b93;
-  --rule-dark: #23232a;
+  /* dark bands, layered: base, surface, raised */
+  --void: #0B0D11;
+  --void-2: #12151B;
+  --void-3: #191D25;
+  --bone: #E9EBEE;
+  --bone-dim: #9BA3AF;
+  --bone-2: #CBD1D9;
+  --bone-3: #7A828E;
+  --rule-dark: #1F242D;
+  --rule-dark-2: #2B323D;
 
-  /* Instrument chrome. Distinct from the two verdict colours, which stay
-     reserved for pass and fail and are never used for structure. */
-  --plate: #101017;
-  --plate-2: #16161e;
-  --tick: #30303c;
-  --tick-lit: #55556a;
-  --tick-l: #c9c9c2;
+  /* instrument chrome, distinct from the verdicts */
+  --plate: #12151B;
+  --plate-2: #191D25;
+  --tick: #262C36;
+  --tick-lit: #3D4553;
+  --tick-l: #C4CACB;
 
-  --pass: #0b7a46;
-  --fail: #cf3a20;
-  /* The same red, dark enough to be read at label sizes on paper. */
-  --fail-ink: #c4341c;
-  --pass-lit: #35e08a;
-  --fail-lit: #ff6244;
+  /* the two verdicts, and the data colours the product itself uses */
+  --pass: #12784C;
+  --fail: #C6392A;
+  --fail-ink: #B33526;
+  --pass-lit: #35E08A;
+  --fail-lit: #FF6B57;
+  --amber: #E8A33D;
+  --azure: #58A6FF;
 
   --display: "Archivo", "Helvetica Neue", sans-serif;
   --body: "Newsreader", Georgia, serif;
@@ -38,10 +52,15 @@
   --wrap: 1280px;
   --gut: clamp(20px, 5vw, 72px);
 
+  /* Corners. Every edge on this site was a right angle, which is a look, and
+     the look was "unstyled". */
+  --r: 10px;
+  --r-sm: 6px;
+
   /* type */
   --t-body: 1.0625rem;
   --t-small: .95rem;
-  --t-lede: clamp(1.35rem, 1.9vw, 1.72rem);
+  --t-lede: clamp(1.2rem, 1.5vw, 1.42rem);
   --t-label: .7rem;
   --t-micro: .69rem;
 
@@ -51,7 +70,7 @@
   --s-3: 24px;
   --s-4: clamp(30px, 4vw, 44px);
   --s-5: clamp(44px, 6vw, 72px);
-  --s-6: clamp(64px, 9vw, 112px);
+  --s-6: clamp(46px, 5.6vw, 78px);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -80,17 +99,20 @@ img { max-width: 100%; display: block; }
 .serif-i { font-style: italic; }
 
 /* Archivo carries every heading. Expanded width is the signature. */
+/* Archivo carries every heading, at a weight and width you can read rather than
+   one you have to survive. It used to be 800 at 118% width in capitals, which is
+   a poster treatment applied to every heading on the page at once. */
 .d {
   font-family: var(--display);
-  font-weight: 800;
-  font-stretch: 118%;
-  letter-spacing: -.02em;
-  line-height: .88;
-  text-transform: uppercase;
+  font-weight: 620;
+  font-stretch: 100%;
+  letter-spacing: -.021em;
+  line-height: 1.04;
 }
-.d-1 { font-size: clamp(2.9rem, 9.5vw, 9rem); margin-bottom: var(--s-4); }
-.d-2 { font-size: clamp(2.1rem, 5.6vw, 4.6rem); margin-bottom: var(--s-3); }
-.d-3 { font-size: clamp(1.24rem, 1.9vw, 1.5rem); font-stretch: 108%; font-weight: 700; letter-spacing: -.012em; line-height: 1.06; margin-bottom: var(--s-2); }
+.d-1 { font-size: clamp(2.4rem, 6vw, 5rem); font-weight: 660; letter-spacing: -.028em; margin-bottom: var(--s-4); }
+.d-2 { font-size: clamp(1.95rem, 3.6vw, 3.1rem); font-weight: 650; letter-spacing: -.026em; margin-bottom: var(--s-3); }
+.d-sec { font-size: clamp(1.55rem, 2.3vw, 2.15rem); font-weight: 640; letter-spacing: -.024em; margin-bottom: var(--s-2); }
+.d-3 { font-size: clamp(1.14rem, 1.55vw, 1.32rem); font-weight: 620; letter-spacing: -.014em; line-height: 1.24; margin-bottom: var(--s-2); }
 /* Headings own the space beneath them. Nothing downstream adds its own margin-top. */
 .lede { margin-top: 0; }
 
@@ -189,35 +211,21 @@ a:hover { text-decoration-thickness: 2px; }
    instrument, and costs four pseudo-elements.
    --------------------------------------------------------------------------- */
 .plate { position: relative; }
-.plate > .plate-in { position: relative; border: 1px solid var(--tick); background: var(--plate); }
+.plate > .plate-in { position: relative; border: 1px solid var(--rule-dark-2); background: var(--plate); border-radius: var(--r); overflow: hidden; }
 .light .plate > .plate-in { border-color: var(--rule); background: var(--paper); }
+.figured { border-radius: var(--r); }
 
-/* Registration marks. Two elements, four corners, drawn with gradients so there
-   is no extra markup inside the plate. */
-.plate-in::before, .plate-in::after {
-  content: ""; position: absolute; pointer-events: none; width: 13px; height: 13px;
-  border-color: var(--tick-lit); border-style: solid;
-}
-.light .plate-in::before, .light .plate-in::after { border-color: var(--mid); }
-.plate-in::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
-.plate-in::after { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
-.plate > .corner-tr, .plate > .corner-bl {
-  content: ""; position: absolute; pointer-events: none; width: 13px; height: 13px;
-  border-color: var(--tick-lit); border-style: solid;
-}
-.light .plate > .corner-tr, .light .plate > .corner-bl { border-color: var(--mid); }
-.plate > .corner-tr { top: 0; right: 0; border-width: 1px 1px 0 0; }
-.plate > .corner-bl { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.plate > .corner-tr, .plate > .corner-bl { display: none; }
 
 .plate-no {
   position: absolute; top: -1.65em; right: 0;
   font-family: var(--mono); font-size: .69rem; letter-spacing: .14em; text-transform: uppercase;
-  color: var(--tick-lit);
+  color: var(--bone-dim);
 }
 .light .plate-no { color: var(--mid); }
 .plate-cap {
   margin-top: var(--s-2); font-size: var(--t-small); line-height: 1.6; max-width: 62ch;
-  color: #8f8f99;
+  color: var(--bone-dim);
 }
 .light .plate-cap { color: var(--mid); }
 
@@ -230,7 +238,7 @@ a:hover { text-decoration-thickness: 2px; }
     linear-gradient(to bottom, var(--grat, rgba(255,255,255,.032)) 1px, transparent 1px);
   background-size: 26px 26px;
 }
-.light .graticule { --grat: rgba(10,10,11,.045); }
+.light .graticule { --grat: rgba(10,10,11,.055); }
 
 /* A graduated rule. Used where the page needs an edge that means something:
    a scale, a boundary, the end of a band. */
@@ -242,19 +250,75 @@ a:hover { text-decoration-thickness: 2px; }
 }
 .light .tickrule { background-image: linear-gradient(to right, var(--rule) 1px, transparent 1px); border-top-color: var(--rule); }
 
-/* The same registration marks, for widgets that already carry their own frame. */
 .figured { position: relative; }
-.figured::before, .figured::after {
-  content: ""; position: absolute; z-index: 3; pointer-events: none;
-  width: 13px; height: 13px; border-color: var(--tick-lit); border-style: solid;
-}
-.light .figured::before, .light .figured::after { border-color: var(--mid); }
-.figured::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
-.figured::after { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
 
 .fig-no {
   display: block; margin-bottom: 10px; text-align: right;
   font-family: var(--mono); font-size: .69rem; letter-spacing: .14em; text-transform: uppercase;
-  color: #7c7c90;
+  color: var(--bone-dim);
 }
 .light .fig-no { color: var(--mid); }
+
+/* ---------------------------------------------------------------------------
+   Leaders. A hairline from a numbered ring to the exact pixel it names. This is
+   how a part is called out on a drawing, and it is the only honest way to point
+   inside a screenshot: the number cannot drift away from what it describes,
+   because it is struck to it. The sentences live in a key underneath, at a size
+   you can actually read, rather than as captions squeezed into a margin.
+
+   Every measurement here is a percentage of the figure, so the leaders stay
+   struck to their anchors at any width.
+   --------------------------------------------------------------------------- */
+.anno { position: relative; padding-inline: 62px; }
+.shot { position: relative; border: 1px solid var(--rule); background: var(--void); border-radius: var(--r); overflow: hidden; }
+.chamber .shot { border-color: var(--tick); }
+.shot img { width: 100%; height: auto; }
+
+/* The pin spans the figure so its percentages measure off the figure, not off
+   itself. A zero-width anchor would make every percentage resolve to nothing. */
+.pin { position: absolute; left: 0; right: 0; top: var(--y); height: 0; z-index: 4; }
+/* Ring at the anchor. Hollow, so it marks the point without covering it. */
+.pin i {
+  position: absolute; left: var(--x); top: -5px; margin-left: -5px;
+  width: 10px; height: 10px; border: 1px solid var(--fail-ink); border-radius: 50%;
+}
+/* The leader, out to the margin. */
+.pin s {
+  position: absolute; top: 0; height: 1px; background: var(--fail-ink); opacity: .6; text-decoration: none;
+  left: var(--x); width: var(--len);
+}
+.pin.l s { left: calc(var(--x) - var(--len)); }
+/* The number, in the margin at the far end of its leader. */
+.pin b {
+  position: absolute; top: -10px; left: calc(var(--x) + var(--len) + 7px);
+  width: 19px; height: 19px; display: grid; place-items: center;
+  border: 1px solid var(--fail-ink); border-radius: 50%; background: var(--paper);
+  font-family: var(--mono); font-size: .66rem; font-weight: 400; color: var(--fail-ink);
+}
+.pin.l b { left: calc(var(--x) - var(--len) - 26px); }
+.chamber .pin i, .chamber .pin b { border-color: var(--pass-lit); }
+.chamber .pin s { background: var(--pass-lit); }
+.chamber .pin b { color: var(--pass-lit); background: var(--void); }
+
+/* The key. Body-sized text, because this is the part that has to be read. */
+.key { margin-top: var(--s-3); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-3) var(--s-4); }
+.key li { display: grid; grid-template-columns: 19px minmax(0, 1fr); gap: 12px; align-items: start; }
+.key .n {
+  width: 19px; height: 19px; display: grid; place-items: center; border: 1px solid var(--fail-ink); border-radius: 50%;
+  font-family: var(--mono); font-size: .66rem; color: var(--fail-ink); margin-top: .1em;
+}
+.chamber .key .n { border-color: var(--pass-lit); color: var(--pass-lit); }
+.key p { font-size: var(--t-small); line-height: 1.55; color: var(--ink-2); }
+.chamber .key p { color: var(--bone-dim); }
+
+@media (max-width: 1000px) { .anno { padding-inline: 40px; } }
+
+/* On a phone the figure is scrolled rather than shrunk, so there is no margin
+   for a leader to reach. The number moves alongside its ring instead, and the
+   sentences stay in the key underneath where they are read either way. */
+@media (max-width: 760px) {
+  .anno { padding-inline: 0; }
+  .pin s { display: none; }
+  .pin b, .pin.l b { left: calc(var(--x) - 9px); right: auto; top: 13px; }
+  .key { grid-template-columns: 1fr; gap: var(--s-2); }
+}
