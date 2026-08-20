@@ -3,7 +3,7 @@
 // Every entry carries the URL it came from; nothing is answerable without one.
 import { P } from './projects.js';
 
-const GROUP = { agents: 'Agent systems', infra: 'Infrastructure', merged: 'Merged upstream' };
+const GROUP = { agents: 'Agent systems', infra: 'Infrastructure', teaching: 'Open source and writing', merged: 'Merged upstream' };
 
 // Roles, matching the spans on the trace.
 export const ROLES = [

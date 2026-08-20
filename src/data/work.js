@@ -33,6 +33,9 @@ const META = {
   'Magicweave': { slug: 'magicweave' },
   'UPI credit lending backend': { slug: 'upi-lending' },
   'Jeet Kune Do Federation of India': { slug: 'jkd-federation' },
+  'flutter-bloc': { slug: 'flutter-bloc' },
+  'Flutter and Django authentication, in three parts': { slug: 'flutter-django-auth' },
+  'Django, Vue and the rest of it': { slug: 'dev-community-writing' },
   'Textualize/rich': { slug: 'rich-binary-units', demo: 'units' },
   'product-motion': { slug: 'product-motion', posts: ['a-pipeline-that-cannot-invent-your-ui'] },
   'Azure Speech for OpenMontage': { slug: 'openmontage-speech' },
@@ -43,6 +46,7 @@ const META = {
 export const GROUPS = {
   agents: 'Agent systems',
   infra: 'Infrastructure',
+  teaching: 'Open source and writing, earlier',
   merged: 'Merged into other repositories'
 };
 
