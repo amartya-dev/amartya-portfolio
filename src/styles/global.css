@@ -16,6 +16,14 @@
   --bone-dim: #8b8b93;
   --rule-dark: #23232a;
 
+  /* Instrument chrome. Distinct from the two verdict colours, which stay
+     reserved for pass and fail and are never used for structure. */
+  --plate: #101017;
+  --plate-2: #16161e;
+  --tick: #30303c;
+  --tick-lit: #55556a;
+  --tick-l: #c9c9c2;
+
   --pass: #0b7a46;
   --fail: #cf3a20;
   /* The same red, dark enough to be read at label sizes on paper. */
@@ -105,9 +113,9 @@ a:hover { text-decoration-thickness: 2px; }
 .chamber::before {
   content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
   background-image:
-    linear-gradient(to right, rgba(255,255,255,.026) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,.026) 1px, transparent 1px);
-  background-size: 68px 68px;
+    linear-gradient(to right, rgba(255,255,255,.028) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,.028) 1px, transparent 1px);
+  background-size: 26px 26px;
   -webkit-mask-image: radial-gradient(120% 90% at 50% 40%, #000 30%, transparent 85%);
   mask-image: radial-gradient(120% 90% at 50% 40%, #000 30%, transparent 85%);
 }
@@ -171,3 +179,82 @@ a:hover { text-decoration-thickness: 2px; }
   .top .brand .short { display: inline; }
   .top .nav { gap: 13px; font-size: 0.69rem; }
 }
+
+
+/* ---------------------------------------------------------------------------
+   Plates. The page is a document of measurements, so the things you can operate
+   are drawn the way a measured figure is drawn: a frame, registration ticks at
+   the corners, a figure number, and a caption underneath. The ticks are the
+   whole device. A plain border is a box; a border with corner marks reads as an
+   instrument, and costs four pseudo-elements.
+   --------------------------------------------------------------------------- */
+.plate { position: relative; }
+.plate > .plate-in { position: relative; border: 1px solid var(--tick); background: var(--plate); }
+.light .plate > .plate-in { border-color: var(--rule); background: var(--paper); }
+
+/* Registration marks. Two elements, four corners, drawn with gradients so there
+   is no extra markup inside the plate. */
+.plate-in::before, .plate-in::after {
+  content: ""; position: absolute; pointer-events: none; width: 13px; height: 13px;
+  border-color: var(--tick-lit); border-style: solid;
+}
+.light .plate-in::before, .light .plate-in::after { border-color: var(--mid); }
+.plate-in::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
+.plate-in::after { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+.plate > .corner-tr, .plate > .corner-bl {
+  content: ""; position: absolute; pointer-events: none; width: 13px; height: 13px;
+  border-color: var(--tick-lit); border-style: solid;
+}
+.light .plate > .corner-tr, .light .plate > .corner-bl { border-color: var(--mid); }
+.plate > .corner-tr { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.plate > .corner-bl { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+
+.plate-no {
+  position: absolute; top: -1.65em; right: 0;
+  font-family: var(--mono); font-size: .69rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--tick-lit);
+}
+.light .plate-no { color: var(--mid); }
+.plate-cap {
+  margin-top: var(--s-2); font-size: var(--t-small); line-height: 1.6; max-width: 62ch;
+  color: #8f8f99;
+}
+.light .plate-cap { color: var(--mid); }
+
+/* A graticule. Behind a plate it reads as chart paper, which is what the things
+   drawn on top of it actually are. */
+.graticule {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(to right, var(--grat, rgba(255,255,255,.032)) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grat, rgba(255,255,255,.032)) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+.light .graticule { --grat: rgba(10,10,11,.045); }
+
+/* A graduated rule. Used where the page needs an edge that means something:
+   a scale, a boundary, the end of a band. */
+.tickrule {
+  height: 9px; width: 100%;
+  background-image: linear-gradient(to right, var(--tick) 1px, transparent 1px);
+  background-size: 13px 100%;
+  border-top: 1px solid var(--tick);
+}
+.light .tickrule { background-image: linear-gradient(to right, var(--rule) 1px, transparent 1px); border-top-color: var(--rule); }
+
+/* The same registration marks, for widgets that already carry their own frame. */
+.figured { position: relative; }
+.figured::before, .figured::after {
+  content: ""; position: absolute; z-index: 3; pointer-events: none;
+  width: 13px; height: 13px; border-color: var(--tick-lit); border-style: solid;
+}
+.light .figured::before, .light .figured::after { border-color: var(--mid); }
+.figured::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
+.figured::after { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+
+.fig-no {
+  display: block; margin-bottom: 10px; text-align: right;
+  font-family: var(--mono); font-size: .69rem; letter-spacing: .14em; text-transform: uppercase;
+  color: #7c7c90;
+}
+.light .fig-no { color: var(--mid); }

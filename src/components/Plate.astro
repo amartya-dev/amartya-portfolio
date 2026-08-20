@@ -1,0 +1,18 @@
+---
+// A measured figure. Frame, registration marks at four corners, a figure number
+// above it and a caption below. Everything on this site you can operate is one
+// of these, because everything on this site you can operate is a measurement.
+const { no = '', cap = '', flush = false } = Astro.props;
+---
+<figure class="plate">
+  {no && <figcaption class="plate-no">{no}</figcaption>}
+  <span class="corner-tr" aria-hidden="true"></span>
+  <span class="corner-bl" aria-hidden="true"></span>
+  <div class:list={['plate-in', { flush }]}><slot /></div>
+  {cap && <p class="plate-cap">{cap}</p>}
+</figure>
+
+<style>
+  .plate { margin: 0; }
+  .plate-in.flush { padding: 0; }
+</style>
