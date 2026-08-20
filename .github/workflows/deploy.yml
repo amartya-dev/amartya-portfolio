@@ -46,6 +46,10 @@ jobs:
       # deploy nobody can reproduce.
       - run: npm ci
 
+      # The spending guards on the ask endpoint. Runs before the build because
+      # a deploy that removes the rate limiter is worse than one that fails.
+      - run: npm test
+
       # Builds and runs the HTML gate. Fails the job on either.
       - run: npm run build
 

@@ -27,6 +27,28 @@ const MAX_TURNS = 12;
 const MAX_ROUNDS = 5;
 const SEED_PASSAGES = 6;
 
+// Everything below this comment is a spending control, not a validation nicety.
+//
+// The browser sends the index and the passages it scored highest, and both went
+// into the prompt unbounded. That is the wrong way round: the client decides how
+// large the prompt is, the prompt is what input tokens are billed on, and the
+// daily cap counts requests rather than tokens. Sitting just under the model's
+// context window, one request was worth about a dollar and the 400-request cap
+// was worth about four hundred, against the four dollars the docs advertised.
+//
+// The real page sends about 7 KB. These caps are several times that and still
+// two orders of magnitude below what was previously accepted.
+// Measured against the real payload rather than guessed: the page currently
+// sends a 17 KB body carrying 43 entries and 13.8 KB of assembled prompt, whose
+// longest passage is 627 characters. Each cap below is three to six times that,
+// which leaves the index room to roughly triple before anything here has to move.
+const MAX_BODY_BYTES = 96 * 1024;    // real: 17 KB
+const MAX_INDEX = 200;               // real: 43
+const MAX_ID = 80;                   // real: 49
+const MAX_TITLE = 160;               // real: 56
+const MAX_PASSAGE = 2500;            // real longest: 627
+const MAX_PROMPT_CHARS = 48 * 1024;  // real: 13.8 KB
+
 const TOOLS = [
   {
     name: 'answer',
@@ -202,10 +224,19 @@ function partialText(buf) {
 }
 
 async function limited(env, ip) {
-  if (!env.ASK_KV) return null;
+  // Fail closed. This used to return null when the binding was missing, which
+  // meant the one configuration mistake that removes the spending cap also
+  // silently removed every trace that it was ever there. If the limiter cannot
+  // run, the box does not answer.
+  if (!env.ASK_KV) return 'The box cannot check its allowance right now, so it is not answering. Try later.';
   const day = new Date().toISOString().slice(0, 10);
   const perIp = Number(env.ASK_DAILY_PER_IP || 12);
-  const total = Number(env.ASK_DAILY_TOTAL || 400);
+  // A typical question costs about a cent. With the prompt now bounded at 48 KB,
+  // the most expensive one an attacker can construct is roughly eight times that
+  // across its five rounds, so this cap is worth about $16 on the worst possible
+  // day and about $2 on a real one. It was 400 when a single request had no
+  // ceiling at all, which made the same cap worth several hundred dollars.
+  const total = Number(env.ASK_DAILY_TOTAL || 250);
   const kIp = `ip:${day}:${ip}`;
   const kAll = `all:${day}`;
   const [a, b] = await Promise.all([env.ASK_KV.get(kIp), env.ASK_KV.get(kAll)]);
@@ -236,19 +267,56 @@ function messagesURL(base) {
   return url;
 }
 
+// The box is for people reading the page. A POST from a browser always carries
+// an Origin, and on Pages the function is served from the same host as the page,
+// so same-host is the whole rule — it covers production, every preview alias and
+// localhost without naming any of them. Trivial to forge by hand and not the
+// point: it costs nothing and removes the entire class of drive-by scripts that
+// never set a header.
+function wrongOrigin(request) {
+  const origin = request.headers.get('origin');
+  if (!origin) return true;
+  try {
+    return new URL(origin).host !== new URL(request.url).host;
+  } catch {
+    return true;
+  }
+}
+
+const clamp = (v, n) => String(v ?? '').slice(0, n);
+
 export async function onRequestPost({ request, env }) {
   if (!env.ANTHROPIC_API_KEY) return json({ error: 'no model configured' }, 501);
+  if (wrongOrigin(request)) return json({ error: 'forbidden' }, 403);
+
+  // Refuse an oversized body before reading it, and again after, because
+  // Content-Length is a claim rather than a fact.
+  const declared = Number(request.headers.get('content-length') || 0);
+  if (declared > MAX_BODY_BYTES) return json({ error: 'too large' }, 413);
 
   let body;
   try {
-    body = await request.json();
+    const raw = await request.text();
+    if (raw.length > MAX_BODY_BYTES) return json({ error: 'too large' }, 413);
+    body = JSON.parse(raw);
   } catch {
     return json({ error: 'bad request' }, 400);
   }
 
   const turns = Array.isArray(body.turns) ? body.turns.slice(-MAX_TURNS) : [];
-  const index = Array.isArray(body.index) ? body.index : [];
-  const seed = Array.isArray(body.seed) ? body.seed.slice(0, SEED_PASSAGES).map(String) : [];
+  // Every field that reaches the model is clamped here, at the boundary, rather
+  // than trusted because the page that normally sends it is well behaved.
+  const index = (Array.isArray(body.index) ? body.index : [])
+    .slice(0, MAX_INDEX)
+    .filter((d) => d && typeof d === 'object')
+    .map((d) => ({
+      id: clamp(d.id, MAX_ID),
+      t: clamp(d.t, MAX_TITLE),
+      a: clamp(d.a, MAX_PASSAGE),
+      u: clamp(d.u, 200),
+      k: clamp(d.k, MAX_TITLE)
+    }));
+  const seed = Array.isArray(body.seed) ? body.seed.slice(0, SEED_PASSAGES).map((x) => clamp(x, MAX_ID)) : [];
   const plots = body.plots && typeof body.plots === 'object' ? body.plots : {};
   if (!turns.length || turns[turns.length - 1].role !== 'user') return json({ error: 'no question' }, 400);
 
@@ -261,6 +329,13 @@ export async function onRequestPost({ request, env }) {
 
   const byId = new Map(index.map((d) => [String(d.id), d]));
   const catalogue = index.map((d) => `  ${d.id}  ${d.t}`).join('\n');
+  // A belt on top of the per-field braces: whatever combination of clamped
+  // fields arrives, the assembled input has one ceiling.
+  const budget =
+    catalogue.length +
+    index.reduce((n, d) => n + d.a.length, 0) +
+    turns.reduce((n, t) => n + String(t.content ?? '').length, 0);
+  if (budget > MAX_PROMPT_CHARS) return json({ error: 'too large' }, 413);
   const opened = new Set();
   const passageBlock = (ids) =>
     ids

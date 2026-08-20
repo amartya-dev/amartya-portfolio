@@ -95,7 +95,7 @@ retrieval alone.
 | `ANTHROPIC_BASE_URL` | no | A gateway or proxy in front of the API. Accepted with or without the trailing `/v1`. Anything that is not an absolute http(s) URL is ignored and the real API is used, so a typo here degrades to normal rather than taking the box down. |
 | `ASK_MODEL` | no | Defaults to `claude-haiku-4-5-20251001`. |
 | `ASK_DAILY_PER_IP` | no | Defaults to 12. |
-| `ASK_DAILY_TOTAL` | no | Defaults to 400. |
+| `ASK_DAILY_TOTAL` | no | Defaults to 250. |
 
 If the model call fails, the visitor sees one of three sentences depending on the
 status — not configured (401/403), too many questions (429), or did not answer — and
@@ -110,17 +110,72 @@ where its absence would be visible.
 Free KV allows 1,000 writes a day. Each question costs two, so the 400-question
 default cap runs into its own ceiling before KV's, which is the right way round.
 
+### The spending guards
+
+The daily cap counts requests. That is only a spending control if a request has a
+bounded size, and for a while it did not: the browser sends the index and the
+passages it scored highest, and both went into the prompt uncapped. A payload sitting
+just under the model's context window made one request worth about a dollar, which
+made the 400-request cap worth about four hundred rather than the four this file used
+to claim.
+
+Everything the client controls is now clamped at the boundary of `onRequestPost`, and
+`scripts/test-ask-guards.mjs` exercises each clamp against a hostile payload in CI:
+
+| Guard | Limit | Real page sends |
+|---|---|---|
+| Request body | 96 KB | 17 KB |
+| Index entries | 200 | 43 |
+| Passage text | 2,500 chars | 627 longest |
+| Title / id | 160 / 80 chars | 56 / 49 |
+| Assembled prompt | 48 KB | 13.8 KB |
+
+Three more things it does, none of which are visible from reading the happy path:
+
+- **The limiter fails closed.** It used to return "allowed" when the `ASK_KV` binding
+  was missing, so the single configuration mistake that removes the spending cap also
+  removed every sign that a cap had ever existed. Now the box declines to answer.
+- **Same-origin only.** A browser always sends `Origin` on a POST, and on Pages the
+  function shares a host with the page, so same-host covers production, every preview
+  alias and localhost without naming any of them. Forgeable by hand, and still enough
+  to remove every drive-by script that sets no headers.
+- **Body size is checked twice**, once against `Content-Length` and once against what
+  actually arrived, because the header is a claim rather than a fact.
+
 ### What it costs to run
 
-Haiku 4.5 is $1 per million input tokens and $5 per million output. A question costs
-roughly 7,000 input tokens across its rounds and about 500 output, so:
+Haiku 4.5 is $1 per million input tokens and $5 per million output. A real question is
+roughly 7,000 input tokens across its rounds and about 500 output — about a cent, and
+half that on a follow-up, because the tools and system prompt are cached and a second
+question within five minutes reads them at a tenth of the price.
 
-about one cent per question cold, and roughly half that inside a conversation, because the tools
-and system prompt are cached and a follow-up asked within five minutes reads them at a tenth of
-the price.
+With the prompt bounded at 48 KB, the most expensive question anyone can construct is
+about eight times a normal one. So the 250-a-day cap is worth roughly **$16 on the
+worst imaginable day and about $2 on a real one**. If that ever stops feeling
+comfortable, `ASK_DAILY_TOTAL` is the dial.
 
-At the 400-a-day cap that is a $4 worst case, and a realistic month on a personal
-site is a couple of dollars. If it ever starts mattering, drop `ASK_DAILY_TOTAL`.
+### Stopping it at the edge
+
+The guards above bound the bill. They do not stop a bot from spending the day's
+allowance in ninety seconds and leaving nothing for anyone reading the page, because
+every blocked request has still travelled through KV to be refused. Two free things
+fix that, and both are dashboard-only — there is no API for either in Wrangler or the
+Cloudflare MCP connector:
+
+1. **A rate limiting rule** (Security → WAF → Rate limiting rules; the free plan
+   allows one). Match `http.request.uri.path eq "/api/ask"`, characteristic **IP**,
+   **10 requests per 1 minute**, action **Block**, duration 1 minute. This refuses the
+   flood at the edge before it reaches the Function, so the daily allowance stays for
+   people. Ten a minute is far above anything a reader does and far below anything a
+   script does.
+2. **Bot Fight Mode** (Security → Bots). One toggle, free, challenges the obvious
+   automated traffic across the whole zone.
+
+If it is ever actually attacked rather than theoretically attackable, the next step is
+[Turnstile](https://developers.cloudflare.com/turnstile/) on the ask form — a token
+minted in the browser and verified in the Function before the model is called. It is
+free and invisible in managed mode, and it is deliberately not here yet, because it is
+a real change to a working form and the caps already bound the money.
 
 ### Running it locally
 
