@@ -378,6 +378,17 @@ const OPENERS = [
       log.scrollTop = 0;
       input.focus();
     });
+
+    // A question can arrive in the URL, which is how the bar on the front page
+    // hands one over: it does not answer anything itself, it just carries the
+    // sentence here. Same 400-character ceiling as the input, and the parameter
+    // is dropped from the address bar afterwards so a reload does not re-ask a
+    // question the reader has already had answered.
+    const q = new URLSearchParams(location.search).get('q');
+    if (q && q.trim()) {
+      history.replaceState(null, '', location.pathname + location.hash);
+      ask(q.trim().slice(0, 400));
+    }
   }
 </script>
 

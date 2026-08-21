@@ -1,55 +1,44 @@
 ---
-// A title page.
+import Flow from './Flow.astro';
+import Social from './Social.astro';
+import AskBar from './AskBar.astro';
+
+// A title page: a name, the claim, five ways out, and a picture of the claim.
 //
-// The old opening was a landing page: name at 4.6rem beside an autoplaying film
-// that ran off the right edge, with a soft green glow behind both. Two subjects
-// competing in the first viewport, and the glow was the single clearest tell
-// that this was a page about AI rather than a page by an engineer.
+// It has lost two things it used to carry. The colophon line — "AI SYSTEMS
+// ENGINEER · BENGALURU · UTC+5:30" — said in small caps what the sentence
+// underneath it says in full, and the city is in the footer of every page
+// anyway. And two paragraphs of prose about Newfold, 230,000 model calls and
+// seven negative registrations, every one of which has a page of its own further
+// down or on /work. A title page that has already started arguing is not a title
+// page.
 //
-// A monograph opens on one thing, set in ink, with air around it. The name is
-// the subject and nothing else is on the sheet. The film has gone to the hunr
-// page, where it is evidence for something instead of decoration for everything.
-//
-// This is the only place on the site where type is allowed to be loud, because a
-// name is the one thing on a personal site that does not need qualifying.
+// What replaced the prose is the drawing, because the claim is a claim about
+// shape and a shape should be drawn. Type left, picture right, meeting on a
+// shared centre line: the name is still the loudest thing on the site, but it is
+// no longer the only thing on the first screen.
 ---
 <section class="masthead chamber">
   <div class="wrap">
-    <p class="stamp">
-      <span>AI systems engineer</span>
-      <span>Bengaluru · UTC+5:30</span>
-    </p>
+    <div class="body rv">
+      <div class="title">
+        <h1 class="d d-1">Amartya&nbsp;Gaur</h1>
+        <p class="sub">I build the layer AI agents run on.</p>
 
-    <div class="title rv">
-      <h1 class="d d-1">Amartya&nbsp;Gaur</h1>
-      <p class="sub">I build the layer AI agents run on.</p>
-    </div>
+        <p class="role">Founder and engineer at <a href="https://hunr.ai" rel="noopener">hunr.ai</a></p>
 
-    <div class="say rv">
-      <p>Five years of that was inside Newfold Digital&rsquo;s AI Center of Excellence: a{' '}
-        <a href="/work/agent-orchestration/">sticky orchestrator</a> carrying about a thousand support
-        conversations an hour, and <a href="/work/eval-gate/">739 regression cases</a> wired into the deploy
-        pipeline so a prompt edit can fail a build. Since August 2026 it has been{' '}
-        <a href="https://hunr.ai" rel="noopener">hunr.ai</a>, which I write on my own.</p>
+        <AskBar />
+        <Social />
+      </div>
 
-      <p class="quiet">I also spent about 230,000 model calls trying to disprove my own routing design.
-        Seven of ten pre-registered experiments{' '}
-        <a href="/work/routing-benchmark/">came back negative</a>.
-        That half is in this index too, because it is the more useful half.</p>
-
-      <p class="links">
-        <a href="#index">The index</a>
-        <a href="/ask">Ask this site</a>
-        <a href="mailto:amartya@hunr.ai">amartya@hunr.ai</a>
-        <a href="https://cal.com/amartyagaur/intro" rel="noopener">Book a call</a>
-        <a href="https://github.com/amartya-dev" rel="me noopener">GitHub</a>
-        <a href="https://linkedin.com/in/amartya-gaur" rel="me noopener">LinkedIn</a>
-      </p>
+      <Flow />
     </div>
   </div>
 
-  <!-- The band closes on a graduated scale rather than a rule, because the six
-       years underneath the index are the first measurement in the document. -->
+  <!-- The band closes on a graduated scale rather than a rule: the six years
+       are the first measurement in the document, and a scale is a cheaper way
+       to say "since 2020" than a sentence saying it. The five overlapping spans
+       it used to introduce now live on /work with the rest of the record. -->
   <div class="scale wrap" aria-hidden="true">
     <div class="tickrule"></div>
     <p class="years mono"><span>2020</span><span>2021</span><span>2022</span><span>2023</span
@@ -58,19 +47,20 @@
 </section>
 
 <style>
-  .masthead { padding-top: clamp(104px, 12vw, 150px); }
+  /* The colophon line used to hold the name down off the running head. With it
+     gone the padding has to do that job on its own. */
+  .masthead { padding-top: clamp(116px, 13vw, 172px); }
 
-  /* A colophon line above a hairline: what this document is, and where it was
-     set. Printed matter identifies itself before it starts talking. */
-  .stamp {
-    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
-    padding-bottom: 10px; border-bottom: 1px solid var(--rule-dark);
-    font-family: var(--mono); font-size: var(--t-micro);
-    letter-spacing: .11em; text-transform: uppercase; color: var(--bone-3);
+  .body {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
+    gap: clamp(30px, 5vw, 64px); align-items: center;
   }
+  .title { min-width: 0; }
 
-  .title { margin-top: clamp(48px, 8vw, 104px); }
-  h1 { color: var(--bone); }
+  /* A step down from the global display size: at 6.5rem the name on its own is
+     wider than the column it now shares with the drawing. It is still, by a wide
+     margin, the loudest thing on the site. */
+  h1 { color: var(--bone); font-size: clamp(3rem, 6vw, 5.4rem); }
 
   /* The subtitle of a title page, in italic serif. It is the claim; everything
      under it is the evidence for the claim. */
@@ -82,31 +72,28 @@
     color: var(--bone-2); max-width: 22ch;
   }
 
-  .say {
-    margin-top: clamp(46px, 6vw, 76px);
-    max-width: 58ch;
+  /* The one line of standing fact left on the title page. It sits directly
+     under the claim because "founder of what" is the first question the claim
+     provokes, and the answer is a link. */
+  .role {
+    margin-top: clamp(16px, 2vw, 22px);
+    font-size: var(--t-small); color: var(--bone-dim); letter-spacing: .01em;
   }
-  .say p { color: var(--bone-2); line-height: 1.7; }
-  .say p + p { margin-top: 1.1em; }
-  .quiet { color: var(--bone-dim) !important; }
-  .say a { color: var(--bone); }
-  .quiet a { color: var(--bone-2); }
+  .role a { color: var(--bone-2); }
+  .role a:hover { color: var(--fail-lit); }
 
-  .links {
-    display: flex; flex-wrap: wrap; gap: 10px 28px;
-    margin-top: clamp(36px, 4.4vw, 56px) !important;
-    padding-top: var(--s-3); border-top: 1px solid var(--rule-dark);
-    font-size: var(--t-small) !important;
-  }
-  .links a { color: var(--bone-2) !important; }
-  .links a:hover { color: var(--fail-lit) !important; }
-
-  .scale { padding-top: clamp(52px, 7vw, 92px); padding-bottom: 30px; }
+  .scale { padding-top: clamp(56px, 7vw, 96px); padding-bottom: 30px; }
   /* The rule runs past the last label, because 2026 is not the end of the scale. */
   .scale .tickrule { width: auto; margin-right: calc(50% - 50vw); }
   .years {
     display: flex; justify-content: space-between; margin-top: 8px;
     color: var(--bone-3); font-size: var(--t-micro); letter-spacing: .04em;
+  }
+
+  /* Below this the name and the drawing cannot share a line without one of them
+     being squeezed, so the drawing drops under the social row. */
+  @media (max-width: 1000px) {
+    .body { grid-template-columns: minmax(0, 1fr); align-items: start; }
   }
 
   @media (max-width: 640px) {

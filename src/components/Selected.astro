@@ -1,0 +1,104 @@
+---
+// Six entries, where the home page used to carry all twenty-four — and each one
+// now carries its own figure.
+//
+// Two things are deliberately missing against the full index on /work: the
+// status word and the provenance line. Both are right there, where somebody is
+// auditing a catalogue. Here they were answering a question nobody had asked
+// yet, and answering it badly: six of the twenty-four statuses read "prototype",
+// "unproven" or "not yet deployed", so a scan of the front page came away with
+// an impression of hedging rather than of work. The caveats belong on the page
+// of the thing they are about, beside the evidence that earns them.
+//
+// What replaced them is a drawing each: a photograph of the thing where one
+// exists, and a schematic of the system where one does not. A list of
+// twenty-four names was text at the reader; six names with six drawings is
+// something to look at.
+import Sketch from './Sketch.astro';
+import { WORK } from '../data/work.js';
+import { WORKFIG } from '../data/workfigs.js';
+
+const PICK = ['hunr', 'agent-orchestration', 'eval-gate', 'website-builder', 'loyalty-engine', 'product-motion'];
+const items = PICK.map((s) => WORK.find((w) => w.slug === s)).filter(Boolean);
+const num = (i) => String(i + 1).padStart(2, '0');
+---
+<ol class="sel rv">
+  {items.map((p, i) => (
+    <li class="entry">
+      <a href={`/work/${p.slug}/`}>
+        <span class="n" aria-hidden="true">{num(i)}</span>
+        <span class="body">
+          <span class="line">
+            <b class="name">{p.n}</b><span class="dash" aria-hidden="true"> — </span><span class="hook">{p.h}</span>
+          </span>
+          {p.demo && <span class="demo">something to try</span>}
+        </span>
+        <Sketch f={WORKFIG[p.slug]} />
+      </a>
+    </li>
+  ))}
+</ol>
+
+<a class="more" href="/work">All {WORK.length}, with what state each is in <span aria-hidden="true">→</span></a>
+
+<style>
+  .sel { border-top: 1px solid var(--ink); }
+  .entry { border-bottom: 1px solid var(--rule); }
+
+  /* The same three-column spread the writing list uses, so the two lists on this
+     page read as one document rather than two designs. */
+  a {
+    display: grid; grid-template-columns: 2.9rem minmax(0, 1fr) 190px;
+    gap: 6px 32px; align-items: start;
+    padding: 24px 12px 24px 0; margin-left: -12px; padding-left: 12px;
+    text-decoration: none; border-radius: var(--r-sm);
+    transition: background-color .16s ease;
+  }
+  a:hover { background: var(--paper-3); color: inherit; }
+
+  .n {
+    margin-top: 2px;
+    font-family: var(--display); font-style: italic; font-weight: 400;
+    font-size: 1rem; color: var(--mid); font-variant-numeric: tabular-nums;
+  }
+  a:hover .n { color: var(--fail-ink); }
+
+  .body { display: grid; gap: 7px; min-width: 0; max-width: 46ch; }
+  .line { display: block; font-size: 1.0625rem; line-height: 1.5; letter-spacing: -.008em; }
+  .name { font-weight: 600; color: var(--ink); transition: color .16s ease; }
+  a:hover .name { color: var(--fail-ink); }
+  .dash { color: var(--mid); }
+  .hook { color: var(--ink-2); font-weight: 400; }
+
+  /* Three of the six rows carry this, so it has to survive being read three
+     times in a column. "Something you can operate on its page" did not — set
+     three times down one edge it stopped being an invitation and became a
+     refrain. Short enough to skim, still a promise. */
+  .demo {
+    font-family: var(--mono); font-size: var(--t-micro); letter-spacing: .04em;
+    color: var(--fail-ink); justify-self: start;
+    border-bottom: 1px solid color-mix(in oklab, var(--fail-ink) 40%, transparent);
+    padding-bottom: 2px;
+  }
+
+  /* Text hangs from the top of the row; the figure floats against it, because a
+     small drawing centred on its entry looks placed and top-aligned looks
+     dropped. */
+  a :global(.fig) { align-self: center; }
+
+  .more {
+    display: inline-block; margin-top: var(--s-3); font-size: var(--t-small); font-weight: 500;
+    color: var(--mid); text-decoration: none; border-bottom: 1px solid var(--rule);
+    padding-bottom: 4px;
+  }
+  .more:hover { color: var(--fail-ink); border-color: var(--fail-ink); }
+  .more span { display: inline-block; transition: transform .22s ease; }
+  .more:hover span { transform: translateX(4px); }
+
+  @media (max-width: 860px) {
+    a { grid-template-columns: 2.4rem minmax(0, 1fr); grid-template-areas: 'n body' '. fig'; row-gap: 16px; }
+    .n { grid-area: n; }
+    .body { grid-area: body; max-width: none; }
+    a :global(.fig) { grid-area: fig; max-width: 210px; }
+  }
+</style>

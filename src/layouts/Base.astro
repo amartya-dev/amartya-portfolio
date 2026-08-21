@@ -13,7 +13,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 const image = new URL(`/og/${og}.png`, Astro.site);
 const path = Astro.url.pathname;
 const NAV = [
-  { href: '/#index', label: 'Work', on: (p) => p === '/' || p.startsWith('/work') },
+  { href: '/work', label: 'Work', on: (p) => p.startsWith('/work') },
   { href: '/blog', label: 'Writing', on: (p) => p.startsWith('/blog') },
   { href: '/ask', label: 'Ask', on: (p) => p.startsWith('/ask') },
   { href: '/about', label: 'About', on: (p) => p.startsWith('/about') },

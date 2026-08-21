@@ -1,0 +1,109 @@
+---
+// The hero drawing: a call descending through the stack.
+//
+// The masthead was a name, a claim and two paragraphs on black, with the right
+// forty per cent of the first screen empty. Typographically that is fine and to
+// look at it is inert — nothing on the opening screen moves, and nothing on it
+// is a picture.
+//
+// This fills that space with the one thing the page is actually claiming. Four
+// plates: the agent on top in a dashed stroke because it is not mine, then the
+// three layers underneath that are. A signal falls from the agent down through
+// orchestration, evaluation and infrastructure, and each plate lights as it
+// passes. That is the sentence "I build the layer AI agents run on" as a moving
+// diagram rather than as a sentence.
+//
+// It is deliberately not the same drawing as the stack in band I. This one shows
+// how a call moves; that one names each layer and links to the work. Plate first,
+// legend after, which is the order a book uses.
+---
+<div class="flow" aria-hidden="true">
+  <svg viewBox="0 0 300 280" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- The spine runs down the right of the plates, not their centre. Centred,
+         it put the falling call straight through the middle of the word
+         INFRASTRUCTURE. -->
+    <path class="spine" d="M240 44v196" />
+
+    <!-- not mine -->
+    <g class="plate ghost">
+      <rect x="30" y="14" width="240" height="46" rx="5" />
+      <text x="46" y="42">AGENTS</text>
+    </g>
+
+    <g class="plate" style="--d:0s">
+      <rect x="30" y="76" width="240" height="46" rx="5" />
+      <text x="46" y="104">ORCHESTRATION</text>
+    </g>
+
+    <g class="plate" style="--d:.42s">
+      <rect x="30" y="138" width="240" height="46" rx="5" />
+      <text x="46" y="166">EVALUATION</text>
+    </g>
+
+    <g class="plate" style="--d:.84s">
+      <rect x="30" y="200" width="240" height="46" rx="5" />
+      <text x="46" y="228">INFRASTRUCTURE</text>
+    </g>
+
+    <!-- the call -->
+    <circle class="pulse" cx="240" cy="0" r="5" />
+  </svg>
+</div>
+
+<style>
+  .flow { width: 100%; max-width: 400px; justify-self: end; }
+  svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+  .spine { stroke: var(--rule-dark-2); stroke-width: 1; stroke-dasharray: 2 4; }
+
+  /* The first version drew these in --rule-dark-2 on --void, which is four
+     points of luminance apart. Correct as a hairline and invisible as a picture:
+     from a metre away the hero still looked like an empty right-hand half. */
+  .plate rect { stroke: var(--bone-dim); stroke-width: 1.1; fill: var(--void-2); opacity: .78; }
+  .plate text {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em;
+    fill: var(--bone-2); stroke: none;
+  }
+  .ghost rect { stroke-dasharray: 4 3.5; fill: none; }
+  .ghost text { fill: var(--bone-dim); opacity: .7; }
+
+  /* Each plate takes the accent as the call reaches it, then lets it go. The
+     stagger is the fall time between one plate and the next. */
+  .plate:not(.ghost) rect { animation: lit 5.2s var(--d) ease-in-out infinite; }
+  .plate:not(.ghost) text { animation: litl 5.2s var(--d) ease-in-out infinite; }
+
+  @keyframes lit {
+    0%, 8% { stroke: var(--bone-dim); fill: var(--void-2); opacity: .78; }
+    13% { stroke: var(--fail-lit); fill: var(--void-3); opacity: 1; }
+    34%, 100% { stroke: var(--bone-dim); fill: var(--void-2); opacity: .78; }
+  }
+  @keyframes litl {
+    0%, 8% { fill: var(--bone-2); }
+    13% { fill: var(--bone); }
+    34%, 100% { fill: var(--bone-2); }
+  }
+
+  .pulse { fill: var(--fail-lit); animation: fall 5.2s ease-in-out infinite; }
+  @keyframes fall {
+    0%      { transform: translateY(44px); opacity: 0; }
+    6%      { opacity: 1; }
+    /* one plate per beat, pausing on each as it is handled */
+    13%     { transform: translateY(99px); }
+    26%     { transform: translateY(99px); }
+    34%     { transform: translateY(161px); }
+    47%     { transform: translateY(161px); }
+    55%     { transform: translateY(223px); }
+    72%     { transform: translateY(223px); opacity: 1; }
+    82%,100%{ transform: translateY(240px); opacity: 0; }
+  }
+
+  /* Nothing moves, and the drawing still says the same thing. */
+  @media (prefers-reduced-motion: reduce) {
+    .pulse { animation: none; transform: translateY(99px); }
+    .plate rect, .plate text { animation: none; }
+  }
+
+  @media (max-width: 900px) {
+    .flow { max-width: 320px; justify-self: start; margin-top: var(--s-4); }
+  }
+</style>

@@ -1,0 +1,171 @@
+---
+// The figure beside a work entry.
+//
+// These used to be the same bar figures the blog posts use, and that was a
+// category error. Those bars normalise to the largest value in the set, which is
+// right when the finding *is* the ratio — 14 seconds against 0.227 is the whole
+// point of that post. Put the same drawing next to "739 regression cases" and
+// the 739 renders as a quarter-full bar beside the 2,700, and a quarter-full bar
+// does not say "739 cases". It says "not much". Three of the six entries were
+// advertising a shortfall that does not exist.
+//
+// So a work entry gets a schematic of the thing instead of a measurement of it.
+// A drawing of a system has no empty half to misread, and it says something the
+// hook cannot: what shape the thing is.
+const { f } = Astro.props;
+---
+{f && (
+  <span class="fig" aria-hidden="true">
+    {f.kind === 'still' && <img class="still" src={f.src} alt="" loading="lazy" decoding="async" />}
+
+    {f.kind === 'sketch' && (
+      <span class="draw">
+        <svg viewBox="0 0 190 96" fill="none" stroke="currentColor" stroke-width="1.2"
+          stroke-linecap="round" stroke-linejoin="round">
+
+          {/* A sticky state machine: a conversation enters, is held by one state
+              across turns, and leaves. The ticks underneath are the traffic. */}
+          {f.d === 'statemachine' && (
+            <g>
+              <circle cx="7" cy="40" r="3" class="dot" />
+              <path d="M13 40h11" /><path d="M21 37l3 3-3 3" />
+              <rect x="26" y="28" width="32" height="24" rx="3" class="box" />
+              <path d="M58 40h11" /><path d="M66 37l3 3-3 3" />
+              <rect x="70" y="28" width="32" height="24" rx="3" class="box on" />
+              <path d="M102 40h11" /><path d="M110 37l3 3-3 3" />
+              <rect x="114" y="28" width="32" height="24" rx="3" class="box" />
+              <path d="M146 40h11" />
+              <circle cx="163" cy="40" r="3" class="dot" />
+              {/* held */}
+              <path d="M78 28c0-11 16-11 16 0" class="ac" />
+              <path d="M91 24l3 4 3-4" class="ac" />
+              <g class="ticks">
+                {Array.from({ length: 26 }, (_, i) => (
+                  <path d={`M${9 + i * 6.2} 70v${i % 4 === 0 ? 12 : 7}`} />
+                ))}
+              </g>
+            </g>
+          )}
+
+          {/* Cases in a block, a gate, and the build behind it. The block is the
+              739 — drawn as a quantity you can see rather than a ratio. */}
+          {f.d === 'gate' && (
+            <g>
+              <g class="cells">
+                {Array.from({ length: 65 }, (_, i) => (
+                  <rect x={6 + (i % 13) * 6} y={19 + Math.floor(i / 13) * 6}
+                    width="4.2" height="4.2" rx=".8" class={i % 9 === 4 ? 'cell on' : 'cell'} />
+                ))}
+              </g>
+              <path d="M86 40h11" /><path d="M94 37l3 3-3 3" />
+              <path d="M103 12v56" class="gate" />
+              <rect x="112" y="25" width="62" height="30" rx="3" class="box" />
+              <path d="M131 40l6 6 13-15" class="ac tick" />
+            </g>
+          )}
+
+          {/* A prompt, a generation stack, a hosted site. */}
+          {f.d === 'builder' && (
+            <g>
+              <path d="M8 30h26M8 40h20M8 50h24" class="soft" />
+              <path d="M40 40h11" /><path d="M48 37l3 3-3 3" />
+              <rect x="55" y="22" width="36" height="10" rx="2" class="box" />
+              <rect x="55" y="35" width="36" height="10" rx="2" class="box" />
+              <rect x="55" y="48" width="36" height="10" rx="2" class="box on" />
+              <path d="M95 40h11" /><path d="M103 37l3 3-3 3" />
+              <rect x="110" y="16" width="72" height="52" rx="3" class="box" />
+              <path d="M110 28h72" />
+              <circle cx="117" cy="22" r="1.8" class="dot" />
+              <circle cx="124" cy="22" r="1.8" class="dot" />
+              <circle cx="131" cy="22" r="1.8" class="dot" />
+              <path d="M119 40h40M119 49h54M119 58h30" class="soft" />
+            </g>
+          )}
+
+          {/* A repository, tokens that each cite the file and line they came
+              from, and the strip cut out of them. The citation ticks are the
+              whole argument: nothing reaches the film without a pointer back. */}
+          {f.d === 'film' && (
+            <g>
+              <rect x="4" y="24" width="30" height="34" rx="2" class="box" />
+              <path d="M10 33h18M10 41h13M10 49h16" class="soft" />
+              <path d="M37 41h10" /><path d="M44 38l3 3-3 3" />
+              {Array.from({ length: 3 }, (_, i) => (
+                <g>
+                  <rect x="52" y={25 + i * 12} width="24" height="9" rx="1.5" class="box" />
+                  <circle cx="55" cy={29.5 + i * 12} r="1.4" class="cite" />
+                </g>
+              ))}
+              <path d="M79 41h10" /><path d="M86 38l3 3-3 3" />
+              <rect x="94" y="20" width="90" height="42" rx="2" class="box" />
+              {Array.from({ length: 7 }, (_, i) => (
+                <g>
+                  <rect x={98 + i * 12} y="22.5" width="4" height="3.5" rx=".6" class="perf" />
+                  <rect x={98 + i * 12} y="56" width="4" height="3.5" rx=".6" class="perf" />
+                </g>
+              ))}
+              <rect x="98" y="29.5" width="26" height="23" rx="1" class="box" />
+              <rect x="126" y="29.5" width="26" height="23" rx="1" class="box on" />
+              <rect x="154" y="29.5" width="26" height="23" rx="1" class="box" />
+            </g>
+          )}
+
+          {/* Rules arbitrated into one decision, and the append-only chain that
+              records it. The last link is open because the chain keeps going. */}
+          {f.d === 'chain' && (
+            <g>
+              <rect x="6" y="18" width="26" height="13" rx="2" class="box" />
+              <rect x="6" y="35" width="26" height="13" rx="2" class="box" />
+              <rect x="6" y="52" width="26" height="13" rx="2" class="box" />
+              <path d="M32 24h8l6 17M32 41h14M32 58h8l6-17" class="soft" />
+              <path d="M46 41l14-11 14 11-14 11z" class="box on" />
+              <path d="M74 41h9" /><path d="M80 38l3 3-3 3" />
+              {Array.from({ length: 4 }, (_, i) => (
+                <g>
+                  <rect x={87 + i * 25} y="32" width="18" height="18" rx="2"
+                    class={i === 3 ? 'box on' : 'box'} />
+                  {i < 3 && <path d={`M${105 + i * 25} 41h7`} />}
+                </g>
+              ))}
+            </g>
+          )}
+        </svg>
+      </span>
+    )}
+
+    <span class="cap">{f.label}</span>
+  </span>
+)}
+
+<style>
+  .fig { display: grid; gap: 9px; align-content: center; }
+  .still { width: 100%; display: block; background: var(--paper-2); }
+
+  /* Hairlines in the body colour, so a schematic sits at the same weight as the
+     sentence beside it rather than shouting over it. */
+  .draw { display: block; color: var(--ink-2); }
+  .draw svg { width: 100%; height: auto; display: block; }
+
+  .box { fill: var(--paper-2); }
+  /* One element in each drawing takes the accent — the state that holds, the
+     build that passed, the page that shipped, the link just written. */
+  .box.on { fill: color-mix(in oklab, var(--fail-ink) 12%, var(--paper-2)); stroke: var(--fail-ink); }
+  .dot { fill: currentColor; stroke: none; }
+  .ac { stroke: var(--fail-ink); }
+  .tick { stroke-width: 1.6; }
+  .gate { stroke: var(--ink); stroke-width: 1.6; }
+  .soft { stroke: var(--mid); }
+
+  /* The block is a quantity, so it has to read as mass rather than as sixty-five
+     separate outlines. Filled and unstroked, with one in nine taking the accent
+     so the eye can still see that they are individually countable. */
+  /* The pointer back to a file and a line. */
+  .cite { fill: var(--fail-ink); stroke: none; }
+  .perf { fill: var(--ink-2); stroke: none; opacity: .38; }
+
+  .cell { fill: var(--ink-2); stroke: none; opacity: .5; }
+  .cell.on { fill: var(--fail-ink); stroke: none; opacity: 1; }
+  .ticks path { stroke: var(--mid); stroke-width: 1.4; opacity: .55; }
+
+  .cap { color: var(--mid); font-family: var(--mono); font-size: var(--t-label); letter-spacing: .01em; line-height: 1.45; }
+</style>

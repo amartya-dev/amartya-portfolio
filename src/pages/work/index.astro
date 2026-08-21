@@ -1,0 +1,42 @@
+---
+// The full index, on its own page.
+//
+// It used to be band II of the home page: twenty-four entries, each carrying a
+// hook, a client, a year and a status, which came to three thousand pixels and
+// more than half the words on the page. A contents page that reproduces the
+// whole book is not a contents page.
+//
+// So the home page keeps a short selection and this holds the record. The
+// difference matters for what each is allowed to say. Here there is room for
+// status and provenance — the reader who has clicked through to a catalogue is
+// asking exactly those questions. On the home page they were answering a
+// question nobody had asked yet.
+import Base from '../../layouts/Base.astro';
+import Band from '../../components/Band.astro';
+import Spans from '../../components/Spans.astro';
+import Index from '../../components/Index.astro';
+import { WORK } from '../../data/work.js';
+
+const demos = WORK.filter((w) => w.demo).length;
+const WORDS = ['no', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'];
+---
+<Base
+  title="Work · Amartya Gaur"
+  description="Everything Amartya Gaur has built, with what state each thing is actually in — agent systems, infrastructure, open source, and work merged into other people's repositories."
+>
+  <Band no="I" label="The record" id="record" title="Six years, five spans">
+    <Fragment slot="lede">Two companies, a consultancy and two products &mdash; and for most of those six
+      years, more than one of them was running at once.</Fragment>
+    <Fragment slot="note">Solid bars were the main thing at the time. Hollow ones ran alongside it.</Fragment>
+    <Spans />
+  </Band>
+
+  <Band no="II" label="Index" id="index" title={`${WORK.length} things, and what became of each`}>
+    <Fragment slot="lede">From a thousand support conversations an hour down to twenty-nine lines in
+      somebody else&rsquo;s repository. Each entry says what state it is in, so you can tell the things
+      that are running from the things that are still an idea.</Fragment>
+    <Fragment slot="note">{WORDS[demos]} entries have something you can operate on their page.
+      Those are marked <em>demo</em>.</Fragment>
+    <Index />
+  </Band>
+</Base>
