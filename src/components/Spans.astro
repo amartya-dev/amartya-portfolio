@@ -60,9 +60,14 @@ const YEARS = [
     left: calc(var(--s) * 100%); width: calc((var(--e) - var(--s)) * 100%);
     background: var(--ink); border-radius: 1px;
   }
-  /* Hollow means it ran alongside something else. The distinction is drawn, not
-     annotated, which is why the caption is one sentence long. */
-  .side .bar { background: none; border: 1px solid var(--ink); }
+  /* "Ran alongside something else" used to be drawn as a hollow bar — an outline
+     with nothing in it. Three of the five spans are side roles, so the chart came
+     out two-fifths filled and three-fifths empty, and an empty bar reads as an
+     empty period rather than as a second job. A consultancy that ran for six
+     years is not an absence.
+     It is a tint now. Same bar, same height, less weight: still obviously
+     secondary to the solid ones, still obviously there. */
+  .side .bar { background: var(--mid); }
   /* The current one takes the accent, because "what is he doing now" is the
      first thing anyone reading this actually wants. */
   .now .bar { background: var(--fail); }
