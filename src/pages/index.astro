@@ -18,6 +18,17 @@
 // entry and again on the post about how it was cut, so the page ran one piece of
 // video three times before a reader reached the contact band. It is on the hunr
 // page and in that post, which is twice, which is enough.
+//
+// The closing band is plain on purpose. It has been through "What's breaking?",
+// which presumed, and then "If any of this is useful — and you do not need a
+// reason", which replaced one problem with another: a heading that doubts itself
+// and a sentence granting permission nobody asked for. Both were performing
+// modesty instead of inviting anybody. An invitation reads best when it is only
+// an invitation.
+//
+// This note is in the frontmatter rather than in an HTML comment beside the
+// markup, because Astro ships HTML comments to the browser and there is no
+// reason for a visitor to read two drafts of the copy they were not shown.
 import Base from '../layouts/Base.astro';
 import Band from '../components/Band.astro';
 import Masthead from '../components/Masthead.astro';
@@ -78,12 +89,6 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric
       <div class="spread">
       <div class="rail" aria-hidden="true"><span class="railhead"><span class="no">IV</span><span class="lbl">Address</span></span></div>
       <div class="col">
-        <!-- Plain. This band has now been through "What's breaking?", which was
-             presumptuous, and "If any of this is useful ... you do not need a
-             reason", which replaced one problem with another: a heading that
-             doubts itself and a sentence explaining that permission is granted.
-             Both were still performing something. An invitation reads best when
-             it is just an invitation. -->
         <h2 class="d d-sec">Say hello</h2>
         <p class="lede">Agents, evals, or the infrastructure underneath &mdash; I am always happy to
           talk about any of it.</p>
